@@ -14,6 +14,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import ject.petfit.domain.note.entity.Note;
+import ject.petfit.domain.pet.entity.Pet;
+import ject.petfit.domain.schedule.entity.Schedule;
 import ject.petfit.domain.user.entity.AuthUser;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,16 +48,13 @@ public class Member {
     private List<Pet> pets;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<> slots;
-
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Schedule> schedules;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Note> note;
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Chat> chattings;
+//    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Chat> chattings;
 
     @Builder
     public Member(String nickname, AuthUser authUser, Role role) {
@@ -62,5 +62,21 @@ public class Member {
         this.authUser = authUser;
         this.role = role;
     }
+
+    public void addPet(Pet pet) {
+        this.pets.add(pet);
+        pet.setMember(this); // 양방향 관계 설정
+    }
+
+    public void addSchedule(Schedule schedule) {
+        this.schedules.add(schedule);
+        schedule.setMember(this);
+    }
+
+    public void addNote(Note note) {
+        this.note.add(note);
+        note.setMember(this);
+    }
+
 
 }
