@@ -7,6 +7,7 @@ import java.util.Optional;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.member.entity.Role;
 import ject.petfit.domain.user.common.util.KakaoUtil;
+import ject.petfit.domain.user.repository.AuthUserRepository;
 import ject.petfit.global.common.util.JwtUtil;
 import ject.petfit.domain.user.entity.AuthUser;
 import lombok.RequiredArgsConstructor;
