@@ -88,6 +88,9 @@ public class JwtUtil {
     }
 
     private Jws<Claims> getClaims(String token) {
-        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
+        return Jwts.parser()
+                .verifyWith(secretKey)   // 서명 검증용 키 지정
+                .build()
+                .parseSignedClaims(token);
     }
 }
