@@ -4,10 +4,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.member.entity.Role;
 import ject.petfit.domain.member.repository.MemberRepository;
 import ject.petfit.domain.user.common.util.KakaoUtil;
+import ject.petfit.domain.user.dto.KakaoDTO;
 import ject.petfit.domain.user.repository.AuthUserRepository;
 import ject.petfit.global.common.util.JwtUtil;
 import ject.petfit.domain.user.entity.AuthUser;
@@ -30,11 +32,8 @@ public class AuthService {
         KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode);
         KakaoDTO.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
 
-        // custom error handling for missing kakaoProfile
-        String email = Optional.ofNullable(kakaoProfile)
-                .map(KakaoDTO.KakaoProfile::getKakao_account)
-                .map(KakaoDTO.KakaoAccount::getEmail)
-                .orElseThrow(() -> new IllegalArgumentException("이메일 정보가 없습니다."));
+        // custom error handling for missing kakaoProfile 처리 필
+        String email = kakaoProfile.getKakao_account().getEmail();
 
         AuthUser user = authUserRepository.findByEmail(email)
                 .orElseGet(() -> createNewUser(kakaoProfile));
@@ -46,24 +45,25 @@ public class AuthService {
     }
 
     private AuthUser createNewUser(KakaoDTO.KakaoProfile kakaoProfile) {
-        KakaoDTO.KakaoAccount account = kakaoProfile.getKakao_account();
-
         // error handling for missing profile information
-        if (account == null || account.getProfile() == null) {
+        if (kakaoProfile == null || kakaoProfile.getKakao_account() == null) {
             throw new IllegalArgumentException("카카오 프로필 정보가 부족합니다.");
         }
 
         Member newMember = Member.builder()
-                .nickname(account.getProfile().getNickname())
+                .nickname(kakaoProfile.getProperties().getNickname())
                 .role(Role.USER)
                 .build();
         memberRepository.save(newMember);
 
+        String randomPassword = UUID.randomUUID().toString();
+        String encodedPassword = passwordEncoder.encode(randomPassword);
+
         AuthUser newUser = AuthConverter.toUser(
-                account.getKakao_id(),
-                account.getEmail(),
-                account.getProfile().getNickname(),
-                passwordEncoder,
+                kakaoProfile.getId(),
+                kakaoProfile.getKakao_account().getEmail(),
+                kakaoProfile.getProperties().getNickname(),
+                encodedPassword,
                 LocalDateTime.now()
         );
         newUser.addMember(newMember);
