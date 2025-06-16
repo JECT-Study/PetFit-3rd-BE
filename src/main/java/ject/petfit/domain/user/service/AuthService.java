@@ -2,13 +2,12 @@ package ject.petfit.domain.user.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.member.entity.Role;
 import ject.petfit.domain.member.repository.MemberRepository;
 import ject.petfit.domain.user.common.util.KakaoUtil;
+import ject.petfit.domain.user.converter.AuthUserConverter;
 import ject.petfit.domain.user.dto.KakaoDTO;
 import ject.petfit.domain.user.repository.AuthUserRepository;
 import ject.petfit.global.common.util.JwtUtil;
@@ -59,12 +58,11 @@ public class AuthService {
         String randomPassword = UUID.randomUUID().toString();
         String encodedPassword = passwordEncoder.encode(randomPassword);
 
-        AuthUser newUser = AuthConverter.toUser(
+        AuthUser newUser = AuthUserConverter.toUser(
                 kakaoProfile.getId(),
                 kakaoProfile.getKakaoAccount().getEmail(),
                 kakaoProfile.getProperties().getNickname(),
-                encodedPassword,
-                LocalDateTime.now()
+                encodedPassword
         );
         newUser.addMember(newMember);
 
