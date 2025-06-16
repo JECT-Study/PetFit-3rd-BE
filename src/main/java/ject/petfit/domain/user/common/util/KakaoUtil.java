@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import ject.petfit.domain.user.dto.KakaoDTO;
+import ject.petfit.domain.user.exception.AuthUserErrorCode;
+import ject.petfit.domain.user.exception.AuthUserException;
 import ject.petfit.global.exception.CustomException;
 import ject.petfit.global.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +43,7 @@ public class KakaoUtil {
                 .body(BodyInserters.fromFormData(params(accessCode)))
                 .retrieve()
                 .onStatus(status -> !status.is2xxSuccessful(),
-                        response -> Mono.error(new CustomException(ErrorCode.OAUTH_SERVER_ERROR)))
+                        response -> Mono.error(new AuthUserException(AuthUserErrorCode.OAUTH_SERVER_ERROR)))
                 .bodyToMono(KakaoDTO.OAuthToken.class)
                 .doOnNext(token -> log.info("oAuthToken : {}", token.getAccessToken()))
                 .block();
@@ -53,7 +55,7 @@ public class KakaoUtil {
                 .header("Authorization", "Bearer " + oAuthToken.getAccessToken())
                 .retrieve()
                 .onStatus(status -> !status.is2xxSuccessful(),
-                        response -> Mono.error(new CustomException(ErrorCode.PROFILE_REQUEST_ERROR)))
+                        response -> Mono.error(new AuthUserException(AuthUserErrorCode.PROFILE_REQUEST_ERROR)))
                 .bodyToMono(KakaoDTO.KakaoProfile.class)
                 .block();
     }
