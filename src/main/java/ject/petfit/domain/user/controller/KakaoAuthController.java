@@ -2,9 +2,11 @@ package ject.petfit.domain.user.controller;
 
 
 import jakarta.servlet.http.HttpServletResponse;
-import ject.petfit.domain.member.entity.Member;
+import ject.petfit.domain.user.converter.AuthUserConverter;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.service.AuthService;
+import ject.petfit.domain.user.dto.request.AuthUserRequestDTO;
+import ject.petfit.domain.user.dto.response.AuthUserResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,15 +21,13 @@ public class KakaoAuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/login")
-    public ResponseEntity<?> join(@RequestBody UserRequestDTO.LoginRequestDTO loginRequestDTO) {
-        return null;
-    }
-
     @GetMapping("/auth/kakao/login")
-    public BaseResponse<UserResponseDTO.JoinResultDTO> kakaoLogin(
+    public ResponseEntity<AuthUserResponseDTO.JoinResultDTO> kakaoLogin(
             @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) {
         AuthUser user = authService.oAuthLogin(accessCode, httpServletResponse);
-        return BaseResponse.onSuccess(UserConverter.toJoinResultDTO(user));
+        AuthUserResponseDTO.JoinResultDTO dto = AuthUserConverter.toJoinResultDTO(user);
+        // 이부분 단순 ok 처리 no
+        // join에 맞게 dto 추가 수정 필요
+        return ResponseEntity.ok(dto);
     }
 }

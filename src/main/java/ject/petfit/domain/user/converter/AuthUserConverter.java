@@ -1,6 +1,7 @@
 package ject.petfit.domain.user.converter;
 
 import ject.petfit.domain.user.entity.AuthUser;
+import ject.petfit.domain.user.dto.response.AuthUserResponseDTO;
 
 public class AuthUserConverter {
     public static AuthUser toUser(Long kakaoUUID, String email, String nickName, String password) {
@@ -11,4 +12,13 @@ public class AuthUserConverter {
                 .encodedPassword(password)
                 .build();
     }
+
+    public static AuthUserResponseDTO.JoinResultDTO toJoinResultDTO(AuthUser authUser) {
+        return AuthUserResponseDTO.JoinResultDTO.builder()
+                .userId(authUser.getId())
+                .createAt(authUser.getCreatedAt())
+                .build();
+    }
+
+
 }
