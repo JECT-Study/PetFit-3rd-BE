@@ -1,5 +1,6 @@
 package ject.petfit.domain.user.dto;
 
+import ject.petfit.global.jwt.RefreshToken;
 import lombok.Getter;
 
 public class KakaoDTO {
@@ -8,7 +9,7 @@ public class KakaoDTO {
     public static class OAuthToken {
         private String accessToken;
         private String token_type;
-        private RefreshTokens refreshToken;
+        private RefreshToken refreshToken;
         private int expiresIn;
         private String scope;
         private int refresh_token_expires_in;

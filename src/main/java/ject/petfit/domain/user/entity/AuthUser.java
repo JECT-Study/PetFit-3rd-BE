@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import ject.petfit.domain.member.entity.Member;
+import ject.petfit.global.jwt.RefreshToken;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -53,8 +54,8 @@ public class AuthUser implements UserDetails {
     @OneToOne(mappedBy = "authUser", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Member member;
 
-    //@OneToOne(mappedBy = "authUser", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    //private RefreshTokens refreshToken;
+    @OneToOne(mappedBy = "authUser", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private RefreshToken refreshToken;
 
     @Builder
     public AuthUser(Long kakaoUUID, String email, String nickname, String encodedPassword) {
@@ -68,6 +69,13 @@ public class AuthUser implements UserDetails {
         this.member = member;
         if (member.getAuthUser() != this) {
             member.addAuthUser(this);
+        }
+    }
+
+    public void addRefreshToken(RefreshToken refreshToken) {
+        this.refreshToken = refreshToken;
+        if (refreshToken.getAuthUser() != this) {
+            refreshToken.addAuthUser(this);
         }
     }
 
