@@ -89,7 +89,7 @@ public class JwtUtil {
 
     private Jws<Claims> getClaims(String token) {
         return Jwts.parser()
-                .verifyWith(secretKey)   // 서명 검증용 키 지정
+                .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token);
     }
