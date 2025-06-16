@@ -9,6 +9,7 @@ import ject.petfit.domain.member.repository.MemberRepository;
 import ject.petfit.domain.user.common.util.KakaoUtil;
 import ject.petfit.domain.user.converter.AuthUserConverter;
 import ject.petfit.domain.user.dto.KakaoDTO;
+import ject.petfit.domain.user.dto.KakaoDTO.KakaoProfile;
 import ject.petfit.domain.user.repository.AuthUserRepository;
 import ject.petfit.global.common.util.JwtUtil;
 import ject.petfit.domain.user.entity.AuthUser;
@@ -35,7 +36,7 @@ public class AuthService {
         String email = kakaoProfile.getKakaoAccount().getEmail();
 
         AuthUser user = authUserRepository.findByEmail(email)
-                .orElseGet(() -> createNewUser(kakaoProfile));
+                .orElseGet(() -> createNewUser(accessCode, kakaoProfile));
 
         String token = jwtUtil.createAccessToken(user.getEmail(), user.getMember().getRole().toString());
         httpServletResponse.setHeader("Authorization", token);
@@ -43,7 +44,7 @@ public class AuthService {
         return user;
     }
 
-    private AuthUser createNewUser(KakaoDTO.KakaoProfile kakaoProfile) {
+    private AuthUser createNewUser(String accessCode, KakaoDTO.KakaoProfile kakaoProfile) {
         // error handling for missing profile information
         if (kakaoProfile == null || kakaoProfile.getKakaoAccount() == null) {
             throw new IllegalArgumentException("카카오 프로필 정보가 부족합니다.");
@@ -59,7 +60,7 @@ public class AuthService {
         String encodedPassword = passwordEncoder.encode(randomPassword);
 
         AuthUser newUser = AuthUserConverter.toUser(
-                kakaoProfile.getId(),
+                getKakaoUUID(accessCode),
                 kakaoProfile.getKakaoAccount().getEmail(),
                 kakaoProfile.getProperties().getNickname(),
                 encodedPassword
@@ -67,5 +68,11 @@ public class AuthService {
         newUser.addMember(newMember);
 
         return authUserRepository.save(newUser);
+    }
+
+    public Long getKakaoUUID(String accessCode) {
+        KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode); // oAuthToken(access 토큰) 요청
+        KakaoDTO.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
+        return kakaoProfile.getId();
     }
 }
