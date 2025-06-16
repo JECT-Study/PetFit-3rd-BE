@@ -1,4 +1,4 @@
-package ject.petfit.global.exception.token;
+package ject.petfit.global.jwt.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

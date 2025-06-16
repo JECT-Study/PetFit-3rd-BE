@@ -14,14 +14,11 @@ import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import javax.crypto.SecretKey;
-import ject.petfit.global.exception.CustomException;
-import ject.petfit.global.exception.ErrorCode;
-import ject.petfit.global.exception.token.TokenErrorCode;
-import ject.petfit.global.exception.token.TokenException;
+import ject.petfit.global.jwt.exception.TokenErrorCode;
+import ject.petfit.global.jwt.exception.TokenException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import io.jsonwebtoken.Jwts;
 
 @Component
 @Slf4j
@@ -37,16 +34,12 @@ public class JwtUtil {
         this.accessTokenValidityMilliseconds = accessTokenValidityMilliseconds;
     }
 
-
-    // HTTP 요청의 'Authorization' 헤더에서 JWT 액세스 토큰을 검색
     public String resolveAccessToken(HttpServletRequest request) {
         String authorization = request.getHeader("Authorization");
 
         if (authorization == null || !authorization.startsWith("Bearer ")) {
-            log.warn("[*] No Token in req");
             throw new TokenException(TokenErrorCode.TOKEN_NOT_FOUND);
         }
-        log.info("[*] Token exists");
         return authorization.split(" ")[1];
     }
 
@@ -79,14 +72,12 @@ public class JwtUtil {
             Date now = new Date();
             return expiredDate.after(now);
         } catch (ExpiredJwtException e) {
-            log.info("[*] _AUTH_EXPIRE_TOKEN");
             throw new TokenException(TokenErrorCode.AUTH_EXPIRE_TOKEN);
         } catch (SignatureException
                  | SecurityException
                  | IllegalArgumentException
                  | MalformedJwtException
                  | UnsupportedJwtException e) {
-            log.info("[*] _AUTH_INVALID_TOKEN");
             throw new TokenException(TokenErrorCode.AUTH_INVALID_TOKEN);
         }
     }

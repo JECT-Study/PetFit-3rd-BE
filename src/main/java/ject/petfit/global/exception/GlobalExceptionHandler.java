@@ -2,8 +2,7 @@ package ject.petfit.global.exception;
 
 import ject.petfit.domain.user.exception.AuthUserException;
 import ject.petfit.global.common.ApiResponse;
-import ject.petfit.global.exception.token.TokenErrorCode;
-import ject.petfit.global.exception.token.TokenException;
+import ject.petfit.global.jwt.exception.TokenException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
