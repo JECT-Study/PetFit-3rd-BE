@@ -15,3 +15,8 @@ spring:
         properties:
           hibernate:
             dialect: org.hibernate.dialect.PostgreSQLDialect
+
+    kakao:
+      auth:
+        client: ${KAKAO_CLIENT_ID}
+        redirect: ${KAKAO_REDIRECT_URI}

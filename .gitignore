@@ -41,3 +41,6 @@ out/
 
 ### log file ###
 *.log
+
+### 환경 변수
+.env
