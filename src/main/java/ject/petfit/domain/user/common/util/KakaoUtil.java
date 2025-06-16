@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import ject.petfit.domain.user.dto.KakaoDTO;
+import ject.petfit.global.exception.CustomException;
+import ject.petfit.global.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -39,19 +41,19 @@ public class KakaoUtil {
                 .body(BodyInserters.fromFormData(params(accessCode)))
                 .retrieve()
                 .onStatus(status -> !status.is2xxSuccessful(),
-                        response -> Mono.error(new AuthHandler(ErrorStatus._OAUTH_SERVER_ERROR)))
+                        response -> Mono.error(new CustomException(ErrorCode.OAUTH_SERVER_ERROR)))
                 .bodyToMono(KakaoDTO.OAuthToken.class)
-                .doOnNext(token -> log.info("oAuthToken : {}", token.getAccess_token()))
+                .doOnNext(token -> log.info("oAuthToken : {}", token.getAccessToken()))
                 .block();
     }
 
     public KakaoDTO.KakaoProfile requestProfile(KakaoDTO.OAuthToken oAuthToken) {
         return webClient.get()
                 .uri("https://kapi.kakao.com/v2/user/me")
-                .header("Authorization", "Bearer " + oAuthToken.getAccess_token())
+                .header("Authorization", "Bearer " + oAuthToken.getAccessToken())
                 .retrieve()
                 .onStatus(status -> !status.is2xxSuccessful(),
-                        response -> Mono.error(new AuthHandler(ErrorStatus._PROFILE_REQUEST_ERROR)))
+                        response -> Mono.error(new CustomException(ErrorCode.PROFILE_REQUEST_ERROR)))
                 .bodyToMono(KakaoDTO.KakaoProfile.class)
                 .block();
     }

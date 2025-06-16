@@ -14,6 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import javax.crypto.SecretKey;
+import ject.petfit.global.exception.CustomException;
+import ject.petfit.global.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -40,7 +42,7 @@ public class JwtUtil {
 
         if (authorization == null || !authorization.startsWith("Bearer ")) {
             log.warn("[*] No Token in req");
-            throw new AuthHandler(ErrorStatus._TOKEN_NOT_FOUND);
+            throw new CustomException(ErrorCode.TOKEN_NOT_FOUND);
         }
         log.info("[*] Token exists");
         return authorization.split(" ")[1];
@@ -76,14 +78,14 @@ public class JwtUtil {
             return expiredDate.after(now);
         } catch (ExpiredJwtException e) {
             log.info("[*] _AUTH_EXPIRE_TOKEN");
-            throw new AuthHandler(ErrorStatus._AUTH_EXPIRE_TOKEN);
+            throw new CustomException(ErrorCode.AUTH_INVALID_TOKEN);
         } catch (SignatureException
                  | SecurityException
                  | IllegalArgumentException
                  | MalformedJwtException
                  | UnsupportedJwtException e) {
             log.info("[*] _AUTH_INVALID_TOKEN");
-            throw new AuthHandler(ErrorStatus._AUTH_INVALID_TOKEN);
+            throw new CustomException(ErrorCode.AUTH_INVALID_TOKEN);
         }
     }
 
