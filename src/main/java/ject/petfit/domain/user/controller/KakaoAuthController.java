@@ -3,6 +3,8 @@ package ject.petfit.domain.user.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import ject.petfit.domain.member.entity.Member;
+import ject.petfit.domain.user.entity.AuthUser;
+import ject.petfit.domain.user.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +27,7 @@ public class KakaoAuthController {
     @GetMapping("/auth/kakao/login")
     public BaseResponse<UserResponseDTO.JoinResultDTO> kakaoLogin(
             @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) {
-        Member member = authService.oAuthLogin(accessCode, httpServletResponse);
+        AuthUser user = authService.oAuthLogin(accessCode, httpServletResponse);
         return BaseResponse.onSuccess(UserConverter.toJoinResultDTO(user));
     }
 }

@@ -63,6 +63,11 @@ public class Member {
         this.role = role;
     }
 
+    public void addAuthUser(AuthUser authUser) {
+        this.authUser = authUser;
+        authUser.addMember(this); // 양방향 관계 설정
+    }
+
     public void addPet(Pet pet) {
         this.pets.add(pet);
         pet.setMember(this); // 양방향 관계 설정

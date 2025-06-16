@@ -64,6 +64,13 @@ public class AuthUser implements UserDetails {
         this.encodedPassword = encodedPassword;
     }
 
+    public void addMember(Member member) {
+        this.member = member;
+        if (member.getAuthUser() != this) {
+            member.addAuthUser(this);
+        }
+    }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
