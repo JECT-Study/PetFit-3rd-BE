@@ -24,12 +24,15 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class JwtUtil {
 
+    private final String issuer;
     private final SecretKey secretKey;
     private final long accessTokenValidityMilliseconds;
 
     public JwtUtil(
+            @Value("${spring.jwt.issuer}") final String issuer,
             @Value("${spring.jwt.secret}") final String secretKey,
             @Value("${spring.jwt.access-token-time}") final long accessTokenValidityMilliseconds) {
+        this.issuer = issuer;
         this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         this.accessTokenValidityMilliseconds = accessTokenValidityMilliseconds;
     }
@@ -53,6 +56,7 @@ public class JwtUtil {
 
         // 토큰 생성 - 전달 정보 미완성, 수정 요망
         return Jwts.builder()
+                .issuer(issuer)
                 .subject(email)
                 .claim("role", role)
                 .issuedAt(Date.from(now.toInstant()))
@@ -62,7 +66,7 @@ public class JwtUtil {
     }
 
     public String getEmail(String token) {
-        return getClaims(token).getBody().get("email", String.class);
+        return getClaims(token).getBody().getSubject();
     }
 
     public boolean isTokenValid(String token) {
