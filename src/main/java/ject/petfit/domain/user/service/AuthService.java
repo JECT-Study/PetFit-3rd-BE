@@ -37,7 +37,7 @@ public class AuthService {
         AuthUser user = authUserRepository.findByEmail(email)
                 .orElseGet(() -> createNewUser(kakaoProfile));
 
-        String token = jwtUtil.createAccessToken(user.getEmail(), user.getRole().toString());
+        String token = jwtUtil.createAccessToken(user.getEmail(), user.getMember().getRole().toString());
         httpServletResponse.setHeader("Authorization", token);
 
         return user;
