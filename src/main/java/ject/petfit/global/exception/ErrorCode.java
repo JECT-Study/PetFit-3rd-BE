@@ -12,7 +12,8 @@ public enum ErrorCode {
     AUTH_INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다"),
     TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "토큰이 존재하지 않습니다"),
     PROFILE_REQUEST_ERROR(HttpStatus.BAD_REQUEST, "프로필 요청에 오류가 발생했습니다"),
-    OAUTH_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "OAuth 서버와의 통신에 실패했습니다");
+    OAUTH_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "OAuth 서버와의 통신에 실패했습니다"),
+    AUTH_EXPIRE_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다");
 
     private final HttpStatus httpStatus;
     private final String message;

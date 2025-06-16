@@ -78,7 +78,7 @@ public class JwtUtil {
             return expiredDate.after(now);
         } catch (ExpiredJwtException e) {
             log.info("[*] _AUTH_EXPIRE_TOKEN");
-            throw new CustomException(ErrorCode.AUTH_INVALID_TOKEN);
+            throw new CustomException(ErrorCode.AUTH_EXPIRE_TOKEN);
         } catch (SignatureException
                  | SecurityException
                  | IllegalArgumentException
