@@ -27,3 +27,4 @@ spring:
         issuer: ${JWT_ISSUER}
         secret: ${JWT_SECRET}
         access-token-time: 3600000  # 1 hour
+        refresh-token-validity-seconds: 604800000  # 7 days
