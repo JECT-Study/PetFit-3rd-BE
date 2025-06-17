@@ -39,12 +39,10 @@ public class JwtUtil {
     public String resolveAccessToken(HttpServletRequest request) {
         String authorization = request.getHeader("Authorization");
 
-//        if (authorization == null || !authorization.startsWith("Bearer ")) {
-//            throw new TokenException(TokenErrorCode.TOKEN_NOT_FOUND);
-//        }
-//        log.warn(authorization);
-//        return authorization.split(" ")[1];
-        return createAccessToken("cms3604@naver.com", "ROLE_USER");
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            throw new TokenException(TokenErrorCode.TOKEN_NOT_FOUND);
+        }
+        return authorization.split(" ")[1];
     }
 
     public String createAccessToken(String email, String role) {

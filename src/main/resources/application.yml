@@ -8,7 +8,7 @@ spring:
         driver-class-name: org.postgresql.Driver
         url: jdbc:postgresql://localhost:5432/petfit
         username: petfit
-        password: ject-3rd-petfit
+        password: ${DB_PASSWORD}
 
     jpa:
         hibernate:

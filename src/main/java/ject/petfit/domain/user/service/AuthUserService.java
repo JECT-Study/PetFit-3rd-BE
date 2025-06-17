@@ -1,5 +1,6 @@
 package ject.petfit.domain.user.service;
 
+import com.nimbusds.oauth2.sdk.TokenResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import java.util.UUID;
@@ -9,26 +10,42 @@ import ject.petfit.domain.member.repository.MemberRepository;
 import ject.petfit.domain.user.common.util.KakaoUtil;
 import ject.petfit.domain.user.converter.AuthUserConverter;
 import ject.petfit.domain.user.dto.KakaoDTO;
+import ject.petfit.domain.user.dto.KakaoDTO.OAuthToken;
+import ject.petfit.domain.user.exception.InvalidGrantErrorCode;
+import ject.petfit.domain.user.exception.InvalidGrantException;
 import ject.petfit.domain.user.repository.AuthUserRepository;
 import ject.petfit.domain.user.entity.AuthUser;
+import ject.petfit.global.jwt.refreshtoken.RefreshToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Service
-@RequiredArgsConstructor
 public class AuthUserService {
 
     private final KakaoUtil kakaoUtil;
     private final AuthUserRepository authUserRepository;
     private final MemberRepository memberRepository;
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+    private final WebClient webClient;
 
-    @Autowired
-    public void setPasswordEncoder(@Lazy PasswordEncoder passwordEncoder) {
+    public AuthUserService(WebClient.Builder webClientBuilder,
+                           KakaoUtil kakaoUtil,
+                           AuthUserRepository authUserRepository,
+                           @Lazy PasswordEncoder passwordEncoder,
+                           MemberRepository memberRepository) {
+        this.kakaoUtil = kakaoUtil;
+        this.authUserRepository = authUserRepository;
+        this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
+        this.webClient = webClientBuilder.build();
     }
 
 
@@ -70,6 +87,16 @@ public class AuthUserService {
 
         return authUserRepository.save(newUser);
     }
+
+    public Mono<TokenResponse> exchangeCodeForToken(String code) {
+        return webClient.post()
+                .uri("https://kauth.kakao.com/oauth/token")
+                .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
+                .body(BodyInserters.fromFormData(kakaoUtil.params(code)))
+                .retrieve()
+                .bodyToMono(TokenResponse.class);
+    }
+
 
     public Long getKakaoUUID(String accessCode) {
         KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode); // oAuthToken(access 토큰) 요청
