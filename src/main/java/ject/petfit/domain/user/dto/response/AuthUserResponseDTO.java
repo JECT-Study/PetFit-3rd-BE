@@ -1,6 +1,7 @@
 package ject.petfit.domain.user.dto.response;
 
 import java.time.LocalDateTime;
+import ject.petfit.domain.member.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +15,10 @@ public class AuthUserResponseDTO {
     @Builder
     public static class JoinResultDTO {
         private Long userId;
-        private LocalDateTime createAt;
+        private String email;
+        private String nickname;
+        private String jwtAccessToken;
+        private Role role;
     }
 
     @Getter
@@ -23,8 +27,9 @@ public class AuthUserResponseDTO {
     @Builder
     public static class UserPreviewDTO {
         private Long userId;
-        private String name;
-        private LocalDateTime updateAt;
-        private LocalDateTime createAt;
+        private String email;
+        private String nickname;
+        private String jwtAccessToken;
+        private Role role;
     }
 }
