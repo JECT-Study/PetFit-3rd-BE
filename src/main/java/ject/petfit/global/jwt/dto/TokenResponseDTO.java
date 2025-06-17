@@ -1,4 +1,4 @@
-package ject.petfit.global.jwt.token;
+package ject.petfit.global.jwt.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefreshTokenRequestDTO {
+public class TokenResponseDTO {
+    private String accessToken;
     private String refreshToken;
 }

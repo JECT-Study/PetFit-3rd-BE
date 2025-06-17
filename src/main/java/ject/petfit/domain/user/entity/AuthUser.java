@@ -34,7 +34,7 @@ public class AuthUser implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "oauth_id", updatable = false)
+    @Column(name = "auth_id", updatable = false)
     private Long id;
 
     private Long kakaoUUID;

@@ -42,6 +42,9 @@ public class RefreshToken {
     private AuthUser authUser;
 
     public RefreshToken(AuthUser authUser, String hashedToken, Instant expirationTime) {
+        this.authUser = authUser;
+        this.hashedRefreshToken = hashedToken;
+        this.expirationTime = expirationTime;
     }
 
 

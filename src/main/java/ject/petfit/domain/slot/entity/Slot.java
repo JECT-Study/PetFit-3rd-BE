@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
         name = "slot",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        columnNames = {"id", "member_id", "pet_id", "category_id"}
+                        columnNames = {"member_id", "pet_id", "category_id"}
                 )
         }
 )

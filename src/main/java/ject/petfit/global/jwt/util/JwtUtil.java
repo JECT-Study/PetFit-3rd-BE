@@ -1,14 +1,10 @@
 package ject.petfit.global.jwt.util;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
@@ -20,8 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-@Component
+
 @Slf4j
+@Component
 public class JwtUtil {
 
     private final String issuer;
@@ -54,13 +51,12 @@ public class JwtUtil {
         ZonedDateTime now = ZonedDateTime.now();
         ZonedDateTime expiration = now.plusSeconds(validityMilliseconds / 1000);
 
-        // 토큰 생성 - 전달 정보 미완성, 수정 요망
         return Jwts.builder()
-                .issuer(issuer)
-                .subject(email)
+                .setSubject(email)
                 .claim("role", role)
-                .issuedAt(Date.from(now.toInstant()))
-                .expiration(Date.from(expiration.toInstant()))
+                .setIssuer(issuer)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + accessTokenValidityMilliseconds))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -71,10 +67,11 @@ public class JwtUtil {
 
     public boolean isTokenValid(String token) {
         try {
-            Jwts.parser()
-                    .verifyWith(secretKey)
+            Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
                     .build()
-                    .parseSignedClaims(token);
+                    .parseClaimsJws(token);
+
             return true;
         } catch (TokenException | IllegalArgumentException e) {
             return false;
@@ -82,9 +79,10 @@ public class JwtUtil {
     }
 
     private Jws<Claims> getClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(secretKey)
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
                 .build()
-                .parseSignedClaims(token);
+                .parseClaimsJws(token);
+
     }
 }
