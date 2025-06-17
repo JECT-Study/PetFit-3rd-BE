@@ -15,6 +15,7 @@ public class AuthUserResponseDTO {
     @Builder
     public static class JoinResultDTO {
         private Long userId;
+        private Long kakaoUUID;
         private String email;
         private String nickname;
         private String jwtAccessToken;
@@ -27,6 +28,7 @@ public class AuthUserResponseDTO {
     @Builder
     public static class UserPreviewDTO {
         private Long userId;
+        private Long kakaoUUID;
         private String email;
         private String nickname;
         private String jwtAccessToken;

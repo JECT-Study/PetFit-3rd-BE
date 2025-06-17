@@ -13,10 +13,14 @@ public class AuthUserConverter {
                 .build();
     }
 
-    public static AuthUserResponseDTO.JoinResultDTO toJoinResultDTO(AuthUser authUser) {
+    public static AuthUserResponseDTO.JoinResultDTO toJoinResultDTO(AuthUser authUser, String accessToken) {
         return AuthUserResponseDTO.JoinResultDTO.builder()
                 .userId(authUser.getId())
-                .createAt(authUser.getCreatedAt())
+                .kakaoUUID(authUser.getKakaoUUID())
+                .email(authUser.getEmail())
+                .nickname(authUser.getNickname())
+                .jwtAccessToken(accessToken)
+                .role(authUser.getMember().getRole())
                 .build();
     }
 

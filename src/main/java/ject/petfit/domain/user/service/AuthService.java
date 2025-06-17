@@ -9,9 +9,7 @@ import ject.petfit.domain.member.repository.MemberRepository;
 import ject.petfit.domain.user.common.util.KakaoUtil;
 import ject.petfit.domain.user.converter.AuthUserConverter;
 import ject.petfit.domain.user.dto.KakaoDTO;
-import ject.petfit.domain.user.dto.KakaoDTO.KakaoProfile;
 import ject.petfit.domain.user.repository.AuthUserRepository;
-import ject.petfit.global.common.util.JwtUtil;
 import ject.petfit.domain.user.entity.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,22 +22,17 @@ public class AuthService {
     private final KakaoUtil kakaoUtil;
     private final AuthUserRepository authUserRepository;
     private final MemberRepository memberRepository;
-    private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public AuthUser oAuthLogin(String accessCode, HttpServletResponse httpServletResponse) {
         KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode);
         KakaoDTO.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
-
         // custom error handling for missing kakaoProfile 처리 필
         String email = kakaoProfile.getKakaoAccount().getEmail();
 
         AuthUser user = authUserRepository.findByEmail(email)
                 .orElseGet(() -> createNewUser(accessCode, kakaoProfile));
-
-        String token = jwtUtil.createAccessToken(user.getEmail(), user.getMember().getRole().toString());
-        httpServletResponse.setHeader("Authorization", token);
 
         return user;
     }
