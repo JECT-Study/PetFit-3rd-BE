@@ -7,10 +7,10 @@ public class KakaoDTO {
 
     @Getter
     public static class OAuthToken {
-        private String accessToken;
+        private String access_token;
         private String token_type;
-        private RefreshToken refreshToken;
-        private int expiresIn;
+        private RefreshToken refresh_token;
+        private int expires_in;
         private String scope;
         private int refresh_token_expires_in;
     }
@@ -18,9 +18,9 @@ public class KakaoDTO {
     @Getter
     public static class KakaoProfile {
         private Long id;
-        private String connectedAt;
+        private String connected_at;
         private Properties properties;
-        private KakaoAccount kakaoAccount;
+        private KakaoAccount kakao_account;
 
         @Getter
         public class Properties {
@@ -30,11 +30,11 @@ public class KakaoDTO {
         @Getter
         public class KakaoAccount {
             private String email;
-            private Boolean isEmailVerified;
-            private Boolean hasEmail;
+            private Boolean is_email_verified;
+            private Boolean has_email;
             private Boolean profile_nickname_needs_agreement;
             private Boolean email_needs_agreement;
-            private Boolean isEmailValid;
+            private Boolean is_email_valid;
         }
     }
 }

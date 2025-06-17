@@ -37,7 +37,7 @@ public class AuthUserService {
         KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode);
         KakaoDTO.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
         // custom error handling for missing kakaoProfile 처리 필
-        String email = kakaoProfile.getKakaoAccount().getEmail();
+        String email = kakaoProfile.getKakao_account().getEmail();
 
         AuthUser user = authUserRepository.findByEmail(email)
                 .orElseGet(() -> createNewUser(accessCode, kakaoProfile));
@@ -47,7 +47,7 @@ public class AuthUserService {
 
     private AuthUser createNewUser(String accessCode, KakaoDTO.KakaoProfile kakaoProfile) {
         // error handling for missing profile information
-        if (kakaoProfile == null || kakaoProfile.getKakaoAccount() == null) {
+        if (kakaoProfile == null || kakaoProfile.getKakao_account() == null) {
             throw new IllegalArgumentException("카카오 프로필 정보가 부족합니다.");
         }
 
@@ -62,7 +62,7 @@ public class AuthUserService {
 
         AuthUser newUser = AuthUserConverter.toUser(
                 getKakaoUUID(accessCode),
-                kakaoProfile.getKakaoAccount().getEmail(),
+                kakaoProfile.getKakao_account().getEmail(),
                 kakaoProfile.getProperties().getNickname(),
                 encodedPassword
         );

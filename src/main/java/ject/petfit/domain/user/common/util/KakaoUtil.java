@@ -40,14 +40,14 @@ public class KakaoUtil {
                 .onStatus(status -> !status.is2xxSuccessful(),
                         response -> Mono.error(new AuthUserException(AuthUserErrorCode.OAUTH_SERVER_ERROR)))
                 .bodyToMono(KakaoDTO.OAuthToken.class)
-                .doOnNext(token -> log.info("oAuthToken : {}", token.getAccessToken()))
+                .doOnNext(token -> log.info("oAuthToken : {}", token.getAccess_token()))
                 .block();
     }
 
     public KakaoDTO.KakaoProfile requestProfile(KakaoDTO.OAuthToken oAuthToken) {
         return webClient.get()
                 .uri("https://kapi.kakao.com/v2/user/me")
-                .header("Authorization", "Bearer " + oAuthToken.getAccessToken())
+                .header("Authorization", "Bearer " + oAuthToken.getAccess_token())
                 .retrieve()
                 .onStatus(status -> !status.is2xxSuccessful(),
                         response -> Mono.error(new AuthUserException(AuthUserErrorCode.PROFILE_REQUEST_ERROR)))
