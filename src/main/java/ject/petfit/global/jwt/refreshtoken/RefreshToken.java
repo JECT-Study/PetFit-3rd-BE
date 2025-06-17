@@ -1,4 +1,4 @@
-package ject.petfit.global.jwt;
+package ject.petfit.global.jwt.refreshtoken;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,6 +13,7 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import ject.petfit.domain.user.entity.AuthUser;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -40,6 +41,9 @@ public class RefreshToken {
     @JoinColumn(name = "auth_user_id", nullable = false, unique = true)
     private AuthUser authUser;
 
+    public RefreshToken(AuthUser authUser, String hashedToken, Instant expirationTime) {
+    }
+
 
     public void addAuthUser(AuthUser authUser) {
         if (this.authUser != null) {
@@ -47,5 +51,10 @@ public class RefreshToken {
         }
         this.authUser = authUser;
         authUser.addRefreshToken(this);
+    }
+
+    public void updateToken(String hashedToken, Instant expirationTime) {
+        this.hashedRefreshToken = hashedToken;
+        this.expirationTime = expirationTime;
     }
 }

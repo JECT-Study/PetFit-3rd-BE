@@ -1,6 +1,6 @@
 package ject.petfit.domain.user.dto;
 
-import ject.petfit.global.jwt.RefreshToken;
+import ject.petfit.global.jwt.refreshtoken.RefreshToken;
 import lombok.Getter;
 
 public class KakaoDTO {

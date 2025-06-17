@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import ject.petfit.domain.member.entity.Member;
-import ject.petfit.global.jwt.RefreshToken;
+import ject.petfit.global.jwt.refreshtoken.RefreshToken;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
