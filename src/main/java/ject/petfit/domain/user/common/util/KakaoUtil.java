@@ -34,7 +34,7 @@ public class KakaoUtil {
     public KakaoDTO.OAuthToken requestToken(String accessCode) {
         return webClient.post()
                 .uri("https://kauth.kakao.com/oauth/token")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
                 .body(BodyInserters.fromFormData(params(accessCode)))
                 .retrieve()
                 .onStatus(status -> !status.is2xxSuccessful(),
