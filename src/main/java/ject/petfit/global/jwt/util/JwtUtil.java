@@ -1,4 +1,4 @@
-package ject.petfit.global.common.util;
+package ject.petfit.global.jwt.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -71,18 +71,13 @@ public class JwtUtil {
 
     public boolean isTokenValid(String token) {
         try {
-            Jws<Claims> claims = getClaims(token);
-            Date expiredDate = claims.getBody().getExpiration();
-            Date now = new Date();
-            return expiredDate.after(now);
-        } catch (ExpiredJwtException e) {
-            throw new TokenException(TokenErrorCode.AUTH_EXPIRE_TOKEN);
-        } catch (SignatureException
-                 | SecurityException
-                 | IllegalArgumentException
-                 | MalformedJwtException
-                 | UnsupportedJwtException e) {
-            throw new TokenException(TokenErrorCode.AUTH_INVALID_TOKEN);
+            Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token);
+            return true;
+        } catch (TokenException | IllegalArgumentException e) {
+            return false;
         }
     }
 

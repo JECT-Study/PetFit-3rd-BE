@@ -68,4 +68,9 @@ public class AuthUserService {
         KakaoDTO.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
         return kakaoProfile.getId();
     }
+
+    public AuthUser loadAuthUserByEmail(String email) {
+        return authUserRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("해당 이메일을 가진 사용자가 없습니다."));
+    }
 }
