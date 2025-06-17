@@ -7,7 +7,9 @@ import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.global.jwt.exception.TokenErrorCode;
 import ject.petfit.global.jwt.exception.TokenException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +18,14 @@ import org.springframework.stereotype.Service;
 public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
-    private final PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
-    @Value("${app.jwt.refresh-token-validity-seconds}")
+    @Autowired
+    public void setPasswordEncoder(@Lazy PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Value("${spring.jwt.refresh-token-validity-seconds}")
     private long refreshTokenValiditySeconds;
 
     @Transactional

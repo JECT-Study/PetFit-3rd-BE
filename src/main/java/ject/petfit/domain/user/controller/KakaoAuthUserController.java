@@ -1,6 +1,7 @@
 package ject.petfit.domain.user.controller;
 
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
 import ject.petfit.domain.user.converter.AuthUserConverter;
@@ -15,6 +16,7 @@ import ject.petfit.global.jwt.dto.TokenResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +31,7 @@ public class KakaoAuthUserController {
     private final RefreshTokenService refreshTokenService;
     private final JwtUtil jwtUtil;
 
-    @Value("${app.jwt.refresh-token-validity-seconds}")
+    @Value("${spring.jwt.refresh-token-validity-seconds}")
     private long refreshTokenValiditySeconds;
 
 
@@ -45,11 +47,17 @@ public class KakaoAuthUserController {
         RefreshToken refreshToken = refreshTokenService.createOrUpdateRefreshToken(user, UUID.randomUUID().toString(), refreshTokenValiditySeconds);
         user.addRefreshToken(refreshToken);
 
-
         AuthUserResponseDTO.JoinResultDTO dto = AuthUserConverter.toJoinResultDTO(user, accessToken);
 
         return ResponseEntity.ok(dto);
     }
+
+    @GetMapping("/auth/protected")
+    public ResponseEntity<String> protectedResource(Authentication authentication) {
+        String username = authentication.getName(); // 인증된 사용자명
+        return ResponseEntity.ok("인증된 사용자: " + username);
+    }
+
 
     // 리프레시 코드 재발급
     @PostMapping("/auth/refresh")

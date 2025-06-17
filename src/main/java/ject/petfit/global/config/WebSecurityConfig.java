@@ -1,6 +1,8 @@
 package ject.petfit.global.config;
 
+import ject.petfit.domain.user.service.AuthUserService;
 import ject.petfit.global.jwt.filter.JwtAuthFilter;
+import ject.petfit.global.jwt.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +21,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-    private final JwtAuthFilter jwtAuthFilter;
+    private final AuthUserService authUserService;
+    private final JwtUtil jwtUtil;
+
+    @Bean
+    public JwtAuthFilter jwtAuthFilter() {
+        return new JwtAuthFilter(jwtUtil, authUserService);
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -28,8 +36,9 @@ public class WebSecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
         return http
+                .cors(cors -> cors.disable())
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

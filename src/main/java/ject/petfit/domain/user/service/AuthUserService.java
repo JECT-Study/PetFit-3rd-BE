@@ -12,6 +12,8 @@ import ject.petfit.domain.user.dto.KakaoDTO;
 import ject.petfit.domain.user.repository.AuthUserRepository;
 import ject.petfit.domain.user.entity.AuthUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +24,13 @@ public class AuthUserService {
     private final KakaoUtil kakaoUtil;
     private final AuthUserRepository authUserRepository;
     private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public void setPasswordEncoder(@Lazy PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
 
     @Transactional
     public AuthUser oAuthLogin(String accessCode, HttpServletResponse httpServletResponse) {
