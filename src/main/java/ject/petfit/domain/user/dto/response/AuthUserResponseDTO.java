@@ -18,7 +18,7 @@ public class AuthUserResponseDTO {
         private Long kakaoUUID;
         private String email;
         private String nickname;
-        private String jwtAccessToken;
+        private String accessToken;
         private Role role;
     }
 

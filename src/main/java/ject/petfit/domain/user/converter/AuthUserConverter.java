@@ -19,7 +19,7 @@ public class AuthUserConverter {
                 .kakaoUUID(authUser.getKakaoUUID())
                 .email(authUser.getEmail())
                 .nickname(authUser.getNickname())
-                .jwtAccessToken(accessToken)
+                .accessToken(accessToken)
                 .role(authUser.getMember().getRole())
                 .build();
     }

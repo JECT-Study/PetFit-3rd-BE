@@ -1,6 +1,7 @@
 package ject.petfit.global.exception;
 
 import ject.petfit.domain.user.exception.AuthUserException;
+import ject.petfit.domain.user.exception.InvalidGrantException;
 import ject.petfit.global.common.ApiResponse;
 import ject.petfit.global.jwt.exception.TokenException;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TokenException.class)
     public ResponseEntity<ApiResponse<Void>> handleCustomException(TokenException e) {
+        ApiResponse<Void> response = ApiResponse.fail(
+                e.getHttpStatus().value(),
+                e.getMessage()
+        );
+        return ResponseEntity.status(e.getHttpStatus()).body(response);
+    }
+
+    @ExceptionHandler(InvalidGrantException.class)
+    public ResponseEntity<ApiResponse<Void>> handleCustomException(InvalidGrantException e) {
         ApiResponse<Void> response = ApiResponse.fail(
                 e.getHttpStatus().value(),
                 e.getMessage()

@@ -18,6 +18,7 @@ import ject.petfit.global.jwt.refreshtoken.RefreshTokenService;
 import ject.petfit.global.jwt.dto.RefreshTokenRequestDTO;
 import ject.petfit.global.jwt.dto.TokenResponseDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class KakaoAuthUserController {
@@ -42,9 +44,10 @@ public class KakaoAuthUserController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<?> kakaoLogin(@RequestBody AuthUserRequestDTO request) {
+    public ResponseEntity<?> login(@RequestBody AuthUserRequestDTO request) {
         try {
             Mono<TokenResponse> tokenResponse = authUserService.exchangeCodeForToken(request.getAccess_code());
+            log.warn("인가 코드: {}", request.getAccess_code());
             return ResponseEntity.ok(tokenResponse);
         } catch (InvalidGrantException e) {
             // 인가 코드 재사용 또는 만료 시
@@ -60,11 +63,9 @@ public class KakaoAuthUserController {
     @GetMapping("/auth/kakao/login")
     public ResponseEntity<AuthUserResponseDTO.JoinResultDTO> kakaoLogin(
             @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) {
-        AuthUser user = authUserService.oAuthLogin(accessCode, httpServletResponse);
+        AuthUser user = authUserService.oAuthLogin(accessCode, jwtUtil, httpServletResponse);
 
         String accessToken = jwtUtil.createAccessToken(user.getEmail(), user.getMember().getRole().toString());
-        httpServletResponse.setHeader("Authorization", "Bearer " + accessToken);
-        httpServletResponse.setContentType("application/json");
 
         RefreshToken refreshToken = refreshTokenService.createOrUpdateRefreshToken(user, UUID.randomUUID().toString(), refreshTokenValiditySeconds);
         user.addRefreshToken(refreshToken);

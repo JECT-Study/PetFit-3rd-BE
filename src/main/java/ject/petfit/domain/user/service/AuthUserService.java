@@ -3,6 +3,7 @@ package ject.petfit.domain.user.service;
 import com.nimbusds.oauth2.sdk.TokenResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+import java.util.Optional;
 import java.util.UUID;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.member.entity.Role;
@@ -11,12 +12,17 @@ import ject.petfit.domain.user.common.util.KakaoUtil;
 import ject.petfit.domain.user.converter.AuthUserConverter;
 import ject.petfit.domain.user.dto.KakaoDTO;
 import ject.petfit.domain.user.dto.KakaoDTO.OAuthToken;
+import ject.petfit.domain.user.exception.AuthUserErrorCode;
+import ject.petfit.domain.user.exception.AuthUserException;
 import ject.petfit.domain.user.exception.InvalidGrantErrorCode;
 import ject.petfit.domain.user.exception.InvalidGrantException;
 import ject.petfit.domain.user.repository.AuthUserRepository;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.global.jwt.refreshtoken.RefreshToken;
+import ject.petfit.global.jwt.refreshtoken.RefreshTokenRepository;
+import ject.petfit.global.jwt.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -28,48 +34,84 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
+@Slf4j
 public class AuthUserService {
 
     private final KakaoUtil kakaoUtil;
     private final AuthUserRepository authUserRepository;
     private final MemberRepository memberRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final WebClient webClient;
 
     public AuthUserService(WebClient.Builder webClientBuilder,
                            KakaoUtil kakaoUtil,
                            AuthUserRepository authUserRepository,
+                            RefreshTokenRepository refreshTokenRepository,
                            @Lazy PasswordEncoder passwordEncoder,
                            MemberRepository memberRepository) {
         this.kakaoUtil = kakaoUtil;
         this.authUserRepository = authUserRepository;
         this.memberRepository = memberRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.webClient = webClientBuilder.build();
     }
 
 
     @Transactional
-    public AuthUser oAuthLogin(String accessCode, HttpServletResponse httpServletResponse) {
-        KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode);
-        KakaoDTO.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
-        // custom error handling for missing kakaoProfile 처리 필
-        String email = kakaoProfile.getKakao_account().getEmail();
+    public AuthUser oAuthLogin(String accessCode, JwtUtil jwtUtil, HttpServletResponse httpServletResponse) {
+        try {
+            // 1. 카카오 토큰 요청
+            KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode);
+            if (oAuthToken == null) {
+                throw new AuthUserException(AuthUserErrorCode.OAUTH_SERVER_ERROR);
+            }
+            // 2. 카카오 프로필 요청
+            KakaoDTO.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
+            if (kakaoProfile == null || kakaoProfile.getKakao_account() == null) {
+                throw new AuthUserException(AuthUserErrorCode.PROFILE_REQUEST_ERROR);
+            }
+            // 3. 이메일 확인
+            String email = kakaoProfile.getKakao_account().getEmail();
+            log.info("Email: " + ( email.isEmpty() ? "없음" : email));
+            if (email == null || email.isEmpty()) {
+                throw new AuthUserException(AuthUserErrorCode.EMAIL_NOT_FOUND);
+            }
+            // 4. 사용자 조회 또는 생성
+            try {
+                AuthUser user = authUserRepository.findByEmail(email)
+                        .orElseGet(() -> createNewUser(kakaoProfile));
+                log.info("User found or created: {}", user.getEmail());
+                // 새 토큰 생성
+                String accessToken = jwtUtil.createAccessToken(user.getEmail(), user.getMember().getRole().toString());
+                log.info("Generated new JWT token: {}", accessToken);
 
-        AuthUser user = authUserRepository.findByEmail(email)
-                .orElseGet(() -> createNewUser(accessCode, kakaoProfile));
+                httpServletResponse.setHeader("Authorization", "Bearer " + accessToken);
+                httpServletResponse.setContentType("application/json");
 
-        return user;
+                return user;
+            } catch (Exception e) {
+                log.error("Error in user creation/finding: {}", e.getMessage(), e);
+                throw e;
+            }
+
+        } catch (AuthUserException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error in oAuthLogin: {}", e.getMessage(), e);
+            throw new AuthUserException(AuthUserErrorCode.OAUTH_SERVER_ERROR);
+        }
     }
 
-    private AuthUser createNewUser(String accessCode, KakaoDTO.KakaoProfile kakaoProfile) {
+    private AuthUser createNewUser(KakaoDTO.KakaoProfile kakaoProfile) {
         // error handling for missing profile information
         if (kakaoProfile == null || kakaoProfile.getKakao_account() == null) {
             throw new IllegalArgumentException("카카오 프로필 정보가 부족합니다.");
         }
 
         Member newMember = Member.builder()
-                .nickname(kakaoProfile.getProperties().getNickname())
+                .nickname(kakaoProfile.getKakao_account().getProfile().getNickname())
                 .role(Role.USER)
                 .build();
         memberRepository.save(newMember);
@@ -78,9 +120,9 @@ public class AuthUserService {
         String encodedPassword = passwordEncoder.encode(randomPassword);
 
         AuthUser newUser = AuthUserConverter.toUser(
-                getKakaoUUID(accessCode),
+                kakaoProfile.getId(),
                 kakaoProfile.getKakao_account().getEmail(),
-                kakaoProfile.getProperties().getNickname(),
+                kakaoProfile.getKakao_account().getProfile().getNickname(),
                 encodedPassword
         );
         newUser.addMember(newMember);
@@ -97,12 +139,6 @@ public class AuthUserService {
                 .bodyToMono(TokenResponse.class);
     }
 
-
-    public Long getKakaoUUID(String accessCode) {
-        KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode); // oAuthToken(access 토큰) 요청
-        KakaoDTO.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
-        return kakaoProfile.getId();
-    }
 
     public AuthUser loadAuthUserByEmail(String email) {
         return authUserRepository.findByEmail(email)
