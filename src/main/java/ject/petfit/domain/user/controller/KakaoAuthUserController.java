@@ -43,23 +43,6 @@ public class KakaoAuthUserController {
     @Value("${spring.jwt.refresh-token-validity-seconds}")
     private long refreshTokenValiditySeconds;
 
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthUserRequestDTO request) {
-        try {
-            Mono<TokenResponse> tokenResponse = authUserService.exchangeCodeForToken(request.getAccess_code());
-            log.warn("인가 코드: {}", request.getAccess_code());
-            return ResponseEntity.ok(tokenResponse);
-        } catch (InvalidGrantException e) {
-            // 인가 코드 재사용 또는 만료 시
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "invalid_grant", "message", "인가 코드가 만료되었거나 이미 사용되었습니다. 다시 로그인하세요."));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "server_error", "message", "서버 오류가 발생했습니다."));
-        }
-    }
-
     // 최초 소셜 로그인/회원가입
     @GetMapping("/auth/kakao/login")
     public ResponseEntity<AuthUserResponseDTO.JoinResultDTO> kakaoLogin(

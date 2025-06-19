@@ -50,8 +50,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/**",
-                                "/error",
-                                "/login/**"
+                                "/error"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
