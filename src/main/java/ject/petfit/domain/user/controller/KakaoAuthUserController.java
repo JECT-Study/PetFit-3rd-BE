@@ -4,6 +4,7 @@ package ject.petfit.domain.user.controller;
 import com.nimbusds.oauth2.sdk.TokenResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 import ject.petfit.domain.user.converter.AuthUserConverter;
@@ -62,7 +63,7 @@ public class KakaoAuthUserController {
     // 최초 소셜 로그인/회원가입
     @GetMapping("/auth/kakao/login")
     public ResponseEntity<AuthUserResponseDTO.JoinResultDTO> kakaoLogin(
-            @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) {
+            @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) throws IOException {
         AuthUser user = authUserService.oAuthLogin(accessCode, jwtUtil, httpServletResponse);
 
         String accessToken = jwtUtil.createAccessToken(user.getEmail(), user.getMember().getRole().toString());
@@ -71,7 +72,7 @@ public class KakaoAuthUserController {
         user.addRefreshToken(refreshToken);
 
         AuthUserResponseDTO.JoinResultDTO dto = AuthUserConverter.toJoinResultDTO(user, accessToken);
-
+        httpServletResponse.sendRedirect("http://localhost:3000/home");
         return ResponseEntity.ok(dto);
     }
 

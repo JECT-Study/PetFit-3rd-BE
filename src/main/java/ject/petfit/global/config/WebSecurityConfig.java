@@ -1,10 +1,12 @@
 package ject.petfit.global.config;
 
+import java.util.Arrays;
 import ject.petfit.domain.user.service.AuthUserService;
 import ject.petfit.global.jwt.filter.JwtAuthFilter;
 import ject.petfit.global.jwt.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -42,15 +44,12 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.disable())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/**",  // auth로 시작하는 모든 경로
-                                "/favicon.ico",  // favicon
-                                "/.well-known/**",  // well-known 경로
+                                "/auth/**",
                                 "/error",
                                 "/login/**"
                         ).permitAll()
@@ -66,10 +65,12 @@ public class WebSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true);
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.addAllowedOrigin("http://localhost:3000"); // 프론트엔드 주소
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.addExposedHeader("Authorization");
+        config.setAllowCredentials(true);
 
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
