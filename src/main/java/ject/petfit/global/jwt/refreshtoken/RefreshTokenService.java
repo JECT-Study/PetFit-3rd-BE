@@ -31,15 +31,15 @@ public class RefreshTokenService {
     @Transactional
     public RefreshToken createOrUpdateRefreshToken(AuthUser authUser, String rawToken, long validitySeconds) {
         String hashedToken = hashToken(rawToken); // SHA-256 등으로 해시화
-        Instant expirationTime = Instant.now().plusSeconds(validitySeconds);
+        Instant expires_at = Instant.now().plusSeconds(validitySeconds);
 
         return refreshTokenRepository.findByAuthUser(authUser)
                 .map(existingToken -> {
-                    existingToken.updateToken(hashedToken, expirationTime);
+                    existingToken.updateToken(hashedToken, expires_at);
                     return existingToken;
                 })
                 .orElseGet(() -> {
-                    RefreshToken newToken = new RefreshToken(authUser, hashedToken, expirationTime);
+                    RefreshToken newToken = new RefreshToken(authUser, hashedToken, expires_at);
                     authUser.addRefreshToken(newToken);
                     return refreshTokenRepository.save(newToken);
                 });

@@ -35,16 +35,16 @@ public class RefreshToken {
     private String token;
 
     @Column(nullable = false)
-    private Instant expirationTime;
+    private Instant expires_at;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "auth_user_id", nullable = false, unique = true)
     private AuthUser authUser;
 
-    public RefreshToken(AuthUser authUser, String token, Instant expirationTime) {
+    public RefreshToken(AuthUser authUser, String token, Instant expires_at) {
         this.authUser = authUser;
         this.token = token;
-        this.expirationTime = expirationTime;
+        this.expires_at = expires_at;
     }
 
 
@@ -56,8 +56,8 @@ public class RefreshToken {
         authUser.addRefreshToken(this);
     }
 
-    public void updateToken(String token, Instant expirationTime) {
+    public void updateToken(String token, Instant expires_at) {
         this.token = token;
-        this.expirationTime = expirationTime;
+        this.expires_at = expires_at;
     }
 }
