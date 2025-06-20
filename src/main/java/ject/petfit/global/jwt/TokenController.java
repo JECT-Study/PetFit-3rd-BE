@@ -33,7 +33,7 @@ public class TokenController {
         String newAccessToken = jwtUtil.createAccessToken(authUser.getEmail(), authUser.getMember().getRole().name());
         // 새로운 refresh 토큰 발급
         String newRefreshToken = refreshTokenService.createOrUpdateRefreshToken(authUser, UUID.randomUUID().toString(),
-                refreshTokenValiditySeconds).getHashedRefreshToken();
+                refreshTokenValiditySeconds).getToken();
         //쿠키 처리
         return ResponseEntity.ok(new TokenResponseDTO(newAccessToken, newRefreshToken));
     }

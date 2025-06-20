@@ -47,9 +47,9 @@ public class RefreshTokenService {
 
     @Transactional
     public AuthUser validateAndRotateToken(String oldRawRefreshToken) {
-        RefreshToken oldToken = refreshTokenRepository.findByHashedRefreshToken(oldRawRefreshToken);
+        RefreshToken oldToken = refreshTokenRepository.findByToken(oldRawRefreshToken);
 
-        if (!passwordEncoder.matches(oldRawRefreshToken, oldToken.getHashedRefreshToken())) {
+        if (!passwordEncoder.matches(oldRawRefreshToken, oldToken.getToken())) {
             throw new TokenException(TokenErrorCode.REFRESH_TOKEN_INVALID);
         }
         // 토큰 로테이션: 기존 토큰 삭제

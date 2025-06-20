@@ -47,7 +47,7 @@ public class AuthUserService {
     public AuthUserService(WebClient.Builder webClientBuilder,
                            KakaoUtil kakaoUtil,
                            AuthUserRepository authUserRepository,
-                            RefreshTokenRepository refreshTokenRepository,
+                           @Lazy RefreshTokenRepository refreshTokenRepository,
                            @Lazy PasswordEncoder passwordEncoder,
                            MemberRepository memberRepository) {
         this.kakaoUtil = kakaoUtil;

@@ -48,7 +48,7 @@ public class KakaoAuthUserController {
     private long refreshTokenValiditySeconds;
 
     // 소셜 로그인/회원가입 -> 쿠키
-    @GetMapping("/auth/kakao/login")
+    @GetMapping("/auth/kakao/login/cookie")
     public void kakaoLogin(
             @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) throws IOException {
         AuthUser user = authUserService.oAuthLogin(accessCode);
