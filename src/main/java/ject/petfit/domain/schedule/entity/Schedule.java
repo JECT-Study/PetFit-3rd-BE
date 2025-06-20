@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import ject.petfit.domain.member.entity.Member;
+import ject.petfit.domain.pet.entity.Pet;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,18 +38,18 @@ public class Schedule {
     private LocalDate scheduleDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @JoinColumn(name = "pet_id", nullable = false)
+    private Pet pet;
 
     @Builder
-    public Schedule(String title, String content, LocalDate scheduleDate, Member member) {
+    public Schedule(String title, String content, LocalDate scheduleDate, Pet pet) {
         this.title = title;
         this.content = content;
         this.scheduleDate = scheduleDate;
-        this.member = member;
+        this.pet = pet;
     }
 
-    public void setMember(Member member) {
-        this.member = member;
+    public void setPet(Pet pet) {
+        this.pet = pet;
     }
 }

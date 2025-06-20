@@ -12,8 +12,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import ject.petfit.domain.member.entity.Member;
+import ject.petfit.domain.note.entity.Note;
+import ject.petfit.domain.schedule.entity.Schedule;
 import ject.petfit.domain.slot.entity.Slot;
 import lombok.Builder;
 import lombok.Getter;
@@ -52,6 +55,12 @@ public class Pet {
     @OneToMany(mappedBy = "pet", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Slot> slots;
 
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Schedule> schedules = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Note> note = new ArrayList<>();
+
 
     @Builder
     public Pet(String name, String type, String gender, LocalDate birthDate, boolean isFirst) {
@@ -64,6 +73,16 @@ public class Pet {
 
     public void setMember(Member member) {
         this.member = member;
+    }
+
+    public void addSchedule(Schedule schedule) {
+        this.schedules.add(schedule);
+        schedule.setPet(this);
+    }
+
+    public void addNote(Note note) {
+        this.note.add(note);
+        note.setPet(this);
     }
 
 }

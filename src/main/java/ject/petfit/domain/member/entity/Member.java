@@ -48,12 +48,6 @@ public class Member {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pet> pets = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Schedule> schedules = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Note> note = new ArrayList<>();
-
 //    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<Chat> chattings;
 
@@ -74,15 +68,6 @@ public class Member {
         pet.setMember(this); // 양방향 관계 설정
     }
 
-    public void addSchedule(Schedule schedule) {
-        this.schedules.add(schedule);
-        schedule.setMember(this);
-    }
-
-    public void addNote(Note note) {
-        this.note.add(note);
-        note.setMember(this);
-    }
 
 
 }
