@@ -32,7 +32,7 @@ public class RefreshToken {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String hashedRefreshToken;
+    private String token;
 
     @Column(nullable = false)
     private Instant expirationTime;
@@ -41,9 +41,9 @@ public class RefreshToken {
     @JoinColumn(name = "auth_user_id", nullable = false, unique = true)
     private AuthUser authUser;
 
-    public RefreshToken(AuthUser authUser, String hashedToken, Instant expirationTime) {
+    public RefreshToken(AuthUser authUser, String token, Instant expirationTime) {
         this.authUser = authUser;
-        this.hashedRefreshToken = hashedToken;
+        this.token = token;
         this.expirationTime = expirationTime;
     }
 
@@ -56,8 +56,8 @@ public class RefreshToken {
         authUser.addRefreshToken(this);
     }
 
-    public void updateToken(String hashedToken, Instant expirationTime) {
-        this.hashedRefreshToken = hashedToken;
+    public void updateToken(String token, Instant expirationTime) {
+        this.token = token;
         this.expirationTime = expirationTime;
     }
 }

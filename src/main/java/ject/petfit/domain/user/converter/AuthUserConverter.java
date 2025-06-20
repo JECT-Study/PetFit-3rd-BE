@@ -2,6 +2,7 @@ package ject.petfit.domain.user.converter;
 
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.dto.response.AuthUserResponseDTO;
+import ject.petfit.global.jwt.refreshtoken.RefreshToken;
 
 public class AuthUserConverter {
     public static AuthUser toUser(Long kakaoUUID, String email, String nickName, String password, boolean isNewUser) {
@@ -14,7 +15,7 @@ public class AuthUserConverter {
                 .build();
     }
 
-    public static AuthUserResponseDTO.JoinResultDTO toJoinResultDTO(AuthUser authUser, String accessToken) {
+    public static AuthUserResponseDTO.JoinResultDTO toJoinResultDTO(AuthUser authUser, String accessToken, RefreshToken refreshToken) {
         return AuthUserResponseDTO.JoinResultDTO.builder()
                 .userId(authUser.getId())
                 .kakaoUUID(authUser.getKakaoUUID())
@@ -23,6 +24,7 @@ public class AuthUserConverter {
                 .accessToken(accessToken)
                 .role(authUser.getMember().getRole())
                 .isNewUser(authUser.getIsNewUser())
+                .refreshToken(refreshToken)
                 .build();
     }
 

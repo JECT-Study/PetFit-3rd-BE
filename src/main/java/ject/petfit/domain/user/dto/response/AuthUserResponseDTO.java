@@ -2,6 +2,7 @@ package ject.petfit.domain.user.dto.response;
 
 import java.time.LocalDateTime;
 import ject.petfit.domain.member.entity.Role;
+import ject.petfit.global.jwt.refreshtoken.RefreshToken;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,5 +22,6 @@ public class AuthUserResponseDTO {
         private String accessToken;
         private Role role;
         private boolean isNewUser;
+        private RefreshToken refreshToken;
     }
 }
