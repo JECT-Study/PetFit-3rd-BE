@@ -22,7 +22,7 @@ public class AuthUserConverter {
                 .nickname(authUser.getNickname())
                 .accessToken(accessToken)
                 .role(authUser.getMember().getRole())
-//                .isNewUser(authUser.getIsNewUser())
+                .isNewUser(authUser.getIsNewUser())
                 .build();
     }
 

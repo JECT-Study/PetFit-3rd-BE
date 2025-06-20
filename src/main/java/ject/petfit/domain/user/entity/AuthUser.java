@@ -48,8 +48,8 @@ public class AuthUser implements UserDetails {
     @Column(name="encoded_password")
     private String encodedPassword;
 
-    @Column(name = "is_new_user", nullable = true)
-    private boolean isNewUser;
+    @Column(name = "is_new_user", nullable = false)
+    private Boolean isNewUser;
 
     @CreatedDate
     private LocalDateTime createdAt;
