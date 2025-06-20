@@ -47,7 +47,7 @@ public class KakaoAuthUserController {
     @GetMapping("/auth/kakao/login")
     public ResponseEntity<AuthUserResponseDTO.JoinResultDTO> kakaoLogin(
             @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) throws IOException {
-        AuthUser user = authUserService.oAuthLogin(accessCode, jwtUtil, httpServletResponse);
+        AuthUser user = authUserService.oAuthLogin(accessCode);
 
         String accessToken = jwtUtil.createAccessToken(user.getEmail(), user.getMember().getRole().toString());
 
@@ -55,14 +55,25 @@ public class KakaoAuthUserController {
         user.addRefreshToken(refreshToken);
 
         AuthUserResponseDTO.JoinResultDTO dto = AuthUserConverter.toJoinResultDTO(user, accessToken);
+        
         httpServletResponse.sendRedirect("http://localhost:3000/home");
+        // 쿠키 설정
         return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/auth/protected")
-    public ResponseEntity<String> protectedResource(Authentication authentication) {
-        String username = authentication.getName(); // 인증된 사용자명
-        return ResponseEntity.ok("인증된 사용자: " + username);
+    public ResponseEntity<Map<String, String>> protectedResource(
+            Authentication authentication,
+            HttpServletRequest request) {
+
+        String accessToken = request.getHeader("Authorization").replace("Bearer ", "");
+        String username = authentication.getName();
+
+        Map<String, String> response = Map.of(
+                "name", "인증된 사용자: " + username,
+                "accessToken", accessToken
+        );
+        return ResponseEntity.ok(response);
     }
 
 }

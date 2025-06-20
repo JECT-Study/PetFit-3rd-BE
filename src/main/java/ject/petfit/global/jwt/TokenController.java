@@ -34,6 +34,7 @@ public class TokenController {
         // 새로운 refresh 토큰 발급
         String newRefreshToken = refreshTokenService.createOrUpdateRefreshToken(authUser, UUID.randomUUID().toString(),
                 refreshTokenValiditySeconds).getHashedRefreshToken();
+        //쿠키 처리
         return ResponseEntity.ok(new TokenResponseDTO(newAccessToken, newRefreshToken));
     }
 }

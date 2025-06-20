@@ -60,7 +60,7 @@ public class AuthUserService {
 
 
     @Transactional
-    public AuthUser oAuthLogin(String accessCode, JwtUtil jwtUtil, HttpServletResponse httpServletResponse) {
+    public AuthUser oAuthLogin(String accessCode) {
         try {
             // 1. 카카오 토큰 요청
             KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode);
@@ -74,28 +74,17 @@ public class AuthUserService {
             }
             // 3. 이메일 확인
             String email = kakaoProfile.getKakao_account().getEmail();
-            log.info("Email: " + ( email.isEmpty() ? "없음" : email));
             if (email == null || email.isEmpty()) {
                 throw new AuthUserException(AuthUserErrorCode.EMAIL_NOT_FOUND);
             }
             // 4. 사용자 조회 또는 생성
             try {
-                AuthUser user = authUserRepository.findByEmail(email)
-                        .orElseGet(() -> createNewUser(kakaoProfile));
-                log.info("User found or created: {}", user.getEmail());
-                // 새 토큰 생성
-                String accessToken = jwtUtil.createAccessToken(user.getEmail(), user.getMember().getRole().toString());
-                log.info("Generated new JWT token: {}", accessToken);
-
-                httpServletResponse.setHeader("Authorization", "Bearer " + accessToken);
-                httpServletResponse.setContentType("application/json");
+                AuthUser user = findOrCreateUser(email, kakaoProfile);
 
                 return user;
             } catch (Exception e) {
-                log.error("Error in user creation/finding: {}", e.getMessage(), e);
                 throw e;
             }
-
         } catch (AuthUserException e) {
             throw e;
         } catch (Exception e) {
@@ -103,6 +92,16 @@ public class AuthUserService {
             throw new AuthUserException(AuthUserErrorCode.OAUTH_SERVER_ERROR);
         }
     }
+
+    private AuthUser findOrCreateUser(String email, KakaoDTO.KakaoProfile kakaoProfile) {
+        return authUserRepository.findByEmail(email)
+                .map(existingUser -> {
+                    existingUser.changeIsNewUser(false);
+                    return authUserRepository.save(existingUser);
+                })
+                .orElseGet(() -> createNewUser(kakaoProfile));
+    }
+
 
     private AuthUser createNewUser(KakaoDTO.KakaoProfile kakaoProfile) {
         // error handling for missing profile information
@@ -123,7 +122,8 @@ public class AuthUserService {
                 kakaoProfile.getId(),
                 kakaoProfile.getKakao_account().getEmail(),
                 kakaoProfile.getKakao_account().getProfile().getNickname(),
-                encodedPassword
+                encodedPassword,
+                true
         );
         newUser.addMember(newMember);
 

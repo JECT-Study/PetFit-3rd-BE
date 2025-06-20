@@ -4,12 +4,13 @@ import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.dto.response.AuthUserResponseDTO;
 
 public class AuthUserConverter {
-    public static AuthUser toUser(Long kakaoUUID, String email, String nickName, String password) {
+    public static AuthUser toUser(Long kakaoUUID, String email, String nickName, String password, boolean isNewUser) {
         return AuthUser.builder()
                 .kakaoUUID(kakaoUUID)
                 .email(email)
                 .nickname(nickName)
                 .encodedPassword(password)
+                .isNewUser(isNewUser)
                 .build();
     }
 
@@ -21,6 +22,7 @@ public class AuthUserConverter {
                 .nickname(authUser.getNickname())
                 .accessToken(accessToken)
                 .role(authUser.getMember().getRole())
+//                .isNewUser(authUser.getIsNewUser())
                 .build();
     }
 

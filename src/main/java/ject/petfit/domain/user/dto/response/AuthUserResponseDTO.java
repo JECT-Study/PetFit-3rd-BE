@@ -20,18 +20,6 @@ public class AuthUserResponseDTO {
         private String nickname;
         private String accessToken;
         private Role role;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Builder
-    public static class UserPreviewDTO {
-        private Long userId;
-        private Long kakaoUUID;
-        private String email;
-        private String nickname;
-        private String jwtAccessToken;
-        private Role role;
+        private boolean isNewUser;
     }
 }

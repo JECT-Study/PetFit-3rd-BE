@@ -48,6 +48,9 @@ public class AuthUser implements UserDetails {
     @Column(name="encoded_password")
     private String encodedPassword;
 
+    @Column(name = "is_new_user", nullable = true)
+    private boolean isNewUser;
+
     @CreatedDate
     private LocalDateTime createdAt;
 
@@ -58,11 +61,12 @@ public class AuthUser implements UserDetails {
     private RefreshToken refreshToken;
 
     @Builder
-    public AuthUser(Long kakaoUUID, String email, String nickname, String encodedPassword) {
+    public AuthUser(Long kakaoUUID, String email, String nickname, String encodedPassword, boolean isNewUser) {
         this.kakaoUUID = kakaoUUID;
         this.email = email;
         this.nickname = nickname;
         this.encodedPassword = encodedPassword;
+        this.isNewUser = isNewUser;
     }
 
     public void addMember(Member member) {
@@ -79,6 +83,9 @@ public class AuthUser implements UserDetails {
         }
     }
 
+    public void changeIsNewUser(boolean isNewUser) {
+        this.isNewUser = isNewUser;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
