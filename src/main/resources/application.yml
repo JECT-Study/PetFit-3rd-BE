@@ -20,6 +20,7 @@ spring:
 
     kakao:
         auth:
+           admin: ${KAKAO_ADMIN_KEY}
            client: ${KAKAO_CLIENT_ID}
            redirect: ${KAKAO_REDIRECT_URI}
            logout:
