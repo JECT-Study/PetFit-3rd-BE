@@ -133,4 +133,10 @@ public class AuthUserService {
         return authUserRepository.findByEmail(email)
                 .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.AUTH_EMAIL_USER_NOT_FOUND));
     }
+
+    @Transactional
+    public void withdraw(Long userId, String refreshToken) {
+        refreshTokenRepository.deleteByToken(refreshToken);
+        authUserRepository.deleteById(userId);
+    }
 }

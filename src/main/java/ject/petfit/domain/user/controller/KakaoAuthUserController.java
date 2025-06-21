@@ -9,10 +9,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
 import ject.petfit.domain.user.converter.AuthUserConverter;
+import ject.petfit.domain.user.dto.request.WithdrawAuthUserRequest;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.service.AuthUserService;
 import ject.petfit.domain.user.dto.response.AuthUserResponseDTO;
 import ject.petfit.global.jwt.dto.RefreshTokenRequestDTO;
+import ject.petfit.global.jwt.exception.TokenErrorCode;
+import ject.petfit.global.jwt.exception.TokenException;
 import ject.petfit.global.jwt.refreshtoken.RefreshTokenRepository;
 import ject.petfit.global.jwt.util.CookieUtils;
 import ject.petfit.global.jwt.util.JwtUtil;
@@ -24,6 +27,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -115,6 +121,25 @@ public class KakaoAuthUserController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.LOCATION, logoutUrl)
                 .body(Map.of("logoutUrl", logoutUrl));
+    }
+
+    // 회원 탈퇴 (JWT 기반)
+    @DeleteMapping("/auth/kakao/withdraw")
+    public ResponseEntity<Void> withdraw(@RequestBody WithdrawAuthUserRequest request,
+                                         Authentication authentication) {
+        // JWT 필터에서 이미 검증된 정보 사용
+        String email = authentication.getName();
+        AuthUser user = authUserService.loadAuthUserByEmail(email);
+
+        // Refresh Token 추가 검증
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(request.getRefreshToken())
+                .orElseThrow(() -> new TokenException(TokenErrorCode.REFRESH_TOKEN_NOT_FOUND));
+        if (!refreshToken.getAuthUser().getId().equals(user.getId())) {
+            throw new TokenException(TokenErrorCode.REFRESH_TOKEN_INVALID);
+        }
+        // 회원 탈퇴 처리
+        authUserService.withdraw(user.getId(), request.getRefreshToken());
+        return ResponseEntity.noContent().build();
     }
 
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {
