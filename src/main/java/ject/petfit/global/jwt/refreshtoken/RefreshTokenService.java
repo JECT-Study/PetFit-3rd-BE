@@ -2,6 +2,7 @@ package ject.petfit.global.jwt.refreshtoken;
 
 import jakarta.transaction.Transactional;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.global.jwt.exception.TokenErrorCode;
@@ -44,17 +45,20 @@ public class RefreshTokenService {
 
     @Transactional
     public AuthUser validateAndRotateToken(String oldRawRefreshToken) {
-        RefreshToken oldToken = refreshTokenRepository.findByToken(oldRawRefreshToken);
+        RefreshToken oldToken = refreshTokenRepository.findByToken(oldRawRefreshToken)
+                .orElseThrow(() -> new TokenException(TokenErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
         if (!passwordEncoder.matches(oldRawRefreshToken, oldToken.getToken())) {
             throw new TokenException(TokenErrorCode.REFRESH_TOKEN_INVALID);
         }
-        // 토큰 로테이션: 기존 토큰 삭제
+
         AuthUser user = oldToken.getAuthUser();
         user.removeRefreshToken();
 
         return user;
     }
+
+
 
     private String hashToken(String rawToken) {
         return passwordEncoder.encode(rawToken);

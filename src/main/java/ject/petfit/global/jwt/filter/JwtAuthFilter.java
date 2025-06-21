@@ -15,6 +15,7 @@ import ject.petfit.global.jwt.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -55,6 +56,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (token != null && jwtUtil.isTokenValid(token)) {
                 // 2. 토큰에서 이메일 추출
                 String email = jwtUtil.getEmail(token);
+
                 // 3. DB에서 사용자 조회
                 UserDetails userDetails = authUserService.loadAuthUserByEmail(email);
                 // 4. SecurityContext에 인증 정보 저장

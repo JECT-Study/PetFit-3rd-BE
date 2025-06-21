@@ -7,5 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
 
     Optional<RefreshToken> findByAuthUser(AuthUser authUser);
-    RefreshToken findByToken(String hashedRefreshToken);
+    Optional<RefreshToken> findByToken(String hashedRefreshToken);
+    void deleteByToken(String token);
+    void deleteByAuthUser(AuthUser authUser);
 }
