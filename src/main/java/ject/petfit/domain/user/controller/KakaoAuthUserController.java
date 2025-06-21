@@ -55,6 +55,9 @@ public class KakaoAuthUserController {
     @Value("${spring.kakao.auth.client}")
     private String clientId;
 
+    @Value("${spring.kakao.auth.admin}")
+    private String adminKey;
+
     @Value("${spring.kakao.auth.logout.redirect}")
     private String redirectUri;
 
@@ -123,7 +126,8 @@ public class KakaoAuthUserController {
                 .body(Map.of("logoutUrl", logoutUrl));
     }
 
-    // 회원 탈퇴 (JWT 기반)
+    // 회원 탈퇴 (JWT 기반 Refresh Token 삭제 후 카카오 계정과의 unlink 처리)
+    // UX 고려하여 회원 탈퇴 시 카카오 계정과의 unlink 처리
     @DeleteMapping("/auth/kakao/withdraw")
     public ResponseEntity<Void> withdraw(@RequestBody WithdrawAuthUserRequest request,
                                          Authentication authentication) {
@@ -137,9 +141,23 @@ public class KakaoAuthUserController {
         if (!refreshToken.getAuthUser().getId().equals(user.getId())) {
             throw new TokenException(TokenErrorCode.REFRESH_TOKEN_INVALID);
         }
+        // 카카오 계정과의 unlink 처리
+        unlinkUserByAdminKey(user.getKakaoUUID().toString());
+
         // 회원 탈퇴 처리
         authUserService.withdraw(user.getId(), request.getRefreshToken());
         return ResponseEntity.noContent().build();
+    }
+
+    public Mono<Void> unlinkUserByAdminKey(String kakaoUserId) {
+        return WebClient.create()
+                .post()
+                .uri("https://kapi.kakao.com/v1/user/unlink")
+                .header("Authorization", "KakaoAK " + adminKey)
+                .bodyValue("target_id_type=user_id&target_id=" + kakaoUserId)
+                .retrieve()
+                .toBodilessEntity()
+                .then();
     }
 
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {
@@ -161,6 +179,7 @@ public class KakaoAuthUserController {
         return header != null ? header.replace("Bearer ", "") : null;
     }
 
+    // 토큰 기반 카카오 계정과의 unlink
     private Mono<Void> revokeKakaoToken(String accessToken) {
         String url = "https://kapi.kakao.com/v1/user/unlink";
         return WebClient.create()
