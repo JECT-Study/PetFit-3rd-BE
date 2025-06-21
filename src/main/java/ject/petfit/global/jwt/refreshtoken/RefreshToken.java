@@ -13,7 +13,6 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import ject.petfit.domain.user.entity.AuthUser;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -46,7 +45,6 @@ public class RefreshToken {
         this.token = token;
         this.expires_at = expires_at;
     }
-
 
     public void addAuthUser(AuthUser authUser) {
         if (this.authUser != null) {

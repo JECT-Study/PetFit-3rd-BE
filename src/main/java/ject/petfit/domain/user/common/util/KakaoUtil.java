@@ -77,7 +77,6 @@ public class KakaoUtil {
 
             return profile;
         } catch (Exception e) {
-            log.error("Failed to get Kakao profile: {}", e.getMessage());
             throw new AuthUserException(AuthUserErrorCode.PROFILE_REQUEST_ERROR);
         }
     }

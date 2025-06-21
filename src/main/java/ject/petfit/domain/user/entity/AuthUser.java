@@ -87,6 +87,10 @@ public class AuthUser implements UserDetails {
         this.isNewUser = isNewUser;
     }
 
+    public void removeRefreshToken() {
+        this.refreshToken = null;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(member.getRole().name()));

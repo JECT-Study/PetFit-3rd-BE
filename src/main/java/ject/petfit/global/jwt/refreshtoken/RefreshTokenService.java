@@ -25,9 +25,6 @@ public class RefreshTokenService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Value("${spring.jwt.refresh-token-validity-seconds}")
-    private long refreshTokenValiditySeconds;
-
     @Transactional
     public RefreshToken createOrUpdateRefreshToken(AuthUser authUser, String rawToken, long validitySeconds) {
         String hashedToken = hashToken(rawToken); // SHA-256 등으로 해시화
@@ -54,8 +51,7 @@ public class RefreshTokenService {
         }
         // 토큰 로테이션: 기존 토큰 삭제
         AuthUser user = oldToken.getAuthUser();
-        refreshTokenRepository.delete(oldToken);
-        user.addRefreshToken(null);
+        user.removeRefreshToken();
 
         return user;
     }

@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.global.jwt.dto.RefreshTokenRequestDTO;
-import ject.petfit.global.jwt.dto.TokenResponseDTO;
 import ject.petfit.global.jwt.refreshtoken.RefreshTokenService;
 import ject.petfit.global.jwt.util.CookieUtils;
 import ject.petfit.global.jwt.util.JwtUtil;
