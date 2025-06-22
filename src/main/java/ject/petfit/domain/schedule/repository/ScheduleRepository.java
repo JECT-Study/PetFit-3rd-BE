@@ -1,8 +1,8 @@
 package ject.petfit.domain.schedule.repository;
 
 import ject.petfit.domain.entry.entity.Entry;
-import org.springframework.data.jpa.repository.JpaRepository;
 import ject.petfit.domain.schedule.entity.Schedule;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 

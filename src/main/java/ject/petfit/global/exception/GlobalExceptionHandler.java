@@ -4,7 +4,10 @@ import ject.petfit.domain.entry.exception.EntryException;
 import ject.petfit.domain.pet.exception.PetException;
 import ject.petfit.domain.remark.exception.RemarkException;
 import ject.petfit.domain.schedule.exception.ScheduleException;
+import ject.petfit.domain.user.exception.AuthUserException;
+import ject.petfit.domain.user.exception.InvalidGrantException;
 import ject.petfit.global.common.ApiResponse;
+import ject.petfit.global.jwt.exception.TokenException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,6 +25,34 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ApiResponse<Void>> handleCustomException(CustomException e) {
         log.info(e.getMessage(), e);
+        ApiResponse<Void> response = ApiResponse.fail(
+                e.getCode(),
+                e.getMessage()
+        );
+        return ResponseEntity.status(e.getHttpStatus()).body(response);
+    }
+
+    @ExceptionHandler(AuthUserException.class)
+    public ResponseEntity<ApiResponse<Void>> handleCustomException(AuthUserException e) {
+        log.info(e.getMessage(), e);
+        ApiResponse<Void> response = ApiResponse.fail(
+                e.getCode(),
+                e.getMessage()
+        );
+        return ResponseEntity.status(e.getHttpStatus()).body(response);
+    }
+
+    @ExceptionHandler(TokenException.class)
+    public ResponseEntity<ApiResponse<Void>> handleCustomException(TokenException e) {
+        ApiResponse<Void> response = ApiResponse.fail(
+                e.getCode(),
+                e.getMessage()
+        );
+        return ResponseEntity.status(e.getHttpStatus()).body(response);
+    }
+
+    @ExceptionHandler(InvalidGrantException.class)
+    public ResponseEntity<ApiResponse<Void>> handleCustomException(InvalidGrantException e) {
         ApiResponse<Void> response = ApiResponse.fail(
                 e.getCode(),
                 e.getMessage()
@@ -77,13 +108,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
-
     // 그외 모든 예외 처리 핸들러
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
-        log.info(e.getMessage(), e);
         ApiResponse<Void> response = ApiResponse.fail(
-                "500",
+                "SERVER-500",
                 "서버 내부 오류가 발생하였습니다."
         );
         return ResponseEntity.status(500).body(response);

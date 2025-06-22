@@ -1,15 +1,14 @@
 package ject.petfit.domain.entry.entity;
 
 import jakarta.persistence.*;
+import ject.petfit.domain.pet.entity.Pet;
+import ject.petfit.domain.remark.entity.Remark;
+import ject.petfit.domain.routine.entity.Routine;
+import ject.petfit.domain.schedule.entity.Schedule;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
-
-import ject.petfit.domain.pet.entity.Pet;
-import ject.petfit.domain.routine.entity.Routine;
-import ject.petfit.domain.schedule.entity.Schedule;
-import ject.petfit.domain.remark.entity.Remark;
 
 @Entity
 @Getter
