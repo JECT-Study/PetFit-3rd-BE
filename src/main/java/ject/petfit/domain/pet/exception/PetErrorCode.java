@@ -1,4 +1,4 @@
-package ject.petfit.global.exception;
+package ject.petfit.domain.pet.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,9 +6,9 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
-public enum ErrorCode {
-    // 커스텀 처리할 오류
-    DEV_NOT_FOUND(HttpStatus.NOT_FOUND, "EXAMPLE-404", "사용자를 찾을 수 없습니다(커스텀 예외 처리)");
+public enum PetErrorCode{
+    PET_NOT_FOUND(HttpStatus.NOT_FOUND, "PET-404", "해당 반려동물을 찾을 수 없습니다.");
+
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
