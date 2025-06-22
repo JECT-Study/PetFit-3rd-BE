@@ -11,8 +11,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -58,9 +62,19 @@ public class RefreshTokenService {
         return user;
     }
 
-
-
     private String hashToken(String rawToken) {
         return passwordEncoder.encode(rawToken);
+    }
+
+    public Mono<Void> revokeKakaoToken(String accessToken) {
+        String url = "https://kapi.kakao.com/v1/user/unlink";
+        return WebClient.create()
+                .post()
+                .uri(url)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .retrieve()
+                .toBodilessEntity()
+                .then();
     }
 }

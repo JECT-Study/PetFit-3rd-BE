@@ -96,6 +96,7 @@ public class KakaoAuthUserController {
     }
 
     // 서비스만 로그아웃
+    // UX 고려하여 카카오 계정과의 unlink 처리는 X
     @PostMapping("/auth/kakao/logout")
     public ResponseEntity<?> logout(
             @RequestBody RefreshTokenRequestDTO request, HttpServletResponse response) {
@@ -105,25 +106,6 @@ public class KakaoAuthUserController {
         // 클라이언트 정리 지시
         response.setHeader("Clear-Site-Data", "\"cache\", \"cookies\", \"storage\"");
         return ResponseEntity.ok().build();
-    }
-
-    // 서비스 + 카카오 연동 로그아웃
-    @PostMapping("/auth/kakao/logout/kakaoAll")
-    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        String kakaoToken = extractToken(request, "Kakao-Access-Token");
-
-        // JWT Refresh Token 무효화 (Access Token 블랙리스트 등록 X)
-        refreshTokenRepository.findByToken(extractRefreshTokenFromCookie(request))
-                .ifPresent(refreshTokenRepository::delete);
-        // 카카오 토큰 무효화
-        revokeKakaoToken(kakaoToken);
-
-        response.setHeader("Clear-Site-Data", "\"cache\", \"cookies\", \"storage\"");
-        // 완전 로그아웃 URL 생성
-        String logoutUrl = buildKakaoLogoutUrl();
-        return ResponseEntity.ok()
-                .header(HttpHeaders.LOCATION, logoutUrl)
-                .body(Map.of("logoutUrl", logoutUrl));
     }
 
     // 회원 탈퇴 (JWT 기반 Refresh Token 삭제 후 카카오 계정과의 unlink 처리)
@@ -142,22 +124,11 @@ public class KakaoAuthUserController {
             throw new TokenException(TokenErrorCode.REFRESH_TOKEN_INVALID);
         }
         // 카카오 계정과의 unlink 처리
-        unlinkUserByAdminKey(user.getKakaoUUID().toString());
+        authUserService.unlinkUserByAdminKey(user.getKakaoUUID().toString(), adminKey);
 
         // 회원 탈퇴 처리
         authUserService.withdraw(user.getId(), request.getRefreshToken());
         return ResponseEntity.noContent().build();
-    }
-
-    public Mono<Void> unlinkUserByAdminKey(String kakaoUserId) {
-        return WebClient.create()
-                .post()
-                .uri("https://kapi.kakao.com/v1/user/unlink")
-                .header("Authorization", "KakaoAK " + adminKey)
-                .bodyValue("target_id_type=user_id&target_id=" + kakaoUserId)
-                .retrieve()
-                .toBodilessEntity()
-                .then();
     }
 
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {
@@ -177,25 +148,6 @@ public class KakaoAuthUserController {
     private String extractToken(HttpServletRequest request, String headerName) {
         String header = request.getHeader(headerName);
         return header != null ? header.replace("Bearer ", "") : null;
-    }
-
-    // 토큰 기반 카카오 계정과의 unlink
-    private Mono<Void> revokeKakaoToken(String accessToken) {
-        String url = "https://kapi.kakao.com/v1/user/unlink";
-        return WebClient.create()
-                .post()
-                .uri(url)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .retrieve()
-                .toBodilessEntity()
-                .then();
-    }
-
-    private String buildKakaoLogoutUrl() {
-        return "https://kauth.kakao.com/oauth/logout" +
-                "?client_id=" + clientId +
-                "&logout_redirect_uri=" + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8);
     }
 
 }

@@ -120,15 +120,6 @@ public class AuthUserService {
         return newUser;
     }
 
-    public Mono<TokenResponse> exchangeCodeForToken(String code) {
-        return webClient.post()
-                .uri("https://kauth.kakao.com/oauth/token")
-                .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
-                .body(BodyInserters.fromFormData(kakaoUtil.params(code)))
-                .retrieve()
-                .bodyToMono(TokenResponse.class);
-    }
-
     public AuthUser loadAuthUserByEmail(String email) {
         return authUserRepository.findByEmail(email)
                 .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.AUTH_EMAIL_USER_NOT_FOUND));
@@ -138,5 +129,16 @@ public class AuthUserService {
     public void withdraw(Long userId, String refreshToken) {
         refreshTokenRepository.deleteByToken(refreshToken);
         authUserRepository.deleteById(userId);
+    }
+
+    public Mono<Void> unlinkUserByAdminKey(String kakaoUserId, String adminKey) {
+        return WebClient.create()
+                .post()
+                .uri("https://kapi.kakao.com/v1/user/unlink")
+                .header("Authorization", "KakaoAK " + adminKey)
+                .bodyValue("target_id_type=user_id&target_id=" + kakaoUserId)
+                .retrieve()
+                .toBodilessEntity()
+                .then();
     }
 }
