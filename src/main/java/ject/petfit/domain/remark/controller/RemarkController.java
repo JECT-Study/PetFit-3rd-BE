@@ -7,10 +7,10 @@ import ject.petfit.domain.remark.dto.request.RemarkRegisterRequest;
 import ject.petfit.domain.remark.dto.request.RemarkUpdateRequest;
 import ject.petfit.domain.remark.dto.response.RemarkResponse;
 import ject.petfit.global.common.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 

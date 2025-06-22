@@ -1,22 +1,23 @@
 package ject.petfit.domain.remark.service;
 
-import ject.petfit.domain.entry.service.EntryService;
-import ject.petfit.domain.remark.dto.response.RemarkResponse;
-import ject.petfit.domain.remark.exception.RemarkErrorCode;
-import ject.petfit.domain.remark.exception.RemarkException;
-import org.springframework.stereotype.Service;
-import lombok.RequiredArgsConstructor;
 import ject.petfit.domain.entry.entity.Entry;
 import ject.petfit.domain.entry.repository.EntryRepository;
+import ject.petfit.domain.entry.service.EntryService;
 import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.pet.exception.PetErrorCode;
 import ject.petfit.domain.pet.exception.PetException;
 import ject.petfit.domain.pet.repository.PetRepository;
 import ject.petfit.domain.remark.dto.request.RemarkRegisterRequest;
 import ject.petfit.domain.remark.dto.request.RemarkUpdateRequest;
+import ject.petfit.domain.remark.dto.response.RemarkResponse;
 import ject.petfit.domain.remark.entity.Remark;
+import ject.petfit.domain.remark.exception.RemarkErrorCode;
+import ject.petfit.domain.remark.exception.RemarkException;
 import ject.petfit.domain.remark.repository.RemarkRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;

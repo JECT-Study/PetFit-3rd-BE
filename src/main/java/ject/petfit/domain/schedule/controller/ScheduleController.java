@@ -8,12 +8,12 @@ import ject.petfit.domain.schedule.dto.request.ScheduleUpdateRequest;
 import ject.petfit.domain.schedule.dto.response.ScheduleResponse;
 import ject.petfit.domain.schedule.service.ScheduleService;
 import ject.petfit.global.common.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestBody;
+
 import java.util.List;
 
 @Slf4j

@@ -1,7 +1,7 @@
 package ject.petfit.domain.entry.controller;
 
-import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor

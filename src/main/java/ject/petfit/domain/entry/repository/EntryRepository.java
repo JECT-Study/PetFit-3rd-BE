@@ -1,12 +1,11 @@
 package ject.petfit.domain.entry.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import ject.petfit.domain.entry.entity.Entry;
+import ject.petfit.domain.pet.entity.Pet;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
-
-import ject.petfit.domain.pet.entity.Pet;
 
 public interface EntryRepository extends JpaRepository<Entry, Long> {
     boolean existsByPetAndEntryDate(Pet pet, LocalDate entryDate);

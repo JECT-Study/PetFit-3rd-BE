@@ -2,7 +2,6 @@ package ject.petfit.global.dev;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import ject.petfit.domain.entry.repository.EntryRepository;
 import ject.petfit.domain.entry.service.EntryService;
 import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.pet.exception.PetErrorCode;
