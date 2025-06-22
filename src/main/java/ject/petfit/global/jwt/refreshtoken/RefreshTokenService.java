@@ -2,17 +2,12 @@ package ject.petfit.global.jwt.refreshtoken;
 
 import jakarta.transaction.Transactional;
 import java.time.Instant;
-import java.util.Optional;
-import java.util.UUID;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.global.jwt.exception.TokenErrorCode;
 import ject.petfit.global.jwt.exception.TokenException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;

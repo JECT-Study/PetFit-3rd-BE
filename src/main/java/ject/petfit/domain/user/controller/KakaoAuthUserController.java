@@ -62,7 +62,7 @@ public class KakaoAuthUserController {
     private String redirectUri;
 
     // 소셜 로그인/회원가입 -> 쿠키
-    @GetMapping("/auth/kakao/login/cookie")
+    @GetMapping("/auth/kakao/login")
     public void kakaoLogin(
             @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) throws IOException {
         AuthUser user = authUserService.oAuthLogin(accessCode);
@@ -79,7 +79,7 @@ public class KakaoAuthUserController {
     }
 
     // 소셜 로그인/회원가입 -> DEV
-    @GetMapping("/auth/kakao/login")
+    @GetMapping("/auth/kakao/login/dev")
     public ResponseEntity<AuthUserResponseDTO.JoinResultDTO> kakaoLoginDev(
             @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) throws IOException {
         AuthUser user = authUserService.oAuthLogin(accessCode);
@@ -95,7 +95,7 @@ public class KakaoAuthUserController {
         return ResponseEntity.ok(dto);
     }
 
-    // 서비스만 로그아웃
+    // 서비스만 로그아웃 -> 쿠키 삭제
     // UX 고려하여 카카오 계정과의 unlink 처리는 X
     @PostMapping("/auth/kakao/logout")
     public ResponseEntity<?> logout(
@@ -105,6 +105,19 @@ public class KakaoAuthUserController {
                 .ifPresent(refreshTokenRepository::delete);
         // 클라이언트 정리 지시
         response.setHeader("Clear-Site-Data", "\"cache\", \"cookies\", \"storage\"");
+        return ResponseEntity.ok().build();
+    }
+
+    // 서비스만 로그아웃 -> Dev
+    @PostMapping("/auth/kakao/logout/dev")
+    public ResponseEntity<?> logoutDev(
+            @RequestBody RefreshTokenRequestDTO request, HttpServletResponse response) {
+        // 리프레시 토큰 무효화
+        refreshTokenRepository.findByToken(request.getRefreshToken())
+                .ifPresent(refreshTokenRepository::delete);
+
+        // 프론트엔드에 토큰 삭제 지시
+        response.setHeader("X-Clear-Tokens", "true");
         return ResponseEntity.ok().build();
     }
 

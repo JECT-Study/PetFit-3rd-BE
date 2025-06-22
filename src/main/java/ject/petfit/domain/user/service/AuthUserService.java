@@ -1,6 +1,5 @@
 package ject.petfit.domain.user.service;
 
-import com.nimbusds.oauth2.sdk.TokenResponse;
 import jakarta.transaction.Transactional;
 import java.util.UUID;
 import ject.petfit.domain.member.entity.Member;
@@ -18,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
