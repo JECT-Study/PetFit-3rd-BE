@@ -131,23 +131,5 @@ public class KakaoAuthUserController {
         return ResponseEntity.noContent().build();
     }
 
-    private String extractRefreshTokenFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        String refreshToken = null;
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("refreshToken".equals(cookie.getName())) {
-                    refreshToken = cookie.getValue();
-                    break;
-                }
-            }
-        }
-        return refreshToken;
-    }
-
-    private String extractToken(HttpServletRequest request, String headerName) {
-        String header = request.getHeader(headerName);
-        return header != null ? header.replace("Bearer ", "") : null;
-    }
 
 }

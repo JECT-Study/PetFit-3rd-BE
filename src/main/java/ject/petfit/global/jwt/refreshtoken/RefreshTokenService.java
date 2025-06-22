@@ -65,16 +65,4 @@ public class RefreshTokenService {
     private String hashToken(String rawToken) {
         return passwordEncoder.encode(rawToken);
     }
-
-    public Mono<Void> revokeKakaoToken(String accessToken) {
-        String url = "https://kapi.kakao.com/v1/user/unlink";
-        return WebClient.create()
-                .post()
-                .uri(url)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .retrieve()
-                .toBodilessEntity()
-                .then();
-    }
 }
