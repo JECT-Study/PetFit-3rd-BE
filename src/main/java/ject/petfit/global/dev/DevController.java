@@ -2,19 +2,28 @@ package ject.petfit.global.dev;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import ject.petfit.domain.entry.service.EntryService;
+import ject.petfit.domain.pet.entity.Pet;
+import ject.petfit.domain.pet.exception.PetErrorCode;
+import ject.petfit.domain.pet.exception.PetException;
+import ject.petfit.domain.pet.repository.PetRepository;
 import ject.petfit.global.common.ApiResponse;
 import ject.petfit.global.exception.CustomException;
 import ject.petfit.global.exception.ErrorCode;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @Tag(name = "개발용 테스트 API")
 @RequestMapping("/dev")
+@RequiredArgsConstructor
 public class DevController {
+
+    private final EntryService entryService;
+    private final PetRepository petRepository;
 
     @Operation(summary = "스웨거 동작 확인",
             description = "상세 설명")
@@ -35,9 +44,21 @@ public class DevController {
             // 실패 응답
             return ResponseEntity
                     .status(404)
-                    .body(ApiResponse.fail(404, "사용자를 찾을 수 없습니다(직접 기재)"));
+                    .body(ApiResponse.fail("DEV-404", "사용자를 찾을 수 없습니다(직접 기재)"));
         }
         // 예외처리 응답
         throw new CustomException(ErrorCode.DEV_NOT_FOUND);
+    }
+
+    @PostMapping("/entries/{petId}/{entryDate}")
+    public ResponseEntity<ApiResponse<String>> createEntry(
+            @PathVariable Long petId,
+            @PathVariable String entryDate
+    ) {
+        Pet pet = petRepository.findById(petId)
+                .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
+        entryService.createEntry(pet, LocalDate.parse(entryDate));
+        return ResponseEntity
+                .ok(ApiResponse.success("Entry 생성 성공"));
     }
 }
