@@ -34,7 +34,7 @@ logging:
 
 jwt:
   issuer: test-issuer
-  secret-key: test-secret-key-for-jwt-token-generation-and-validation-in-test-environment
+  secret-key: test-secret-key-
   access-token-validity: 3600000  # 1시간
   refresh-token-validity: 604800  # 7일
 
