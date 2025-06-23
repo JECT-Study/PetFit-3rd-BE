@@ -1,8 +1,10 @@
 package ject.petfit.global.jwt.util;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -75,7 +77,8 @@ public class JwtUtil {
                     .parseClaimsJws(token);
 
             return true;
-        } catch (TokenException | IllegalArgumentException e) {
+        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException
+                 | ExpiredJwtException | TokenException e) {
             return false;
         }
     }
