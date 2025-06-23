@@ -44,12 +44,6 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	
-	// H2 데이터베이스 (테스트용)
-	testRuntimeOnly 'com.h2database:h2'
-	
-	// AssertJ (더 나은 테스트 assertion)
-	testImplementation 'org.assertj:assertj-core:3.24.2'
 
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 

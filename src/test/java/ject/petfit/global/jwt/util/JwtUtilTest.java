@@ -71,11 +71,63 @@ class JwtUtilTest {
     }
 
     @Test
+    @DisplayName("Authorization 헤더가 비어있을 때 예외 발생")
+    void resolveAccessToken_헤더비어있음_예외발생() {
+        // given
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeader("Authorization")).thenReturn("");
+
+        // when & then
+        assertThatThrownBy(() -> jwtUtil.resolveAccessToken(request))
+                .isInstanceOf(TokenException.class)
+                .hasFieldOrPropertyWithValue("code", "TOKEN-401");
+    }
+
+    @Test
+    @DisplayName("Authorization 헤더가 공백만 있을 때 예외 발생")
+    void resolveAccessToken_헤더공백만있음_예외발생() {
+        // given
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeader("Authorization")).thenReturn("   ");
+
+        // when & then
+        assertThatThrownBy(() -> jwtUtil.resolveAccessToken(request))
+                .isInstanceOf(TokenException.class)
+                .hasFieldOrPropertyWithValue("code", "TOKEN-401");
+    }
+
+    @Test
     @DisplayName("Bearer 형식이 아닌 헤더일 때 예외 발생")
     void resolveAccessToken_Bearer형식아님_예외발생() {
         // given
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getHeader("Authorization")).thenReturn("Invalid " + "valid.jwt.token");
+
+        // when & then
+        assertThatThrownBy(() -> jwtUtil.resolveAccessToken(request))
+                .isInstanceOf(TokenException.class)
+                .hasFieldOrPropertyWithValue("code", "TOKEN-401");
+    }
+
+    @Test
+    @DisplayName("Bearer 뒤에 토큰이 없을 때 예외 발생")
+    void resolveAccessToken_Bearer뒤토큰없음_예외발생() {
+        // given
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeader("Authorization")).thenReturn("Bearer ");
+
+        // when & then
+        assertThatThrownBy(() -> jwtUtil.resolveAccessToken(request))
+                .isInstanceOf(TokenException.class)
+                .hasFieldOrPropertyWithValue("code", "TOKEN-401");
+    }
+
+    @Test
+    @DisplayName("Bearer 뒤에 공백만 있을 때 예외 발생")
+    void resolveAccessToken_Bearer뒤공백만있음_예외발생() {
+        // given
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeader("Authorization")).thenReturn("Bearer    ");
 
         // when & then
         assertThatThrownBy(() -> jwtUtil.resolveAccessToken(request))
