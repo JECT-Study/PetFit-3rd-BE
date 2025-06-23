@@ -44,7 +44,9 @@ public class RefreshTokenService {
 
     @Transactional
     public AuthUser validateAndRotateToken(String oldRawRefreshToken) {
-        RefreshToken oldToken = refreshTokenRepository.findByToken(oldRawRefreshToken)
+        RefreshToken oldToken = refreshTokenRepository.findAll().stream()
+                .filter(t -> passwordEncoder.matches(oldRawRefreshToken, t.getToken()))
+                .findFirst()
                 .orElseThrow(() -> new TokenException(TokenErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
         if (!passwordEncoder.matches(oldRawRefreshToken, oldToken.getToken())) {
