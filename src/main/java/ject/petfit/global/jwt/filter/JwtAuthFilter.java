@@ -52,18 +52,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             // 1. 요청 헤더에서 JWT 추출
             String token = jwtUtil.resolveAccessToken(request);
 
-            if (token != null && jwtUtil.isTokenValid(token)) {
-                // 2. 토큰에서 이메일 추출
-                String email = jwtUtil.getEmail(token);
+            if (token != null) {
+                if (jwtUtil.isTokenValid(token)) {
+                    // 2. 토큰에서 이메일 추출
+                    String email = jwtUtil.getEmail(token);
 
-                // 3. DB에서 사용자 조회
-                UserDetails userDetails = authUserService.loadAuthUserByEmail(email);
-                // 4. SecurityContext에 인증 정보 저장
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities()
-                        );
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    // 3. DB에서 사용자 조회
+                    UserDetails userDetails = authUserService.loadAuthUserByEmail(email);
+                    // 4. SecurityContext에 인증 정보 저장
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails, null, userDetails.getAuthorities()
+                            );
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    throw new TokenException(TokenErrorCode.AUTH_INVALID_TOKEN);
+                }
             }
         } catch (ExpiredJwtException e) {
             log.error("Token expired", e);
