@@ -67,7 +67,7 @@ class JwtUtilTest {
         // when & then
         assertThatThrownBy(() -> jwtUtil.resolveAccessToken(request))
                 .isInstanceOf(TokenException.class)
-                .hasFieldOrPropertyWithValue("code", "TOKEN-401");
+                .hasFieldOrPropertyWithValue("code", "TOKEN-451");
     }
 
     @Test
@@ -80,7 +80,7 @@ class JwtUtilTest {
         // when & then
         assertThatThrownBy(() -> jwtUtil.resolveAccessToken(request))
                 .isInstanceOf(TokenException.class)
-                .hasFieldOrPropertyWithValue("code", "TOKEN-401");
+                .hasFieldOrPropertyWithValue("code", "TOKEN-451");
     }
 
     @Test
@@ -93,7 +93,7 @@ class JwtUtilTest {
         // when & then
         assertThatThrownBy(() -> jwtUtil.resolveAccessToken(request))
                 .isInstanceOf(TokenException.class)
-                .hasFieldOrPropertyWithValue("code", "TOKEN-401");
+                .hasFieldOrPropertyWithValue("code", "TOKEN-451");
     }
 
     @Test
@@ -106,7 +106,7 @@ class JwtUtilTest {
         // when & then
         assertThatThrownBy(() -> jwtUtil.resolveAccessToken(request))
                 .isInstanceOf(TokenException.class)
-                .hasFieldOrPropertyWithValue("code", "TOKEN-401");
+                .hasFieldOrPropertyWithValue("code", "TOKEN-451");
     }
 
     @Test
@@ -119,7 +119,7 @@ class JwtUtilTest {
         // when & then
         assertThatThrownBy(() -> jwtUtil.resolveAccessToken(request))
                 .isInstanceOf(TokenException.class)
-                .hasFieldOrPropertyWithValue("code", "TOKEN-401");
+                .hasFieldOrPropertyWithValue("code", "TOKEN-451");
     }
 
     @Test
@@ -132,7 +132,7 @@ class JwtUtilTest {
         // when & then
         assertThatThrownBy(() -> jwtUtil.resolveAccessToken(request))
                 .isInstanceOf(TokenException.class)
-                .hasFieldOrPropertyWithValue("code", "TOKEN-401");
+                .hasFieldOrPropertyWithValue("code", "TOKEN-451");
     }
 
     @Test
