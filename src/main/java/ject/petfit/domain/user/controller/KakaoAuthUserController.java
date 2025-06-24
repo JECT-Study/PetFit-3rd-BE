@@ -38,14 +38,9 @@ public class KakaoAuthUserController {
     @Value("${spring.jwt.refresh-token-validity-seconds}")
     private long refreshTokenValiditySeconds;
 
-    @Value("${spring.kakao.auth.client}")
-    private String clientId;
-
     @Value("${spring.kakao.auth.admin}")
     private String adminKey;
 
-    @Value("${spring.kakao.auth.logout.redirect}")
-    private String redirectUri;
 
     // 소셜 로그인/회원가입 -> 쿠키
     @GetMapping("/auth/kakao/login")
@@ -129,6 +124,5 @@ public class KakaoAuthUserController {
         authUserService.withdraw(user.getId(), request.getRefreshToken());
         return ResponseEntity.noContent().build();
     }
-
 
 }

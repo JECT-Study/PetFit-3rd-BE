@@ -1,5 +1,6 @@
 package ject.petfit.global.jwt.refreshtoken;
 
+import java.util.List;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.member.entity.Role;
 import ject.petfit.domain.user.entity.AuthUser;
@@ -107,17 +108,17 @@ class RefreshTokenServiceTest {
     void validateAndRotateToken_유효한토큰_성공() {
         // given
         String rawToken = "valid.refresh.token";
-        String hashedToken = "hashed.valid.token";
-        RefreshToken refreshToken = new RefreshToken(authUser, hashedToken, Instant.now().plusSeconds(3600));
+        String testToken = "hashed.valid.token";
+        RefreshToken refreshToken = new RefreshToken(authUser, testToken, Instant.now().plusSeconds(3600));
 
-        when(refreshTokenRepository.findByToken(rawToken)).thenReturn(Optional.of(refreshToken));
-        when(passwordEncoder.matches(rawToken, hashedToken)).thenReturn(true);
+        when(refreshTokenRepository.findAll()).thenReturn(List.of(refreshToken));
+        when(passwordEncoder.matches(rawToken, testToken)).thenReturn(true);
 
         // when
         AuthUser result = refreshTokenService.validateAndRotateToken(rawToken);
 
         // then
-        verify(refreshTokenRepository).findByToken(rawToken);
+        assertThat(result).isEqualTo(authUser);
     }
 
     @Test
@@ -125,12 +126,13 @@ class RefreshTokenServiceTest {
     void validateAndRotateToken_토큰없음_예외발생() {
         // given
         String invalidToken = "invalid.token";
-        when(refreshTokenRepository.findByToken(invalidToken)).thenReturn(Optional.empty());
+        // findAll()이 빈 리스트를 반환하도록 stub
+        when(refreshTokenRepository.findAll()).thenReturn(java.util.Collections.emptyList());
 
         // when & then
         assertThatThrownBy(() -> refreshTokenService.validateAndRotateToken(invalidToken))
                 .isInstanceOf(TokenException.class)
-                .hasFieldOrPropertyWithValue("code", "TOKEN-401");
+                .hasFieldOrPropertyWithValue("code", "TOKEN-471");
     }
 
     @Test
@@ -141,13 +143,13 @@ class RefreshTokenServiceTest {
         String hashedToken = "hashed.valid.token";
         RefreshToken refreshToken = new RefreshToken(authUser, hashedToken, Instant.now().plusSeconds(3600));
 
-        when(refreshTokenRepository.findByToken(rawToken)).thenReturn(Optional.of(refreshToken));
+        when(refreshTokenRepository.findAll()).thenReturn(List.of(refreshToken));
         when(passwordEncoder.matches(rawToken, hashedToken)).thenReturn(false);
 
         // when & then
         assertThatThrownBy(() -> refreshTokenService.validateAndRotateToken(rawToken))
                 .isInstanceOf(TokenException.class)
-                .hasFieldOrPropertyWithValue("code", "TOKEN-401");
+                .hasFieldOrPropertyWithValue("code", "TOKEN-471");
     }
 
 } 

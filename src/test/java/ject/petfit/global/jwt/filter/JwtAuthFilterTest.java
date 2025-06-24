@@ -164,7 +164,7 @@ class JwtAuthFilterTest {
         // when & then
         assertThatThrownBy(() -> jwtAuthFilter.doFilterInternal(request, response, filterChain))
                 .isInstanceOf(TokenException.class)
-                .hasFieldOrPropertyWithValue("code", "TOKEN-401");
+                .hasFieldOrPropertyWithValue("code", "TOKEN-441");
     }
 
     @Test
@@ -185,7 +185,7 @@ class JwtAuthFilterTest {
         // when & then
         assertThatThrownBy(() -> jwtAuthFilter.doFilterInternal(request, response, filterChain))
                 .isInstanceOf(TokenException.class)
-                .hasFieldOrPropertyWithValue("code", "TOKEN-401");
+                .hasFieldOrPropertyWithValue("code", "TOKEN-441");
     }
 
     @Test
@@ -199,6 +199,6 @@ class JwtAuthFilterTest {
         // when & then
         assertThatThrownBy(() -> jwtAuthFilter.doFilterInternal(request, response, filterChain))
                 .isInstanceOf(TokenException.class)
-                .hasFieldOrPropertyWithValue("code", "TOKEN-401");
+                .hasFieldOrPropertyWithValue("code", "TOKEN-441");
     }
 } 
