@@ -57,5 +57,11 @@ public class Pet {
     }
 
 
-
+    public void updatePet(Pet pet) {
+        this.name = pet.getName();
+        this.type = pet.getType();
+        this.gender = pet.getGender();
+        this.birthDate = pet.getBirthDate();
+        this.isFirst = pet.isFirst();
+    }
 }
