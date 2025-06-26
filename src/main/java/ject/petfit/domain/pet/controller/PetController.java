@@ -2,7 +2,9 @@ package ject.petfit.domain.pet.controller;
 
 
 import java.util.List;
+import ject.petfit.domain.pet.dto.request.PetFavoriteRequestDTO;
 import ject.petfit.domain.pet.dto.request.PetRequestDto;
+import ject.petfit.domain.pet.dto.response.PetFavoriteResponseDTO;
 import ject.petfit.domain.pet.dto.response.PetResponseDto;
 import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.pet.service.PetService;
@@ -57,6 +59,12 @@ public class PetController {
     }
 
     // Update (Pet List info) - 즐겨찾기 동물 (isFirst) 변경
+    @PostMapping("/api/pets/batch-favorites")
+    public ResponseEntity<List<PetFavoriteResponseDTO>> updateFavoritesInBatch(
+            @RequestBody List<PetFavoriteRequestDTO> requestDtos) {
+        List<PetFavoriteResponseDTO> response = petService.updateFavoriteBatch(requestDtos);
+        return ResponseEntity.ok(response);
+    }
 
 
     // Delete (Pet)

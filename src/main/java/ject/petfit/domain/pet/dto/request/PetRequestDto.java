@@ -17,16 +17,7 @@ public class PetRequestDto {
     private String type;
     private String gender;
     private LocalDate birthDate;
-    private Boolean isFirst;
+    private Boolean isFavorite;
     private Long authUserId;
 
-    public PetRequestDto of(Pet pet) {
-        this.name = pet.getName();
-        this.type = pet.getType();
-        this.gender = pet.getGender();
-        this.birthDate = pet.getBirthDate();
-        this.isFirst = pet.getIsFirst();
-        this.authUserId = pet.getMember().getAuthUser().getId();
-        return this;
-    }
 }

@@ -2,14 +2,18 @@ package ject.petfit.domain.pet.service;
 
 
 import jakarta.persistence.EntityNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.member.entity.Role;
 import ject.petfit.domain.member.exception.MemberErrorCode;
 import ject.petfit.domain.member.exception.MemberException;
 import ject.petfit.domain.member.repository.MemberRepository;
+import ject.petfit.domain.pet.dto.request.PetFavoriteRequestDTO;
 import ject.petfit.domain.pet.dto.request.PetRequestDto;
+import ject.petfit.domain.pet.dto.response.PetFavoriteResponseDTO;
 import ject.petfit.domain.pet.dto.response.PetResponseDto;
 import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.pet.exception.PetErrorCode;
@@ -45,21 +49,21 @@ public class PetService {
 
         Pet savedPet = petRepository.save(pet);
         return new PetResponseDto(savedPet.getId(), savedPet.getName(), savedPet.getType(), savedPet.getGender(),
-                savedPet.getBirthDate(), savedPet.getIsFirst());
+                savedPet.getBirthDate(), savedPet.getIsFavorite());
     }
 
     public PetResponseDto getPetById(Long id) {
         Pet pet = petRepository.findById(id)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
         return new PetResponseDto(pet.getId(), pet.getName(), pet.getType(), pet.getGender(),
-                pet.getBirthDate(), pet.getIsFirst());
+                pet.getBirthDate(), pet.getIsFavorite());
     }
 
     public List<PetResponseDto> getAllPets() {
         return petRepository.findAll()
                 .stream()
                 .map(p -> new PetResponseDto(p.getId(), p.getName(), p.getType(), p.getGender(),
-                        p.getBirthDate(), p.getIsFirst()))
+                        p.getBirthDate(), p.getIsFavorite()))
                 .collect(Collectors.toList());
     }
 
@@ -69,7 +73,7 @@ public class PetService {
         pet.updatePet(petDto);
         Pet updatedPet = petRepository.save(pet);
         return new PetResponseDto(updatedPet.getId(), updatedPet.getName(), updatedPet.getType(),
-                updatedPet.getGender(), updatedPet.getBirthDate(), updatedPet.getIsFirst());
+                updatedPet.getGender(), updatedPet.getBirthDate(), updatedPet.getIsFavorite());
     }
 
 
@@ -79,4 +83,31 @@ public class PetService {
         petRepository.deleteById(id);
     }
 
+    public List<PetFavoriteResponseDTO> updateFavoriteBatch(List<PetFavoriteRequestDTO> dtos) {
+        // ID 추출 (WHERE IN 절 사용)
+        List<Long> petIds = dtos.stream()
+                .map(dto -> dto.getPetId())
+                .collect(Collectors.toList());
+
+        // 한 번의 쿼리로 엔티티 조회
+        Map<Long, Pet> petMap = petRepository.findByIdIn(petIds)
+                .stream()
+                .collect(Collectors.toMap(Pet::getId, pet -> pet));
+
+        // 업데이트 작업
+        List<Pet> updatedPets = new ArrayList<>();
+        for (PetFavoriteRequestDTO dto : dtos) {
+            Pet pet = petMap.get(dto.getPetId());
+            if (pet != null) {
+                pet.updateIsFavorite(dto.getIsFavorite());
+                updatedPets.add(pet);
+            }
+        }
+        // 일괄 저장 (batch update)
+        petRepository.saveAll(updatedPets);
+        // 응답 생성
+        return updatedPets.stream()
+                .map(pet -> new PetFavoriteResponseDTO(pet.getId(), pet.getIsFavorite()))
+                .collect(Collectors.toList());
+    }
 }

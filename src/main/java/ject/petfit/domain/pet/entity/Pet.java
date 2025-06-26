@@ -34,8 +34,8 @@ public class Pet {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
-    @Column(name = "is_first")
-    private Boolean isFirst;
+    @Column(name = "is_favorite")
+    private Boolean isFavorite;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -45,12 +45,12 @@ public class Pet {
     private List<Entry> entries;
 
     @Builder
-    public Pet(String name, String type, String gender, LocalDate birthDate, boolean isFirst) {
+    public Pet(String name, String type, String gender, LocalDate birthDate, boolean isFavorite) {
         this.name = name;
         this.type = type;
         this.gender = gender;
         this.birthDate = birthDate;
-        this.isFirst = isFirst;
+        this.isFavorite = isFavorite;
     }
 
     public void setMember(Member member) {
@@ -63,8 +63,11 @@ public class Pet {
         this.type = pet.getType();
         this.gender = pet.getGender();
         this.birthDate = pet.getBirthDate();
-        this.isFirst = pet.getIsFirst();
-        this.member = pet.getMember();
+        this.isFavorite = pet.getIsFavorite();
+    }
+
+    public void updateIsFavorite(Boolean isFavorite) {
+        this.isFavorite = isFavorite;
     }
 
 }
