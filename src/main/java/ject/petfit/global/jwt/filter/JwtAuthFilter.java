@@ -36,7 +36,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
         // 인증이 필요 없는 엔드포인트는 토큰 체크 건너뛰기
-        if (request.getRequestURI().startsWith("/auth/") ||
+        if (request.getRequestURI().startsWith("/api/auth/") ||
                 request.getRequestURI().equals("/error")) {
             filterChain.doFilter(request, response);
             return;

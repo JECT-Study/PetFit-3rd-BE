@@ -130,7 +130,7 @@ class JwtIntegrationTest {
         RefreshTokenRequestDTO request = new RefreshTokenRequestDTO(rawRefreshToken);
 
         // when & then
-        mockMvc.perform(post("/auth/refresh")
+        mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -146,7 +146,7 @@ class JwtIntegrationTest {
         RefreshTokenRequestDTO request = new RefreshTokenRequestDTO(expiredToken);
 
         // when & then
-        mockMvc.perform(post("/auth/refresh")
+        mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized());

@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -91,7 +92,7 @@ class TokenControllerTest {
         when(refreshToken.getToken()).thenReturn(newRefreshTokenValue);
 
         // when & then
-        mockMvc.perform(post("/auth/refresh")
+        mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -110,7 +111,7 @@ class TokenControllerTest {
                 .thenThrow(new TokenException(TokenErrorCode.REFRESH_TOKEN_INVALID));
 
         // when & then
-        mockMvc.perform(post("/auth/refresh")
+        mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized());
@@ -127,7 +128,7 @@ class TokenControllerTest {
                 .thenThrow(new TokenException(TokenErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
         // when & then
-        mockMvc.perform(post("/auth/refresh")
+        mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized());
@@ -144,7 +145,7 @@ class TokenControllerTest {
                 .thenThrow(new TokenException(TokenErrorCode.REFRESH_TOKEN_EXPIRED));
 
         // when & then
-        mockMvc.perform(post("/auth/refresh")
+        mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized());
@@ -172,9 +173,9 @@ class TokenNullOrEmptyControllerTest {
         RefreshTokenRequestDTO request = new RefreshTokenRequestDTO("");
 
         // when & then
-        mockMvc.perform(post("/auth/refresh")
+        mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content("{\"refreshToken\":\"\"}"))
                 .andExpect(status().is4xxClientError());
     }
 
@@ -185,7 +186,7 @@ class TokenNullOrEmptyControllerTest {
         String requestJson = "{}";
 
         // when & then
-        mockMvc.perform(post("/auth/refresh")
+        mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().is4xxClientError());

@@ -41,4 +41,4 @@ jwt:
 kakao:
   client-id: test-client-id
   client-secret: test-client-secret
-  redirect-uri: http://localhost:8080/auth/kakao/callback 
+  redirect-uri: http://localhost:8080/api/auth/kakao/callback
