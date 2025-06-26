@@ -64,6 +64,7 @@ public class Pet {
         this.gender = pet.getGender();
         this.birthDate = pet.getBirthDate();
         this.isFirst = pet.getIsFirst();
+        this.member = pet.getMember();
     }
 
 }

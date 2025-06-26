@@ -27,7 +27,8 @@ public class PetController {
 
     private final PetService petService;
 
-    // Create
+    // Create - 회원가입 직후 (첫 반려동물 등록)
+    // Create - 추가
     @PostMapping
     public ResponseEntity<PetResponseDto> createPet(@RequestBody PetRequestDto petDto) {
         PetResponseDto createdPet = petService.createPet(petDto);
@@ -54,6 +55,9 @@ public class PetController {
         PetResponseDto updatedPet = petService.updatePet(id, petDto);
         return new ResponseEntity<>(updatedPet, HttpStatus.OK);
     }
+
+    // Update (Pet List info) - 즐겨찾기 동물 (isFirst) 변경
+
 
     // Delete (Pet)
     @DeleteMapping("/{id}")
