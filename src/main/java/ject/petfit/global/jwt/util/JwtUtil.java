@@ -1,8 +1,10 @@
 package ject.petfit.global.jwt.util;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,11 +40,16 @@ public class JwtUtil {
     // 프 -> 백 헤더 추가 곤련
     public String resolveAccessToken(HttpServletRequest request) {
         String authorization = request.getHeader("Authorization");
-
-        if (authorization == null || !authorization.startsWith("Bearer ")) {
+        // Authorization 헤더가 없는 경우 / 비어있는 경우 / Bearer로 시작하지 않는 경우 / 토큰이 없는 경우
+        if (authorization == null){
             throw new TokenException(TokenErrorCode.TOKEN_NOT_FOUND);
         }
-        return authorization.split(" ")[1];
+        String[] parts = authorization.split(" ");
+        if (authorization.trim().isEmpty() || !authorization.startsWith("Bearer ")
+                || parts.length != 2 || parts[1].trim().isEmpty()) {
+            throw new TokenException(TokenErrorCode.TOKEN_NOT_FOUND);
+        }
+        return parts[1].trim();
     }
 
     public String createAccessToken(String email, String role) {
@@ -75,7 +82,8 @@ public class JwtUtil {
                     .parseClaimsJws(token);
 
             return true;
-        } catch (TokenException | IllegalArgumentException e) {
+        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException
+                 | ExpiredJwtException | TokenException e) {
             return false;
         }
     }

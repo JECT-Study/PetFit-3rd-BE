@@ -49,7 +49,7 @@ public class WebSecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/**",
+                                "/api/auth/**",
                                 "/error"
                         ).permitAll()
                         .anyRequest().authenticated()

@@ -27,9 +27,8 @@ public class KakaoUtil {
     }
 
     public OAuthToken requestToken(String accessCode) {
-        OAuthToken token = null;
         try {
-            token = webClient.post()
+            OAuthToken token = webClient.post()
                     .uri("https://kauth.kakao.com/oauth/token")
                     .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
                     .body(BodyInserters.fromFormData(params(accessCode)))
@@ -41,13 +40,12 @@ public class KakaoUtil {
 
             // 토큰을 받은 후 로깅
             if (token != null) {
-                new AuthUserException(AuthUserErrorCode.OAUTH_SERVER_ERROR);
+                throw new AuthUserException(AuthUserErrorCode.OAUTH_SERVER_ERROR);
             }
             return token;
         } catch (Exception e) {
-            new AuthUserException(AuthUserErrorCode.OAUTH_SERVER_ERROR);
+            throw new AuthUserException(AuthUserErrorCode.OAUTH_SERVER_ERROR);
         }
-        return token;
     }
 
 
