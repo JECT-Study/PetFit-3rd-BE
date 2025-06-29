@@ -28,6 +28,7 @@ public class RoutineService {
     private final RoutineRepository routineRepository;
     private final PetRepository petRepository;
     private final EntryService entryService;
+    private final EntryRepository entryRepository;
 
     // ------------------------------ 루틴 공통 메서드 -----------------------------------
     // 카테고리에 따른 슬롯 목표량 or null 반환
@@ -63,9 +64,12 @@ public class RoutineService {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
 
-        // 해당 날짜의 entry 조회
+        // 해당 날짜의 entry 조회 - entry가 없으면 빈 리스트 반환
         LocalDate entryDate = LocalDate.parse(date);
-        Entry entry = entryService.getEntry(pet, entryDate);
+        Entry entry = entryRepository.findByPetAndEntryDate(pet, entryDate);
+        if (entry == null) {
+            return List.of(); 
+        }
 
         // 루틴 조회
         List<Routine> routines = routineRepository.findAllByEntry(entry);
