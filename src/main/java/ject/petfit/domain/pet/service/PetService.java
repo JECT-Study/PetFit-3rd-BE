@@ -42,9 +42,9 @@ public class PetService {
                 .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         // 최초 등록 (즐겨 찾기) 동물 처리
-        Boolean isFirst = authUser.getIsNewUser();
+        Boolean isFavorite = authUser.getIsNewUser();
 
-        Pet pet = new Pet(petDto.getName(), petDto.getType(), petDto.getGender(), petDto.getBirthDate(), isFirst);
+        Pet pet = new Pet(petDto.getName(), petDto.getType(), petDto.getGender(), petDto.getBirthDate(), isFavorite);
         pet.setMember(member);
 
         Pet savedPet = petRepository.save(pet);

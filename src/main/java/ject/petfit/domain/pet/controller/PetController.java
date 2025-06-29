@@ -58,14 +58,13 @@ public class PetController {
         return new ResponseEntity<>(updatedPet, HttpStatus.OK);
     }
 
-    // Update (Pet List info) - 즐겨찾기 동물 (isFirst) 변경
-    @PostMapping("/api/pets/batch-favorites")
+    // Update (Pet List info) - 즐겨찾기 동물 (isFavorite) 변경
+    @PostMapping("/api/pets/favorites")
     public ResponseEntity<List<PetFavoriteResponseDTO>> updateFavoritesInBatch(
             @RequestBody List<PetFavoriteRequestDTO> requestDtos) {
         List<PetFavoriteResponseDTO> response = petService.updateFavoriteBatch(requestDtos);
         return ResponseEntity.ok(response);
     }
-
 
     // Delete (Pet)
     @DeleteMapping("/{id}")
