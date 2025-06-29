@@ -15,9 +15,22 @@ spring:
     show-sql: true
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
-        show_sql: true
-        use_sql_comments: true
+        
+  kakao:
+    auth:
+      admin: test-admin-key
+      client: test-client-id
+      redirect: http://localhost:8080/test-redirect
+      logout:
+        redirect: http://localhost:8080/test-logout-redirect
+  jwt:
+    issuer: test-issuer
+    secret: test-secret-key-for-testing-purposes-only
+    access-token-time: 3600000
+    refresh-token-validity-seconds: 604800000
+    
   
   security:
     user:
@@ -32,13 +45,3 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
-jwt:
-  issuer: test-issuer
-  secret-key: test-secret-key-
-  access-token-validity: 3600000  # 1시간
-  refresh-token-validity: 604800  # 7일
-
-kakao:
-  client-id: test-client-id
-  client-secret: test-client-secret
-  redirect-uri: http://localhost:8080/api/auth/kakao/callback
