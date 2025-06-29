@@ -50,7 +50,7 @@ public class ScheduleController {
 
     // 일정 등록
     // 현재는 '일'까지만 요청, 추후 '시분초'까지 요청 가능하도록 변경할지 검토 필요
-    @PostMapping("/{petId}/{date}")
+    @PostMapping("/{petId}")
     @Operation(summary = "일정 등록", description = "title(20자), content(200자), targetDate(yyyy-MM-dd) 형식 제한 <br> " +
             "알림 기능 확장시 targetTime(시:분:초)도 추가 예정")
     public ResponseEntity<ApiResponse<ScheduleResponse>> createSchedule(
