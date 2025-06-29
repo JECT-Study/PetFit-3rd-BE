@@ -79,9 +79,6 @@ public class ScheduleService {
         // (펫ID & 날짜)의 entry가 있으면 반환, 없으면 생성해서 반환
         Entry entry = entryService.getOrCreateEntry(pet, targetDate);
 
-        // 일정 등록여부 true로 변경
-        entry.updateScheduledTrue();
-
         // 일정 등록
         LocalDateTime targetDateTime = targetDate.atStartOfDay();
         Schedule schedule = scheduleRepository.save(
@@ -91,6 +88,10 @@ public class ScheduleService {
                         .content(request.getContent())
                         .targetDate(targetDateTime)
                         .build());
+
+        // 일정 등록여부 true로 변경
+        entry.updateScheduledTrue();
+
         return ScheduleResponse.from(schedule);
     }
 

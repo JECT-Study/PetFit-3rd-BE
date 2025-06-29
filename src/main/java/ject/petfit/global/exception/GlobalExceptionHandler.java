@@ -3,7 +3,9 @@ package ject.petfit.global.exception;
 import ject.petfit.domain.entry.exception.EntryException;
 import ject.petfit.domain.pet.exception.PetException;
 import ject.petfit.domain.remark.exception.RemarkException;
+import ject.petfit.domain.routine.exception.RoutineException;
 import ject.petfit.domain.schedule.exception.ScheduleException;
+import ject.petfit.domain.slot.exception.SlotException;
 import ject.petfit.domain.user.exception.AuthUserException;
 import ject.petfit.domain.user.exception.InvalidGrantException;
 import ject.petfit.global.common.ApiResponse;
@@ -92,6 +94,26 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntryException.class)
     public ResponseEntity<ApiResponse<Void>> handleEntryException(EntryException e) {
+        log.info(e.getMessage(), e);
+        ApiResponse<Void> response = ApiResponse.fail(
+                e.getCode(),
+                e.getMessage()
+        );
+        return ResponseEntity.status(e.getHttpStatus()).body(response);
+    }
+
+    @ExceptionHandler(SlotException.class)
+    public ResponseEntity<ApiResponse<Void>> handleSlotException(SlotException e) {
+        log.info(e.getMessage(), e);
+        ApiResponse<Void> response = ApiResponse.fail(
+                e.getCode(),
+                e.getMessage()
+        );
+        return ResponseEntity.status(e.getHttpStatus()).body(response);
+    }
+
+    @ExceptionHandler(RoutineException.class)
+    public ResponseEntity<ApiResponse<Void>> handleRoutineException(RoutineException e) {
         log.info(e.getMessage(), e);
         ApiResponse<Void> response = ApiResponse.fail(
                 e.getCode(),

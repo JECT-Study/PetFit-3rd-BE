@@ -19,6 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 @Slf4j
 @Configuration
@@ -50,7 +51,19 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/**",
-                                "/error"
+                                "/error",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/health/**",
+
+                                // 개발용으로 허용
+                                "/api/routines/**",
+                                "/api/remarks/**",
+                                "/api/schedules/**",
+                                "/api/slots/**",
+                                "/api/entries/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
