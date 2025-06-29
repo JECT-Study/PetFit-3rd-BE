@@ -45,7 +45,7 @@ public class EntryController {
                     "해당 주의 루틴 체크, 메모, 특이사항을 모두 조회 <br> " +
                     "월간 조회처럼 유무 값도 포함 <br>" +
                     "주간 조회 응답에서 일간 조회 뽑아서 사용하면 API 요청을 줄일 수 있으니 일간 조회API를 따로 만들지 않았음")
-    public ResponseEntity<ApiResponse<List<EntryDailyResponse>>> getWeeklyEntries(
+    public ResponseEntity<ApiResponse<List<EntryDailyResponse>>> getWeeklyEntries(  //
             @PathVariable Long petId,
             @PathVariable String week
     ) {
