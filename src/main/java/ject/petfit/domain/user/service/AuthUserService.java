@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
@@ -75,7 +74,6 @@ public class AuthUserService {
         } catch (AuthUserException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Unexpected error in oAuthLogin: {}", e.getMessage(), e);
             throw new AuthUserException(AuthUserErrorCode.OAUTH_SERVER_ERROR);
         }
     }
@@ -91,7 +89,6 @@ public class AuthUserService {
 
 
     private AuthUser createNewUser(KakaoDTO.KakaoProfile kakaoProfile) {
-        // error handling for missing profile information
         if (kakaoProfile == null || kakaoProfile.getKakao_account() == null) {
             throw new AuthUserException(AuthUserErrorCode.PROFILE_INFORMATION_NOT_SUPPORTED);
         }
@@ -130,14 +127,16 @@ public class AuthUserService {
         authUserRepository.deleteById(userId);
     }
 
-    public Mono<Void> unlinkUserByAdminKey(String kakaoUserId, String adminKey) {
-        return WebClient.create()
+    public void unlinkUserByAdminKey(String kakaoUserId, String adminKey) {
+        WebClient.create()
                 .post()
                 .uri("https://kapi.kakao.com/v1/user/unlink")
                 .header("Authorization", "KakaoAK " + adminKey)
                 .bodyValue("target_id_type=user_id&target_id=" + kakaoUserId)
                 .retrieve()
                 .toBodilessEntity()
-                .then();
+                .then()
+                .block();
+
     }
 }

@@ -52,6 +52,9 @@ dependencies {
 	runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.104.Final:osx-aarch_64'
 
 	implementation 'org.springframework.boot:spring-boot-starter-validation'	// 유효성 검사 의존성 추가
+
+	// test DB
+	testImplementation 'com.h2database:h2'
 }
 
 tasks.named('test') {
