@@ -5,6 +5,7 @@ import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.global.jwt.exception.TokenErrorCode;
 import ject.petfit.global.jwt.exception.TokenException;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,7 +44,9 @@ public class RefreshTokenService {
 
     @Transactional
     public AuthUser validateAndRotateToken(String oldRawRefreshToken) {
-        RefreshToken oldToken = refreshTokenRepository.findByToken(oldRawRefreshToken)
+        RefreshToken oldToken = refreshTokenRepository.findAll().stream()
+                .filter(t -> passwordEncoder.matches(oldRawRefreshToken, t.getToken()))
+                .findFirst()
                 .orElseThrow(() -> new TokenException(TokenErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
         if (!passwordEncoder.matches(oldRawRefreshToken, oldToken.getToken())) {

@@ -27,6 +27,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class KakaoAuthUserController {
 
@@ -38,17 +39,12 @@ public class KakaoAuthUserController {
     @Value("${spring.jwt.refresh-token-validity-seconds}")
     private long refreshTokenValiditySeconds;
 
-    @Value("${spring.kakao.auth.client}")
-    private String clientId;
-
     @Value("${spring.kakao.auth.admin}")
     private String adminKey;
 
-    @Value("${spring.kakao.auth.logout.redirect}")
-    private String redirectUri;
 
     // 소셜 로그인/회원가입 -> 쿠키
-    @GetMapping("/auth/kakao/login")
+    @GetMapping("/kakao/login")
     public void kakaoLogin(
             @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) throws IOException {
         AuthUser user = authUserService.oAuthLogin(accessCode);
@@ -65,7 +61,7 @@ public class KakaoAuthUserController {
     }
 
     // 소셜 로그인/회원가입 -> DEV
-    @GetMapping("/auth/kakao/login/dev")
+    @GetMapping("/kakao/login/dev")
     public ResponseEntity<AuthUserResponseDTO.JoinResultDTO> kakaoLoginDev(
             @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) throws IOException {
         AuthUser user = authUserService.oAuthLogin(accessCode);
@@ -83,7 +79,7 @@ public class KakaoAuthUserController {
 
     // 서비스만 로그아웃 -> 쿠키 삭제
     // UX 고려하여 카카오 계정과의 unlink 처리는 X
-    @PostMapping("/auth/kakao/logout")
+    @PostMapping("/kakao/logout")
     public ResponseEntity<?> logout(
             @RequestBody RefreshTokenRequestDTO request, HttpServletResponse response) {
         // 리프레시 토큰 무효화
@@ -95,7 +91,7 @@ public class KakaoAuthUserController {
     }
 
     // 서비스만 로그아웃 -> Dev
-    @PostMapping("/auth/kakao/logout/dev")
+    @PostMapping("/kakao/logout/dev")
     public ResponseEntity<?> logoutDev(
             @RequestBody RefreshTokenRequestDTO request, HttpServletResponse response) {
         // 리프레시 토큰 무효화
@@ -109,7 +105,7 @@ public class KakaoAuthUserController {
 
     // 회원 탈퇴 (JWT 기반 Refresh Token 삭제 후 카카오 계정과의 unlink 처리)
     // UX 고려하여 회원 탈퇴 시 카카오 계정과의 unlink 처리
-    @DeleteMapping("/auth/kakao/withdraw")
+    @DeleteMapping("/kakao/withdraw")
     public ResponseEntity<Void> withdraw(@RequestBody WithdrawAuthUserRequest request,
                                          Authentication authentication) {
         // JWT 필터에서 이미 검증된 정보 사용
@@ -129,6 +125,5 @@ public class KakaoAuthUserController {
         authUserService.withdraw(user.getId(), request.getRefreshToken());
         return ResponseEntity.noContent().build();
     }
-
 
 }
