@@ -62,6 +62,7 @@ public class WebSecurityConfig {
                                 "/health/**",
 
                                 // 개발용으로 허용
+                                "/api/pet/**",
                                 "/api/routines/**",
                                 "/api/remarks/**",
                                 "/api/schedules/**",
