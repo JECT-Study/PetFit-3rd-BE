@@ -7,7 +7,7 @@ spring:
     datasource:
         driver-class-name: org.postgresql.Driver
         url: jdbc:postgresql://localhost:5432/petfit
-        username: petfit
+        username: postgres
         password: ${DB_PASSWORD}
 
     jpa:
@@ -31,3 +31,4 @@ spring:
         secret: ${JWT_SECRET}
         access-token-time: 3600000  # 1 hour
         refresh-token-validity-seconds: 604800000  # 7 days
+

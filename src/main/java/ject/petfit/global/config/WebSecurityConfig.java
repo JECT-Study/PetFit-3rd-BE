@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -19,8 +20,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 @Slf4j
+@Profile("!test")
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -49,8 +52,23 @@ public class WebSecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/**",
-                                "/error"
+
+                                "/api/auth/**",
+                                "/error",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/health/**",
+
+                                // 개발용으로 허용
+                                "/api/pet/**",
+                                "/api/routines/**",
+                                "/api/remarks/**",
+                                "/api/schedules/**",
+                                "/api/slots/**",
+                                "/api/entries/**"
+
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

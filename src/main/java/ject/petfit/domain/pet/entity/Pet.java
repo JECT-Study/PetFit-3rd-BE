@@ -3,6 +3,8 @@ package ject.petfit.domain.pet.entity;
 import jakarta.persistence.*;
 import ject.petfit.domain.entry.entity.Entry;
 import ject.petfit.domain.member.entity.Member;
+import ject.petfit.domain.slot.entity.Slot;
+import ject.petfit.domain.pet.dto.request.PetRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,8 +35,8 @@ public class Pet {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
-    @Column(name = "is_first")
-    private boolean isFirst;
+    @Column(name = "is_favorite")
+    private Boolean isFavorite;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -43,13 +45,16 @@ public class Pet {
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Entry> entries;
 
+    @OneToOne(mappedBy = "pet")
+    private Slot slot;
+
     @Builder
-    public Pet(String name, String type, String gender, LocalDate birthDate, boolean isFirst) {
+    public Pet(String name, String type, String gender, LocalDate birthDate, boolean isFavorite) {
         this.name = name;
         this.type = type;
         this.gender = gender;
         this.birthDate = birthDate;
-        this.isFirst = isFirst;
+        this.isFavorite = isFavorite;
     }
 
     public void setMember(Member member) {
@@ -57,5 +62,16 @@ public class Pet {
     }
 
 
+    public void updatePet(PetRequestDto pet) {
+        this.name = pet.getName();
+        this.type = pet.getType();
+        this.gender = pet.getGender();
+        this.birthDate = pet.getBirthDate();
+        this.isFavorite = pet.getIsFavorite();
+    }
+
+    public void updateIsFavorite(Boolean isFavorite) {
+        this.isFavorite = isFavorite;
+    }
 
 }

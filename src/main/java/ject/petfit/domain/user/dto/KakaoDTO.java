@@ -1,22 +1,9 @@
 package ject.petfit.domain.user.dto;
 
-import com.nimbusds.oauth2.sdk.TokenResponse;
-import com.nimbusds.oauth2.sdk.http.HTTPResponse;
 import lombok.Getter;
 
 
-public class KakaoDTO extends TokenResponse {
-
-    @Override
-    public boolean indicatesSuccess() {
-        return false;
-    }
-
-    @Override
-    public HTTPResponse toHTTPResponse() {
-        return null;
-    }
-
+public class KakaoDTO {
 
     @Getter
     public static class OAuthToken {

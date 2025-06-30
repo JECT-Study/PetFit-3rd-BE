@@ -36,8 +36,24 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
         // 인증이 필요 없는 엔드포인트는 토큰 체크 건너뛰기
-        if (request.getRequestURI().startsWith("/auth/") ||
-                request.getRequestURI().equals("/error")) {
+
+        String uri = request.getRequestURI();
+        if (
+            uri.startsWith("/api/auth/") ||
+            uri.equals("/error") ||
+            uri.startsWith("/swagger-ui") ||
+            uri.startsWith("/v3/api-docs") ||
+            uri.startsWith("/swagger-resources") ||
+            uri.startsWith("/health") ||
+
+            // 개발용으로 허용
+            uri.startsWith("/api/routines/") ||
+            uri.startsWith("/api/remarks/") ||
+            uri.startsWith("/api/schedules/") ||
+            uri.startsWith("/api/slots/") ||
+            uri.startsWith("/api/entries/")
+        ) {
+
             filterChain.doFilter(request, response);
             return;
         }
@@ -52,18 +68,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             // 1. 요청 헤더에서 JWT 추출
             String token = jwtUtil.resolveAccessToken(request);
 
-            if (token != null && jwtUtil.isTokenValid(token)) {
-                // 2. 토큰에서 이메일 추출
-                String email = jwtUtil.getEmail(token);
+            if (token != null) {
+                if (jwtUtil.isTokenValid(token)) {
+                    // 2. 토큰에서 이메일 추출
+                    String email = jwtUtil.getEmail(token);
 
-                // 3. DB에서 사용자 조회
-                UserDetails userDetails = authUserService.loadAuthUserByEmail(email);
-                // 4. SecurityContext에 인증 정보 저장
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities()
-                        );
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    // 3. DB에서 사용자 조회
+                    UserDetails userDetails = authUserService.loadAuthUserByEmail(email);
+                    // 4. SecurityContext에 인증 정보 저장
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails, null, userDetails.getAuthorities()
+                            );
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    throw new TokenException(TokenErrorCode.AUTH_INVALID_TOKEN);
+                }
             }
         } catch (ExpiredJwtException e) {
             log.error("Token expired", e);
