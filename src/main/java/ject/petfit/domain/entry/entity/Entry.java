@@ -5,6 +5,7 @@ import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.remark.entity.Remark;
 import ject.petfit.domain.routine.entity.Routine;
 import ject.petfit.domain.schedule.entity.Schedule;
+import ject.petfit.global.common.BaseTime;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -19,7 +20,7 @@ import java.util.List;
 @Table(name = "entry", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"entry_date", "pet_id"})
 })
-public class Entry {
+public class Entry extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long entryId;
@@ -61,7 +62,6 @@ public class Entry {
     public void updateScheduledFalse() {
         this.isScheduled = false;
     }
-
     public void updateCheckedFalse() {
         this.isChecked = false;
     }

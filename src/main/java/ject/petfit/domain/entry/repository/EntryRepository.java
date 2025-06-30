@@ -18,4 +18,6 @@ public interface EntryRepository extends JpaRepository<Entry, Long> {
 
     //isRemarked
     List<Entry> findAllByPetAndIsRemarkedTrueAndEntryDateBetween(Pet pet, LocalDate startDate, LocalDate endDate);
+
+    List<Entry> findAllByPetAndEntryDateBetween(Pet pet, LocalDate startDate, LocalDate endDate);
 }

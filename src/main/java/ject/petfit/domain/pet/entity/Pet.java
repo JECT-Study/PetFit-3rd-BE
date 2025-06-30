@@ -3,6 +3,7 @@ package ject.petfit.domain.pet.entity;
 import jakarta.persistence.*;
 import ject.petfit.domain.entry.entity.Entry;
 import ject.petfit.domain.member.entity.Member;
+import ject.petfit.domain.slot.entity.Slot;
 import ject.petfit.domain.pet.dto.request.PetRequestDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -43,6 +44,9 @@ public class Pet {
 
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Entry> entries;
+
+    @OneToOne(mappedBy = "pet")
+    private Slot slot;
 
     @Builder
     public Pet(String name, String type, String gender, LocalDate birthDate, boolean isFavorite) {
