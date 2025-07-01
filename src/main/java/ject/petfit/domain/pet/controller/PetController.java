@@ -33,7 +33,7 @@ public class PetController {
     // Create - 회원가입 직후 (첫 반려동물 등록)
     // Create - 추가
     @PostMapping
-    @Operation(summary = "새로운 동물 등록", description = "이름(20자), 종(5타입), 성별(2타입), 생일(YYYY-MM-DD) 형식 제한")
+    @Operation(summary = "새로운 동물 등록", description = "이름(20자), 종(6타입), 성별(3타입), 생일(YYYY-MM-DD) 형식 제한")
     public ResponseEntity<PetResponseDto> createPet(@RequestBody PetRequestDto petDto) {
         PetResponseDto createdPet = petService.createPet(petDto);
         return new ResponseEntity<>(createdPet, HttpStatus.CREATED);
