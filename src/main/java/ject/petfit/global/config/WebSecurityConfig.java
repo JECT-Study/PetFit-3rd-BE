@@ -67,7 +67,8 @@ public class WebSecurityConfig {
                                 "/api/remarks/**",
                                 "/api/schedules/**",
                                 "/api/slots/**",
-                                "/api/entries/**"
+                                "/api/entries/**",
+                                "/api/members/**"
 
                         ).permitAll()
                         .anyRequest().authenticated()

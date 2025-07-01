@@ -1,6 +1,7 @@
 package ject.petfit.domain.pet.controller;
 
 
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import ject.petfit.domain.pet.dto.request.PetFavoriteRequestDTO;
 import ject.petfit.domain.pet.dto.request.PetRequestDto;
@@ -32,34 +33,39 @@ public class PetController {
     // Create - 회원가입 직후 (첫 반려동물 등록)
     // Create - 추가
     @PostMapping
+    @Operation(summary = "새로운 동물 등록", description = "이름(20자), 종(5타입), 성별(2타입), 생일(YYYY-MM-DD) 형식 제한")
     public ResponseEntity<PetResponseDto> createPet(@RequestBody PetRequestDto petDto) {
         PetResponseDto createdPet = petService.createPet(petDto);
         return new ResponseEntity<>(createdPet, HttpStatus.CREATED);
     }
 
     // Read (Single info of Pet)
-    @GetMapping("/{id}")
-    public ResponseEntity<PetResponseDto> getPetById(@PathVariable Long id) {
-        PetResponseDto pet = petService.getPetById(id);
+    @GetMapping("/{petId}")
+    @Operation(summary = "동물 한 마리 정보 조회", description = "반려동물 ID로 반려동물 정보 조회")
+    public ResponseEntity<PetResponseDto> getPetById(@PathVariable Long petId) {
+        PetResponseDto pet = petService.getPetById(petId);
         return new ResponseEntity<>(pet, HttpStatus.OK);
     }
 
     // Read (List of Pets)
     @GetMapping
+    @Operation(summary = "모든 동물 정보 조회", description = "사용자의 모든 반려동물 정보 조회")
     public ResponseEntity<List<PetResponseDto>> getAllPets() {
         List<PetResponseDto> pets = petService.getAllPets();
         return new ResponseEntity<>(pets, HttpStatus.OK);
     }
 
     // Update (Pet info)
-    @PutMapping("/{id}")
-    public ResponseEntity<PetResponseDto> updatePet(@PathVariable Long id, @RequestBody PetRequestDto petDto) {
-        PetResponseDto updatedPet = petService.updatePet(id, petDto);
+    @PutMapping("/{petId}")
+    @Operation(summary = "동물 정보 수정", description = "반려동물 ID로 반려동물 정보 수정")
+    public ResponseEntity<PetResponseDto> updatePet(@PathVariable Long petId, @RequestBody PetRequestDto petDto) {
+        PetResponseDto updatedPet = petService.updatePet(petId, petDto);
         return new ResponseEntity<>(updatedPet, HttpStatus.OK);
     }
 
     // Update (Pet List info) - 즐겨찾기 동물 (isFavorite) 변경
     @PostMapping("/api/pets/favorites")
+    @Operation(summary = "즐겨찾기 동물 목록 업데이트", description = "즐겨찾기 동물 목록을 일괄 업데이트")
     public ResponseEntity<List<PetFavoriteResponseDTO>> updateFavoritesInBatch(
             @RequestBody List<PetFavoriteRequestDTO> requestDtos) {
         List<PetFavoriteResponseDTO> response = petService.updateFavoriteBatch(requestDtos);
@@ -67,9 +73,10 @@ public class PetController {
     }
 
     // Delete (Pet)
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePet(@PathVariable Long id) {
-        petService.deletePet(id);
+    @DeleteMapping("/{petId}")
+    @Operation(summary = "동물 삭제", description = "반려동물 ID로 반려동물 정보 삭제")
+    public ResponseEntity<Void> deletePet(@PathVariable Long petId) {
+        petService.deletePet(petId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

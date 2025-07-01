@@ -51,7 +51,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             uri.startsWith("/api/remarks/") ||
             uri.startsWith("/api/schedules/") ||
             uri.startsWith("/api/slots/") ||
-            uri.startsWith("/api/entries/")
+            uri.startsWith("/api/entries/") ||
+            uri.startsWith("/api/pets/") ||
+            uri.startsWith("/api/members/")
         ) {
 
             filterChain.doFilter(request, response);
