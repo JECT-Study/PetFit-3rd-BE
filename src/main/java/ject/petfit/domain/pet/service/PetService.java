@@ -52,8 +52,8 @@ public class PetService {
                 savedPet.getBirthDate(), savedPet.getIsFavorite());
     }
 
-    public PetResponseDto getPetById(Long id) {
-        Pet pet = petRepository.findById(id)
+    public PetResponseDto getPetById(Long petId) {
+        Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
         return new PetResponseDto(pet.getId(), pet.getName(), pet.getType(), pet.getGender(),
                 pet.getBirthDate(), pet.getIsFavorite());
@@ -67,8 +67,8 @@ public class PetService {
                 .collect(Collectors.toList());
     }
 
-    public PetResponseDto updatePet(Long id, PetRequestDto petDto) {
-        Pet pet = petRepository.findById(id)
+    public PetResponseDto updatePet(Long petId, PetRequestDto petDto) {
+        Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
         pet.updatePet(petDto);
         Pet updatedPet = petRepository.save(pet);
@@ -77,10 +77,10 @@ public class PetService {
     }
 
 
-    public void deletePet(Long id) {
-        Pet pet = petRepository.findById(id)
+    public void deletePet(Long petId) {
+        Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
-        petRepository.deleteById(id);
+        petRepository.deleteById(petId);
     }
 
     public List<PetFavoriteResponseDTO> updateFavoriteBatch(List<PetFavoriteRequestDTO> dtos) {
