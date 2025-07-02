@@ -10,8 +10,6 @@ import ject.petfit.domain.pet.dto.response.PetListResponseDto;
 import ject.petfit.domain.pet.dto.response.PetResponseDto;
 import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.pet.service.PetService;
-import ject.petfit.domain.user.exception.AuthUserErrorCode;
-import ject.petfit.domain.user.exception.AuthUserException;
 import ject.petfit.domain.user.service.AuthUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -80,7 +79,7 @@ public class PetController {
     }
 
     // Update (Pet List info) - 즐겨찾기 동물 (isFavorite) 변경
-    @PutMapping("/favorites/batch-updates")
+    @PatchMapping("/favorites/batch-updates")
     @Operation(summary = "즐겨찾기 동물 목록 업데이트", description = "즐겨찾기 동물 목록을 일괄 업데이트")
     public ResponseEntity<List<PetFavoriteResponseDTO>> updateFavoritesInBatch(
             @RequestBody List<PetFavoriteRequestDTO> requestDtos) {
