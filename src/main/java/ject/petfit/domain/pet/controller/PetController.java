@@ -64,7 +64,7 @@ public class PetController {
     }
 
     // Update (Pet List info) - 즐겨찾기 동물 (isFavorite) 변경
-    @PostMapping("/api/pets/favorites")
+    @PostMapping("/favorites")
     @Operation(summary = "즐겨찾기 동물 목록 업데이트", description = "즐겨찾기 동물 목록을 일괄 업데이트")
     public ResponseEntity<List<PetFavoriteResponseDTO>> updateFavoritesInBatch(
             @RequestBody List<PetFavoriteRequestDTO> requestDtos) {

@@ -19,5 +19,4 @@ public class PetRequestDto {
     private LocalDate birthDate;
     private Boolean isFavorite;
     private Long authUserId;
-
 }
