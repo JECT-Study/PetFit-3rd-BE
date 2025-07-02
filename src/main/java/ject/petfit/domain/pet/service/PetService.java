@@ -1,13 +1,11 @@
 package ject.petfit.domain.pet.service;
 
 
-import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import ject.petfit.domain.member.entity.Member;
-import ject.petfit.domain.member.entity.Role;
 import ject.petfit.domain.member.exception.MemberErrorCode;
 import ject.petfit.domain.member.exception.MemberException;
 import ject.petfit.domain.member.repository.MemberRepository;
@@ -35,8 +33,8 @@ public class PetService {
     private final MemberRepository memberRepository;
 
 
-    public PetResponseDto createPet(PetRequestDto petDto) {
-        AuthUser authUser = authUserRepository.findById(petDto.getAuthUserId())
+    public PetResponseDto createPet(PetRequestDto petDto, Long authUserId) {
+        AuthUser authUser = authUserRepository.findById(authUserId)
                 .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.USER_NOT_FOUND));
         Member member = memberRepository.findByAuthUser(authUser)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));

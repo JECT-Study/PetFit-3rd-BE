@@ -105,7 +105,8 @@ class JwtAuthFilterTest {
     @DisplayName("인증이 불필요한 경로는 필터 스킵")
     void doFilterInternal_인증불필요경로_필터스킵() throws Exception {
         // given
-        when(request.getRequestURI()).thenReturn("/auth/login");
+        when(request.getRequestURI()).thenReturn("/api/auth/login");
+        lenient().when(request.getHeaderNames()).thenReturn(Collections.emptyEnumeration());
 
         // when
         jwtAuthFilter.doFilterInternal(request, response, filterChain);

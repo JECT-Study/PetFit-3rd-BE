@@ -71,7 +71,7 @@ class PetServiceIntegrationTest {
     @Test
     @DisplayName("반려동물 생성 성공")
     void createPet_Success() {
-        PetRequestDto dto = new PetRequestDto("멍멍이", "강아지", "남아", LocalDate.of(2020, 1, 1), true, authUser.getId());
+        PetRequestDto dto = new PetRequestDto("멍멍이", "강아지", "남아", LocalDate.of(2020, 1, 1), true);
         Pet pet = new Pet(dto.getName(), dto.getType(), dto.getGender(), dto.getBirthDate(), dto.getIsFavorite());
         pet.setMember(member);
 
@@ -138,7 +138,7 @@ class PetServiceIntegrationTest {
         pet.setMember(member);
         Pet savedPet = petRepository.save(pet);
 
-        PetRequestDto updateDto = new PetRequestDto("냥냥이", "고양이", "여아", LocalDate.of(2021, 2, 2), false, authUser.getId());
+        PetRequestDto updateDto = new PetRequestDto("냥냥이", "고양이", "여아", LocalDate.of(2021, 2, 2), false);
         PetResponseDto updated = petService.updatePet(savedPet.getId(), updateDto);
 
         assertThat(updated.getName()).isEqualTo("냥냥이");

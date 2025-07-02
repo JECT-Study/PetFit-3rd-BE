@@ -27,13 +27,15 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test") // (테스트용 yml 쓸 때)
+@ActiveProfiles("test")
+@Import(JwtTestConfig.class)
 class TokenControllerTest {
 
     @Autowired
@@ -94,7 +96,8 @@ class TokenControllerTest {
         // when & then
         mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request))
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(cookie().exists("access_token"))
                 .andExpect(cookie().exists("refresh_token"));
@@ -113,7 +116,8 @@ class TokenControllerTest {
         // when & then
         mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request))
+                        .with(csrf()))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -130,7 +134,8 @@ class TokenControllerTest {
         // when & then
         mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request))
+                        .with(csrf()))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -147,7 +152,8 @@ class TokenControllerTest {
         // when & then
         mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request))
+                        .with(csrf()))
                 .andExpect(status().isUnauthorized());
     }
 }
@@ -175,7 +181,8 @@ class TokenNullOrEmptyControllerTest {
         // when & then
         mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"refreshToken\":\"\"}"))
+                        .content("{\"refreshToken\":\"\"}")
+                        .with(csrf()))
                 .andExpect(status().is4xxClientError());
     }
 
@@ -188,7 +195,8 @@ class TokenNullOrEmptyControllerTest {
         // when & then
         mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
+                        .content(requestJson)
+                        .with(csrf()))
                 .andExpect(status().is4xxClientError());
     }
 }

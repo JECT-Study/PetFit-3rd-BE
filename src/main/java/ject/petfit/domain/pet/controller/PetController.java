@@ -9,10 +9,16 @@ import ject.petfit.domain.pet.dto.response.PetFavoriteResponseDTO;
 import ject.petfit.domain.pet.dto.response.PetResponseDto;
 import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.pet.service.PetService;
+import ject.petfit.domain.user.exception.AuthUserErrorCode;
+import ject.petfit.domain.user.exception.AuthUserException;
+import ject.petfit.domain.user.service.AuthUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,13 +35,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class PetController {
 
     private final PetService petService;
+    private final AuthUserService authUserService;
 
     // Create - 회원가입 직후 (첫 반려동물 등록)
     // Create - 추가
     @PostMapping
     @Operation(summary = "새로운 동물 등록", description = "이름(20자), 종(6타입), 성별(3타입), 생일(YYYY-MM-DD) 형식 제한")
-    public ResponseEntity<PetResponseDto> createPet(@RequestBody PetRequestDto petDto) {
-        PetResponseDto createdPet = petService.createPet(petDto);
+    public ResponseEntity<PetResponseDto> createPet(
+            @RequestBody PetRequestDto petDto,
+            @AuthenticationPrincipal UserDetails userDetails // JWT에서 사용자 정보 추출
+    ) {
+        String email = userDetails.getUsername();
+        Long authUserId = authUserService.loadAuthUserByEmail(email).getId();
+        PetResponseDto createdPet = petService.createPet(petDto, authUserId);
         return new ResponseEntity<>(createdPet, HttpStatus.CREATED);
     }
 
@@ -57,14 +69,16 @@ public class PetController {
 
     // Update (Pet info)
     @PutMapping("/{petId}")
-    @Operation(summary = "동물 정보 수정", description = "반려동물 ID로 반려동물 정보 수정")
-    public ResponseEntity<PetResponseDto> updatePet(@PathVariable Long petId, @RequestBody PetRequestDto petDto) {
+    public ResponseEntity<PetResponseDto> updatePet(
+            @PathVariable Long petId,
+            @RequestBody PetRequestDto petDto
+    ) {
         PetResponseDto updatedPet = petService.updatePet(petId, petDto);
         return new ResponseEntity<>(updatedPet, HttpStatus.OK);
     }
 
     // Update (Pet List info) - 즐겨찾기 동물 (isFavorite) 변경
-    @PutMapping("/favorites")
+    @PutMapping("/favorites/batch-updates")
     @Operation(summary = "즐겨찾기 동물 목록 업데이트", description = "즐겨찾기 동물 목록을 일괄 업데이트")
     public ResponseEntity<List<PetFavoriteResponseDTO>> updateFavoritesInBatch(
             @RequestBody List<PetFavoriteRequestDTO> requestDtos) {
