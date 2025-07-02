@@ -7,6 +7,7 @@ import ject.petfit.domain.member.repository.MemberRepository;
 import ject.petfit.domain.pet.dto.request.PetFavoriteRequestDTO;
 import ject.petfit.domain.pet.dto.request.PetRequestDto;
 import ject.petfit.domain.pet.dto.response.PetFavoriteResponseDTO;
+import ject.petfit.domain.pet.dto.response.PetListResponseDto;
 import ject.petfit.domain.pet.dto.response.PetResponseDto;
 import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.pet.exception.PetException;
@@ -121,7 +122,7 @@ class PetServiceIntegrationTest {
         petRepository.save(pet1);
         petRepository.save(pet2);
 
-        List<PetResponseDto> pets = petService.getAllPets();
+        List<PetListResponseDto> pets = petService.getAllPets();
         assertThat(pets).hasSize(2);
     }
 

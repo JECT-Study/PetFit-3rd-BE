@@ -12,6 +12,7 @@ import ject.petfit.domain.member.repository.MemberRepository;
 import ject.petfit.domain.pet.dto.request.PetFavoriteRequestDTO;
 import ject.petfit.domain.pet.dto.request.PetRequestDto;
 import ject.petfit.domain.pet.dto.response.PetFavoriteResponseDTO;
+import ject.petfit.domain.pet.dto.response.PetListResponseDto;
 import ject.petfit.domain.pet.dto.response.PetResponseDto;
 import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.pet.exception.PetErrorCode;
@@ -57,11 +58,10 @@ public class PetService {
                 pet.getBirthDate(), pet.getIsFavorite());
     }
 
-    public List<PetResponseDto> getAllPets() {
+    public List<PetListResponseDto> getAllPets() {
         return petRepository.findAll()
                 .stream()
-                .map(p -> new PetResponseDto(p.getId(), p.getName(), p.getType(), p.getGender(),
-                        p.getBirthDate(), p.getIsFavorite()))
+                .map(p -> new PetListResponseDto(p.getId(), p.getName(), p.getIsFavorite()))
                 .collect(Collectors.toList());
     }
 

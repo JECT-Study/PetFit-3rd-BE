@@ -6,6 +6,7 @@ import java.util.List;
 import ject.petfit.domain.pet.dto.request.PetFavoriteRequestDTO;
 import ject.petfit.domain.pet.dto.request.PetRequestDto;
 import ject.petfit.domain.pet.dto.response.PetFavoriteResponseDTO;
+import ject.petfit.domain.pet.dto.response.PetListResponseDto;
 import ject.petfit.domain.pet.dto.response.PetResponseDto;
 import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.pet.service.PetService;
@@ -62,13 +63,14 @@ public class PetController {
     // Read (List of Pets)
     @GetMapping
     @Operation(summary = "모든 동물 정보 조회", description = "사용자의 모든 반려동물 정보 조회")
-    public ResponseEntity<List<PetResponseDto>> getAllPets() {
-        List<PetResponseDto> pets = petService.getAllPets();
+    public ResponseEntity<List<PetListResponseDto>> getAllPets() {
+        List<PetListResponseDto> pets = petService.getAllPets();
         return new ResponseEntity<>(pets, HttpStatus.OK);
     }
 
     // Update (Pet info)
     @PutMapping("/{petId}")
+    @Operation(summary = "동물 정보 수정", description = "반려동물 ID로 반려동물 정보 수정")
     public ResponseEntity<PetResponseDto> updatePet(
             @PathVariable Long petId,
             @RequestBody PetRequestDto petDto
