@@ -1,6 +1,7 @@
 package ject.petfit.global.jwt.refreshtoken;
 
 import jakarta.transaction.Transactional;
+import java.util.Optional;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.global.jwt.exception.TokenErrorCode;
 import ject.petfit.global.jwt.exception.TokenException;
@@ -61,5 +62,11 @@ public class RefreshTokenService {
 
     private String hashToken(String rawToken) {
         return passwordEncoder.encode(rawToken);
+    }
+
+    public Optional<RefreshToken> findTokenByPlain(String plainToken) {
+        return refreshTokenRepository.findAll().stream()
+                .filter(token -> passwordEncoder.matches(plainToken, token.getToken()))
+                .findFirst();
     }
 }

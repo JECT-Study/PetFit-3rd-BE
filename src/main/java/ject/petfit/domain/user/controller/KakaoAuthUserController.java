@@ -72,8 +72,6 @@ public class KakaoAuthUserController {
 
         AuthUserResponseDTO.JoinResultDTO dto = AuthUserConverter.toJoinResultDTO(user, accessToken, refreshToken);
 
-        httpServletResponse.sendRedirect("http://localhost:3000/home"); //?
-
         return ResponseEntity.ok(dto);
     }
 
@@ -81,11 +79,13 @@ public class KakaoAuthUserController {
     // UX 고려하여 카카오 계정과의 unlink 처리는 X
     @PostMapping("/kakao/logout")
     public ResponseEntity<?> logout(
-            @RequestBody RefreshTokenRequestDTO request, HttpServletResponse response) {
+            @CookieValue("refresh_token") String refreshToken, HttpServletResponse response) {
         // 리프레시 토큰 무효화
-        refreshTokenRepository.findByToken(request.getRefreshToken())
+        refreshTokenService.findTokenByPlain(refreshToken)
                 .ifPresent(refreshTokenRepository::delete);
         // 클라이언트 정리 지시
+        response.addCookie(CookieUtils.deleteCookieByName("access_token"));
+        response.addCookie(CookieUtils.deleteCookieByName("refresh_token"));
         response.setHeader("Clear-Site-Data", "\"cache\", \"cookies\", \"storage\"");
         return ResponseEntity.ok().build();
     }
@@ -95,7 +95,7 @@ public class KakaoAuthUserController {
     public ResponseEntity<?> logoutDev(
             @RequestBody RefreshTokenRequestDTO request, HttpServletResponse response) {
         // 리프레시 토큰 무효화
-        refreshTokenRepository.findByToken(request.getRefreshToken())
+        refreshTokenService.findTokenByPlain(request.getRefreshToken())
                 .ifPresent(refreshTokenRepository::delete);
 
         // 프론트엔드에 토큰 삭제 지시
@@ -105,7 +105,7 @@ public class KakaoAuthUserController {
 
     // 회원 탈퇴 (JWT 기반 Refresh Token 삭제 후 카카오 계정과의 unlink 처리)
     // UX 고려하여 회원 탈퇴 시 카카오 계정과의 unlink 처리
-    @DeleteMapping("/kakao/withdraw")
+    @PostMapping("/kakao/withdraw")
     public ResponseEntity<Void> withdraw(@RequestBody WithdrawAuthUserRequest request,
                                          Authentication authentication) {
         // JWT 필터에서 이미 검증된 정보 사용
@@ -113,7 +113,7 @@ public class KakaoAuthUserController {
         AuthUser user = authUserService.loadAuthUserByEmail(email);
 
         // Refresh Token 추가 검증
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(request.getRefreshToken())
+        RefreshToken refreshToken = refreshTokenService.findTokenByPlain(request.getRefreshToken())
                 .orElseThrow(() -> new TokenException(TokenErrorCode.REFRESH_TOKEN_NOT_FOUND));
         if (!refreshToken.getAuthUser().getId().equals(user.getId())) {
             throw new TokenException(TokenErrorCode.REFRESH_TOKEN_INVALID);
