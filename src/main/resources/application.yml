@@ -7,7 +7,7 @@ spring:
     datasource:
         driver-class-name: org.postgresql.Driver
         url: jdbc:postgresql://localhost:5432/petfit
-        username: petfit
+        username: postgres
         password: ${DB_PASSWORD}
 
     jpa:
