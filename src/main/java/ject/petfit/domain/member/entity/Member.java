@@ -56,5 +56,7 @@ public class Member {
     }
 
 
-
+    public void editNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }
