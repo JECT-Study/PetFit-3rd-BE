@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.member.entity.Role;
 import ject.petfit.domain.user.entity.AuthUser;
-import ject.petfit.global.jwt.dto.RefreshTokenRequestDTO;
+import ject.petfit.global.jwt.dto.RefreshTokenRequestDto;
 import ject.petfit.global.jwt.exception.TokenErrorCode;
 import ject.petfit.global.jwt.exception.TokenException;
 import ject.petfit.global.jwt.refreshtoken.RefreshToken;
-import ject.petfit.global.jwt.refreshtoken.RefreshTokenService;
+import ject.petfit.global.jwt.refreshtoken.service.RefreshTokenService;
 import ject.petfit.global.jwt.util.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -84,7 +84,7 @@ class TokenControllerTest {
         String newAccessToken = "new.access.token";
         String newRefreshTokenValue = "new.refresh.token";
 
-        RefreshTokenRequestDTO request = new RefreshTokenRequestDTO(oldRefreshToken);
+        RefreshTokenRequestDto request = new RefreshTokenRequestDto(oldRefreshToken);
 
         when(refreshTokenService.validateAndRotateToken(oldRefreshToken)).thenReturn(authUser);
         when(jwtUtil.createAccessToken(anyString(), anyString())).thenReturn(newAccessToken);
@@ -108,7 +108,7 @@ class TokenControllerTest {
     void refresh_유효하지않은토큰_예외발생() throws Exception {
         // given
         String invalidToken = "invalid.token";
-        RefreshTokenRequestDTO request = new RefreshTokenRequestDTO(invalidToken);
+        RefreshTokenRequestDto request = new RefreshTokenRequestDto(invalidToken);
 
         when(refreshTokenService.validateAndRotateToken(invalidToken))
                 .thenThrow(new TokenException(TokenErrorCode.REFRESH_TOKEN_INVALID));
@@ -126,7 +126,7 @@ class TokenControllerTest {
     void refresh_존재하지않는토큰_예외발생() throws Exception {
         // given
         String nonExistentToken = "nonexistent.token";
-        RefreshTokenRequestDTO request = new RefreshTokenRequestDTO(nonExistentToken);
+        RefreshTokenRequestDto request = new RefreshTokenRequestDto(nonExistentToken);
 
         when(refreshTokenService.validateAndRotateToken(nonExistentToken))
                 .thenThrow(new TokenException(TokenErrorCode.REFRESH_TOKEN_NOT_FOUND));
@@ -144,7 +144,7 @@ class TokenControllerTest {
     void refresh_만료된토큰_예외발생() throws Exception {
         // given
         String expiredToken = "expired.token";
-        RefreshTokenRequestDTO request = new RefreshTokenRequestDTO(expiredToken);
+        RefreshTokenRequestDto request = new RefreshTokenRequestDto(expiredToken);
 
         when(refreshTokenService.validateAndRotateToken(expiredToken))
                 .thenThrow(new TokenException(TokenErrorCode.REFRESH_TOKEN_EXPIRED));
@@ -176,7 +176,7 @@ class TokenNullOrEmptyControllerTest {
     @DisplayName("빈 리프레시 토큰으로 요청 시 400 에러")
     void refresh_빈토큰_400에러() throws Exception {
         // given
-        RefreshTokenRequestDTO request = new RefreshTokenRequestDTO("");
+        RefreshTokenRequestDto request = new RefreshTokenRequestDto("");
 
         // when & then
         mockMvc.perform(post("/api/auth/refresh")

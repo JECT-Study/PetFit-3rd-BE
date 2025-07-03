@@ -5,10 +5,10 @@ import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.member.entity.Role;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.repository.AuthUserRepository;
-import ject.petfit.global.jwt.dto.RefreshTokenRequestDTO;
+import ject.petfit.global.jwt.dto.RefreshTokenRequestDto;
 import ject.petfit.global.jwt.refreshtoken.RefreshToken;
-import ject.petfit.global.jwt.refreshtoken.RefreshTokenRepository;
-import ject.petfit.global.jwt.refreshtoken.RefreshTokenService;
+import ject.petfit.global.jwt.refreshtoken.repository.RefreshTokenRepository;
+import ject.petfit.global.jwt.refreshtoken.service.RefreshTokenService;
 import ject.petfit.global.jwt.util.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -129,7 +129,7 @@ class JwtIntegrationTest {
         // 리프레시 토큰 생성
         refreshTokenService.createOrUpdateRefreshToken(authUser, rawRefreshToken, validitySeconds);
 
-        RefreshTokenRequestDTO request = new RefreshTokenRequestDTO(rawRefreshToken);
+        RefreshTokenRequestDto request = new RefreshTokenRequestDto(rawRefreshToken);
 
         // when & then
         mockMvc.perform(post("/api/auth/refresh")
@@ -145,7 +145,7 @@ class JwtIntegrationTest {
     void refreshToken_만료된토큰_갱신실패() throws Exception {
         // given
         String expiredToken = "expired.refresh.token";
-        RefreshTokenRequestDTO request = new RefreshTokenRequestDTO(expiredToken);
+        RefreshTokenRequestDto request = new RefreshTokenRequestDto(expiredToken);
 
         // when & then
         mockMvc.perform(post("/api/auth/refresh")

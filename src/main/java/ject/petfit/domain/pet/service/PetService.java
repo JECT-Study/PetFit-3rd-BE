@@ -1,6 +1,7 @@
 package ject.petfit.domain.pet.service;
 
 
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,9 +10,9 @@ import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.member.exception.MemberErrorCode;
 import ject.petfit.domain.member.exception.MemberException;
 import ject.petfit.domain.member.repository.MemberRepository;
-import ject.petfit.domain.pet.dto.request.PetFavoriteRequestDTO;
+import ject.petfit.domain.pet.dto.request.PetFavoriteRequestDto;
 import ject.petfit.domain.pet.dto.request.PetRequestDto;
-import ject.petfit.domain.pet.dto.response.PetFavoriteResponseDTO;
+import ject.petfit.domain.pet.dto.response.PetFavoriteResponseDto;
 import ject.petfit.domain.pet.dto.response.PetListResponseDto;
 import ject.petfit.domain.pet.dto.response.PetResponseDto;
 import ject.petfit.domain.pet.entity.Pet;
@@ -34,6 +35,7 @@ public class PetService {
     private final MemberRepository memberRepository;
 
 
+    @Transactional
     public PetResponseDto createPet(PetRequestDto petDto, Long authUserId) {
         AuthUser authUser = authUserRepository.findById(authUserId)
                 .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.USER_NOT_FOUND));
@@ -65,23 +67,32 @@ public class PetService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public PetResponseDto updatePet(Long petId, PetRequestDto petDto) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
-        pet.updatePet(petDto);
+        pet.updatePet(
+                petDto.getName(),
+                petDto.getType(),
+                petDto.getGender(),
+                petDto.getBirthDate(),
+                petDto.getIsFavorite()
+        );
         Pet updatedPet = petRepository.save(pet);
         return new PetResponseDto(updatedPet.getId(), updatedPet.getName(), updatedPet.getType(),
                 updatedPet.getGender(), updatedPet.getBirthDate(), updatedPet.getIsFavorite());
     }
 
 
+    @Transactional
     public void deletePet(Long petId) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
         petRepository.deleteById(petId);
     }
 
-    public List<PetFavoriteResponseDTO> updateFavoriteBatch(List<PetFavoriteRequestDTO> dtos) {
+    @Transactional
+    public List<PetFavoriteResponseDto> updateFavoriteBatch(List<PetFavoriteRequestDto> dtos) {
         // ID 추출 (WHERE IN 절 사용)
         List<Long> petIds = dtos.stream()
                 .map(dto -> dto.getPetId())
@@ -94,7 +105,7 @@ public class PetService {
 
         // 업데이트 작업
         List<Pet> updatedPets = new ArrayList<>();
-        for (PetFavoriteRequestDTO dto : dtos) {
+        for (PetFavoriteRequestDto dto : dtos) {
             Pet pet = petMap.get(dto.getPetId());
             if (pet != null) {
                 pet.updateIsFavorite(dto.getIsFavorite());
@@ -105,7 +116,7 @@ public class PetService {
         petRepository.saveAll(updatedPets);
         // 응답 생성
         return updatedPets.stream()
-                .map(pet -> new PetFavoriteResponseDTO(pet.getId(), pet.getIsFavorite()))
+                .map(pet -> new PetFavoriteResponseDto(pet.getId(), pet.getIsFavorite()))
                 .collect(Collectors.toList());
     }
 }

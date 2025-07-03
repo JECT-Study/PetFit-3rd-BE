@@ -4,9 +4,9 @@ import java.util.Arrays;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.member.entity.Role;
 import ject.petfit.domain.member.repository.MemberRepository;
-import ject.petfit.domain.pet.dto.request.PetFavoriteRequestDTO;
+import ject.petfit.domain.pet.dto.request.PetFavoriteRequestDto;
 import ject.petfit.domain.pet.dto.request.PetRequestDto;
-import ject.petfit.domain.pet.dto.response.PetFavoriteResponseDTO;
+import ject.petfit.domain.pet.dto.response.PetFavoriteResponseDto;
 import ject.petfit.domain.pet.dto.response.PetListResponseDto;
 import ject.petfit.domain.pet.dto.response.PetResponseDto;
 import ject.petfit.domain.pet.entity.Pet;
@@ -195,13 +195,13 @@ class PetServiceIntegrationTest {
         pet1 = petRepository.save(pet1);
         pet2 = petRepository.save(pet2);
 
-        PetFavoriteRequestDTO req1 = new PetFavoriteRequestDTO(pet1.getId(), true);
-        PetFavoriteRequestDTO req2 = new PetFavoriteRequestDTO(pet2.getId(), true);
+        PetFavoriteRequestDto req1 = new PetFavoriteRequestDto(pet1.getId(), true);
+        PetFavoriteRequestDto req2 = new PetFavoriteRequestDto(pet2.getId(), true);
 
-        List<PetFavoriteRequestDTO> batchRequest = Arrays.asList(req1, req2);
+        List<PetFavoriteRequestDto> batchRequest = Arrays.asList(req1, req2);
 
         // when
-        List<PetFavoriteResponseDTO> result = petService.updateFavoriteBatch(batchRequest);
+        List<PetFavoriteResponseDto> result = petService.updateFavoriteBatch(batchRequest);
 
         // then
         assertThat(result).hasSize(2);

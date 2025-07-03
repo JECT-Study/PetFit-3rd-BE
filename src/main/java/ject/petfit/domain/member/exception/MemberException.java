@@ -1,6 +1,5 @@
 package ject.petfit.domain.member.exception;
 
-import ject.petfit.domain.pet.exception.PetErrorCode;
 import org.springframework.http.HttpStatus;
 
 public class MemberException extends RuntimeException {
