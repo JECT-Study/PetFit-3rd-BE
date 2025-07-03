@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AuthUserException.class)
-    public ResponseEntity<ApiResponse<Void>> handleCustomException(AuthUserException e) {
+    public ResponseEntity<ApiResponse<Void>> handleAuthUserException(AuthUserException e) {
         log.info(e.getMessage(), e);
         ApiResponse<Void> response = ApiResponse.fail(
                 e.getCode(),
@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(TokenException.class)
-    public ResponseEntity<ApiResponse<Void>> handleCustomException(TokenException e) {
+    public ResponseEntity<ApiResponse<Void>> handleTokenException(TokenException e) {
         ApiResponse<Void> response = ApiResponse.fail(
                 e.getCode(),
                 e.getMessage()
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidGrantException.class)
-    public ResponseEntity<ApiResponse<Void>> handleCustomException(InvalidGrantException e) {
+    public ResponseEntity<ApiResponse<Void>> handleInvalidGrantException(InvalidGrantException e) {
         ApiResponse<Void> response = ApiResponse.fail(
                 e.getCode(),
                 e.getMessage()
