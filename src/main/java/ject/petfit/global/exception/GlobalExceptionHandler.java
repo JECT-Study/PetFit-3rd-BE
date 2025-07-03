@@ -1,6 +1,7 @@
 package ject.petfit.global.exception;
 
 import ject.petfit.domain.entry.exception.EntryException;
+import ject.petfit.domain.member.exception.MemberException;
 import ject.petfit.domain.pet.exception.PetException;
 import ject.petfit.domain.remark.exception.RemarkException;
 import ject.petfit.domain.routine.exception.RoutineException;
@@ -26,6 +27,16 @@ public class GlobalExceptionHandler {
     // 커스텀할 예외 처리 핸들러
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ApiResponse<Void>> handleCustomException(CustomException e) {
+        log.info(e.getMessage(), e);
+        ApiResponse<Void> response = ApiResponse.fail(
+                e.getCode(),
+                e.getMessage()
+        );
+        return ResponseEntity.status(e.getHttpStatus()).body(response);
+    }
+
+    @ExceptionHandler(AuthUserException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMemberException(MemberException e) {
         log.info(e.getMessage(), e);
         ApiResponse<Void> response = ApiResponse.fail(
                 e.getCode(),
