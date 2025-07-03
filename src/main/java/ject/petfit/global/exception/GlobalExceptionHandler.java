@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(e.getHttpStatus()).body(response);
     }
 
-    @ExceptionHandler(AuthUserException.class)
+    @ExceptionHandler(MemberException.class)
     public ResponseEntity<ApiResponse<Void>> handleMemberException(MemberException e) {
         log.info(e.getMessage(), e);
         ApiResponse<Void> response = ApiResponse.fail(
