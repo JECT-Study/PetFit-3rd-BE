@@ -1,17 +1,13 @@
 package ject.petfit.domain.slot.service;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.pet.exception.PetErrorCode;
 import ject.petfit.domain.pet.exception.PetException;
 import ject.petfit.domain.pet.repository.PetRepository;
-import ject.petfit.domain.slot.dto.request.SlotActivatedRequest;
-import ject.petfit.domain.slot.dto.request.SlotAmountRequest;
 import ject.petfit.domain.slot.dto.request.SlotInitializeRequest;
-import ject.petfit.domain.slot.dto.response.SlotActivatedResponse;
-import ject.petfit.domain.slot.dto.response.SlotAmountResponse;
-import ject.petfit.domain.slot.dto.response.SlotInitializeResponse;
+import ject.petfit.domain.slot.dto.request.SlotRequest;
+import ject.petfit.domain.slot.dto.response.SlotResponse;
 import ject.petfit.domain.slot.entity.Slot;
 import ject.petfit.domain.slot.exception.SlotErrorCode;
 import ject.petfit.domain.slot.exception.SlotException;
@@ -36,9 +32,9 @@ public class SlotService {
         return slot;
     }
 
-    // 반려동물 슬롯 초기화 (회원가입 슬롯 설정)
+    // 슬롯 초기화 (회원가입 슬롯 설정)
     @Transactional
-    public SlotInitializeResponse initializePetSlot(Long petId, SlotInitializeRequest request) {
+    public SlotResponse initializePetSlot(Long petId, SlotInitializeRequest request) {
         // petId로 Pet 엔티티 조회
         Pet pet = petRepository.findById(petId).orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
 
@@ -60,48 +56,48 @@ public class SlotService {
                 .walkAmount(request.getWalkAmount())
                 .pet(pet)
                 .build());
-        return SlotInitializeResponse.from(slot);
+        return SlotResponse.from(slot);
     }
 
 
     // 슬롯 활성화 상태 조회
-    public SlotActivatedResponse getSlotActivated(Long petId) {
+    public SlotResponse getSlotActivated(Long petId) {
         Slot slot = getSlotOrThrow(petId);
-        return SlotActivatedResponse.from(slot);
+        return SlotResponse.from(slot);
     }
 
     // 슬롯 활성화 상태 설정
     @Transactional
-    public SlotActivatedResponse setSlotActivated(Long petId, SlotActivatedRequest request) {
+    public SlotResponse setSlotActivated(Long petId, SlotRequest request) {
         Slot slot = getSlotOrThrow(petId);
-        slot.updateSlotActivated(request);
+        slot.updateSlot(request);
         slotRepository.save(slot);
-        return SlotActivatedResponse.from(slot);
+        return SlotResponse.from(slot);
     }
 
-    // 사료, 음수, 배변 목표량 조회
-    public SlotAmountResponse getSlotAmounts(Long petId) {
-        Slot slot = getSlotOrThrow(petId);
-        return SlotAmountResponse.from(slot);
-    }
-
-    // 사료, 음수, 배변 목표량 설정
-    @Transactional
-    public SlotAmountResponse setSlotAmounts(Long petId, @Valid SlotAmountRequest request) {
-        Slot slot = getSlotOrThrow(petId);
-
-        // 사료, 음수, 산책 목표량 업데이트 (null 값은 수정하지 않음)
-        if (request.getFeedAmount() != null) {
-            slot.updateFeedAmount(request.getFeedAmount());
-        }
-        if (request.getWaterAmount() != null) {
-            slot.updateWaterAmount(request.getWaterAmount());
-        }
-        if (request.getWalkAmount() != null) {
-            slot.updateWalkAmount(request.getWalkAmount());
-        }
-
-        slotRepository.save(slot);
-        return SlotAmountResponse.from(slot);
-    }
+//    // 사료, 음수, 배변 목표량 조회
+//    public SlotAmountResponse getSlotAmounts(Long petId) {
+//        Slot slot = getSlotOrThrow(petId);
+//        return SlotAmountResponse.from(slot);
+//    }
+//
+//    // 사료, 음수, 배변 목표량 설정
+//    @Transactional
+//    public SlotAmountResponse setSlotAmounts(Long petId, @Valid SlotAmountRequest request) {
+//        Slot slot = getSlotOrThrow(petId);
+//
+//        // 사료, 음수, 산책 목표량 업데이트 (null 값은 수정하지 않음)
+//        if (request.getFeedAmount() != null) {
+//            slot.updateFeedAmount(request.getFeedAmount());
+//        }
+//        if (request.getWaterAmount() != null) {
+//            slot.updateWaterAmount(request.getWaterAmount());
+//        }
+//        if (request.getWalkAmount() != null) {
+//            slot.updateWalkAmount(request.getWalkAmount());
+//        }
+//
+//        slotRepository.save(slot);
+//        return SlotAmountResponse.from(slot);
+//    }
 }
