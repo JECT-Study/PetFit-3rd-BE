@@ -4,17 +4,18 @@ import jakarta.persistence.*;
 import ject.petfit.domain.entry.entity.Entry;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.slot.entity.Slot;
-import ject.petfit.domain.pet.dto.request.PetRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
+import lombok.ToString;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@ToString(exclude = "member")
 @Table(name = "pet")
 public class Pet {
 
@@ -62,12 +63,12 @@ public class Pet {
     }
 
 
-    public void updatePet(PetRequestDto pet) {
-        this.name = pet.getName();
-        this.type = pet.getType();
-        this.gender = pet.getGender();
-        this.birthDate = pet.getBirthDate();
-        this.isFavorite = pet.getIsFavorite();
+    public void updatePet(String name, String type, String gender, LocalDate birthDate, Boolean isFavorite) {
+        this.name = name;
+        this.type = type;
+        this.gender = gender;
+        this.birthDate = birthDate;
+        this.isFavorite = isFavorite;
     }
 
     public void updateIsFavorite(Boolean isFavorite) {

@@ -10,10 +10,12 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.ToString;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@ToString(exclude = "pets")
 @Table(name = "member")
 public class Member {
 
@@ -55,6 +57,7 @@ public class Member {
         pet.setMember(this); // 양방향 관계 설정
     }
 
-
-
+    public void editNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }

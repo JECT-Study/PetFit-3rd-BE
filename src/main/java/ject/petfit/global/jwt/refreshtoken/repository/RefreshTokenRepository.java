@@ -1,6 +1,7 @@
-package ject.petfit.global.jwt.refreshtoken;
+package ject.petfit.global.jwt.refreshtoken.repository;
 
 import ject.petfit.domain.user.entity.AuthUser;
+import ject.petfit.global.jwt.refreshtoken.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

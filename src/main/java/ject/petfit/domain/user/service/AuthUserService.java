@@ -6,12 +6,12 @@ import ject.petfit.domain.member.entity.Role;
 import ject.petfit.domain.member.repository.MemberRepository;
 import ject.petfit.domain.user.common.util.KakaoUtil;
 import ject.petfit.domain.user.converter.AuthUserConverter;
-import ject.petfit.domain.user.dto.KakaoDTO;
+import ject.petfit.domain.user.dto.KakaoDto;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.exception.AuthUserErrorCode;
 import ject.petfit.domain.user.exception.AuthUserException;
 import ject.petfit.domain.user.repository.AuthUserRepository;
-import ject.petfit.global.jwt.refreshtoken.RefreshTokenRepository;
+import ject.petfit.global.jwt.refreshtoken.repository.RefreshTokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,12 +50,12 @@ public class AuthUserService {
     public AuthUser oAuthLogin(String accessCode) {
         try {
             // 1. 카카오 토큰 요청
-            KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode);
+            KakaoDto.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode);
             if (oAuthToken == null) {
                 throw new AuthUserException(AuthUserErrorCode.OAUTH_SERVER_ERROR);
             }
             // 2. 카카오 프로필 요청
-            KakaoDTO.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
+            KakaoDto.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
             if (kakaoProfile == null || kakaoProfile.getKakao_account() == null) {
                 throw new AuthUserException(AuthUserErrorCode.PROFILE_REQUEST_ERROR);
             }
@@ -78,7 +78,7 @@ public class AuthUserService {
         }
     }
 
-    private AuthUser findOrCreateUser(String email, KakaoDTO.KakaoProfile kakaoProfile) {
+    private AuthUser findOrCreateUser(String email, KakaoDto.KakaoProfile kakaoProfile) {
         return authUserRepository.findByEmail(email)
                 .map(existingUser -> {
                     existingUser.changeIsNewUser(false);
@@ -88,7 +88,7 @@ public class AuthUserService {
     }
 
 
-    private AuthUser createNewUser(KakaoDTO.KakaoProfile kakaoProfile) {
+    private AuthUser createNewUser(KakaoDto.KakaoProfile kakaoProfile) {
         if (kakaoProfile == null || kakaoProfile.getKakao_account() == null) {
             throw new AuthUserException(AuthUserErrorCode.PROFILE_INFORMATION_NOT_SUPPORTED);
         }

@@ -1,11 +1,13 @@
-package ject.petfit.global.jwt.refreshtoken;
+package ject.petfit.global.jwt.refreshtoken.service;
 
 import jakarta.transaction.Transactional;
+import java.util.Optional;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.global.jwt.exception.TokenErrorCode;
 import ject.petfit.global.jwt.exception.TokenException;
+import ject.petfit.global.jwt.refreshtoken.RefreshToken;
+import ject.petfit.global.jwt.refreshtoken.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,5 +63,11 @@ public class RefreshTokenService {
 
     private String hashToken(String rawToken) {
         return passwordEncoder.encode(rawToken);
+    }
+
+    public Optional<RefreshToken> findTokenByPlain(String plainToken) {
+        return refreshTokenRepository.findAll().stream()
+                .filter(token -> passwordEncoder.matches(plainToken, token.getToken()))
+                .findFirst();
     }
 }

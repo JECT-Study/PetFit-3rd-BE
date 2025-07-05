@@ -1,6 +1,7 @@
 package ject.petfit.global.exception;
 
 import ject.petfit.domain.entry.exception.EntryException;
+import ject.petfit.domain.member.exception.MemberException;
 import ject.petfit.domain.pet.exception.PetException;
 import ject.petfit.domain.remark.exception.RemarkException;
 import ject.petfit.domain.routine.exception.RoutineException;
@@ -34,8 +35,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(e.getHttpStatus()).body(response);
     }
 
+    @ExceptionHandler(MemberException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMemberException(MemberException e) {
+        log.info(e.getMessage(), e);
+        ApiResponse<Void> response = ApiResponse.fail(
+                e.getCode(),
+                e.getMessage()
+        );
+        return ResponseEntity.status(e.getHttpStatus()).body(response);
+    }
+
     @ExceptionHandler(AuthUserException.class)
-    public ResponseEntity<ApiResponse<Void>> handleCustomException(AuthUserException e) {
+    public ResponseEntity<ApiResponse<Void>> handleAuthUserException(AuthUserException e) {
         log.info(e.getMessage(), e);
         ApiResponse<Void> response = ApiResponse.fail(
                 e.getCode(),
@@ -45,7 +56,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(TokenException.class)
-    public ResponseEntity<ApiResponse<Void>> handleCustomException(TokenException e) {
+    public ResponseEntity<ApiResponse<Void>> handleTokenException(TokenException e) {
         ApiResponse<Void> response = ApiResponse.fail(
                 e.getCode(),
                 e.getMessage()
@@ -54,7 +65,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidGrantException.class)
-    public ResponseEntity<ApiResponse<Void>> handleCustomException(InvalidGrantException e) {
+    public ResponseEntity<ApiResponse<Void>> handleInvalidGrantException(InvalidGrantException e) {
         ApiResponse<Void> response = ApiResponse.fail(
                 e.getCode(),
                 e.getMessage()
