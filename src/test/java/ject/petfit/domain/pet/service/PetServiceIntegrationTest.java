@@ -4,9 +4,10 @@ import java.util.Arrays;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.member.entity.Role;
 import ject.petfit.domain.member.repository.MemberRepository;
-import ject.petfit.domain.pet.dto.request.PetFavoriteRequestDTO;
+import ject.petfit.domain.pet.dto.request.PetFavoriteRequestDto;
 import ject.petfit.domain.pet.dto.request.PetRequestDto;
-import ject.petfit.domain.pet.dto.response.PetFavoriteResponseDTO;
+import ject.petfit.domain.pet.dto.response.PetFavoriteResponseDto;
+import ject.petfit.domain.pet.dto.response.PetListResponseDto;
 import ject.petfit.domain.pet.dto.response.PetResponseDto;
 import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.pet.exception.PetException;
@@ -71,7 +72,7 @@ class PetServiceIntegrationTest {
     @Test
     @DisplayName("반려동물 생성 성공")
     void createPet_Success() {
-        PetRequestDto dto = new PetRequestDto("멍멍이", "강아지", "남아", LocalDate.of(2020, 1, 1), true, authUser.getId());
+        PetRequestDto dto = new PetRequestDto("멍멍이", "강아지", "남아", LocalDate.of(2020, 1, 1), true);
         Pet pet = new Pet(dto.getName(), dto.getType(), dto.getGender(), dto.getBirthDate(), dto.getIsFavorite());
         pet.setMember(member);
 
@@ -121,7 +122,7 @@ class PetServiceIntegrationTest {
         petRepository.save(pet1);
         petRepository.save(pet2);
 
-        List<PetResponseDto> pets = petService.getAllPets();
+        List<PetListResponseDto> pets = petService.getAllPets();
         assertThat(pets).hasSize(2);
     }
 
@@ -138,7 +139,7 @@ class PetServiceIntegrationTest {
         pet.setMember(member);
         Pet savedPet = petRepository.save(pet);
 
-        PetRequestDto updateDto = new PetRequestDto("냥냥이", "고양이", "여아", LocalDate.of(2021, 2, 2), false, authUser.getId());
+        PetRequestDto updateDto = new PetRequestDto("냥냥이", "고양이", "여아", LocalDate.of(2021, 2, 2), false);
         PetResponseDto updated = petService.updatePet(savedPet.getId(), updateDto);
 
         assertThat(updated.getName()).isEqualTo("냥냥이");
@@ -194,13 +195,13 @@ class PetServiceIntegrationTest {
         pet1 = petRepository.save(pet1);
         pet2 = petRepository.save(pet2);
 
-        PetFavoriteRequestDTO req1 = new PetFavoriteRequestDTO(pet1.getId(), true);
-        PetFavoriteRequestDTO req2 = new PetFavoriteRequestDTO(pet2.getId(), true);
+        PetFavoriteRequestDto req1 = new PetFavoriteRequestDto(pet1.getId(), true);
+        PetFavoriteRequestDto req2 = new PetFavoriteRequestDto(pet2.getId(), true);
 
-        List<PetFavoriteRequestDTO> batchRequest = Arrays.asList(req1, req2);
+        List<PetFavoriteRequestDto> batchRequest = Arrays.asList(req1, req2);
 
         // when
-        List<PetFavoriteResponseDTO> result = petService.updateFavoriteBatch(batchRequest);
+        List<PetFavoriteResponseDto> result = petService.updateFavoriteBatch(batchRequest);
 
         // then
         assertThat(result).hasSize(2);

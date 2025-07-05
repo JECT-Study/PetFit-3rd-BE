@@ -1,7 +1,7 @@
 package ject.petfit.domain.user.common.util;
 
-import ject.petfit.domain.user.dto.KakaoDTO;
-import ject.petfit.domain.user.dto.KakaoDTO.OAuthToken;
+import ject.petfit.domain.user.dto.KakaoDto;
+import ject.petfit.domain.user.dto.KakaoDto.OAuthToken;
 import ject.petfit.domain.user.exception.AuthUserErrorCode;
 import ject.petfit.domain.user.exception.AuthUserException;
 import lombok.extern.slf4j.Slf4j;
@@ -49,19 +49,19 @@ public class KakaoUtil {
     }
 
 
-    public KakaoDTO.KakaoProfile requestProfile(OAuthToken oAuthToken) {
+    public KakaoDto.KakaoProfile requestProfile(OAuthToken oAuthToken) {
         try {
             if (oAuthToken == null || oAuthToken.getAccess_token() == null) {
                 throw new AuthUserException(AuthUserErrorCode.OAUTH_SERVER_ERROR);
             }
 
-            KakaoDTO.KakaoProfile profile = webClient.get()
+            KakaoDto.KakaoProfile profile = webClient.get()
                     .uri("https://kapi.kakao.com/v2/user/me")
                     .header("Authorization", "Bearer " + oAuthToken.getAccess_token())
                     .retrieve()
                     .onStatus(status -> !status.is2xxSuccessful(),
                             response -> Mono.error(new AuthUserException(AuthUserErrorCode.PROFILE_REQUEST_ERROR)))
-                    .bodyToMono(KakaoDTO.KakaoProfile.class)
+                    .bodyToMono(KakaoDto.KakaoProfile.class)
                     .doOnNext(p -> log.info("Kakao profile received: id={}, nickname={}",
                             p.getId(),
                             p.getKakao_account().getProfile().getNickname()))

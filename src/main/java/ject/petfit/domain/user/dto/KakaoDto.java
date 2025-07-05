@@ -3,7 +3,7 @@ package ject.petfit.domain.user.dto;
 import lombok.Getter;
 
 
-public class KakaoDTO {
+public class KakaoDto {
 
     @Getter
     public static class OAuthToken {

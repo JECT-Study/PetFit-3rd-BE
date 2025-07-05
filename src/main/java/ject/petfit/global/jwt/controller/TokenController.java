@@ -2,12 +2,14 @@ package ject.petfit.global.jwt.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import ject.petfit.domain.user.entity.AuthUser;
-import ject.petfit.global.jwt.dto.RefreshTokenRequestDTO;
-import ject.petfit.global.jwt.refreshtoken.RefreshTokenService;
+import ject.petfit.global.common.ApiResponse;
+import ject.petfit.global.jwt.dto.RefreshTokenRequestDto;
+import ject.petfit.global.jwt.refreshtoken.service.RefreshTokenService;
 import ject.petfit.global.jwt.util.CookieUtils;
 import ject.petfit.global.jwt.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,7 +32,7 @@ public class TokenController {
 
     // Refresh Token 재발급
     @PostMapping("/auth/refresh")
-    public ResponseEntity<Void> refresh(@RequestBody RefreshTokenRequestDTO request, HttpServletResponse httpServletResponse) {
+    public ResponseEntity<ApiResponse<Void>> refresh(@RequestBody RefreshTokenRequestDto request, HttpServletResponse httpServletResponse) {
         // 토큰 유효성 검사 및 삭제
         AuthUser authUser = refreshTokenService.validateAndRotateToken(request.getRefreshToken());
         // 새로운 access 토큰 발급
@@ -42,6 +44,8 @@ public class TokenController {
         httpServletResponse.addCookie(CookieUtils.addCookie("access_token", newAccessToken));
         httpServletResponse.addCookie(CookieUtils.addCookie("refresh_token", newRefreshToken));
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponse.success(null)
+        );
     }
 }

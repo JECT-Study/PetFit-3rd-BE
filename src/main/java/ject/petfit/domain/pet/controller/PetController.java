@@ -1,19 +1,27 @@
 package ject.petfit.domain.pet.controller;
 
 
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
-import ject.petfit.domain.pet.dto.request.PetFavoriteRequestDTO;
+import ject.petfit.domain.pet.dto.request.PetFavoriteRequestDto;
 import ject.petfit.domain.pet.dto.request.PetRequestDto;
-import ject.petfit.domain.pet.dto.response.PetFavoriteResponseDTO;
+import ject.petfit.domain.pet.dto.response.PetFavoriteResponseDto;
+import ject.petfit.domain.pet.dto.response.PetListResponseDto;
 import ject.petfit.domain.pet.dto.response.PetResponseDto;
-import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.pet.service.PetService;
+import ject.petfit.domain.user.exception.AuthUserErrorCode;
+import ject.petfit.domain.user.exception.AuthUserException;
+import ject.petfit.domain.user.service.AuthUserService;
+import ject.petfit.global.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -28,48 +36,78 @@ import org.springframework.web.bind.annotation.RestController;
 public class PetController {
 
     private final PetService petService;
+    private final AuthUserService authUserService;
 
     // Create - 회원가입 직후 (첫 반려동물 등록)
     // Create - 추가
     @PostMapping
-    public ResponseEntity<PetResponseDto> createPet(@RequestBody PetRequestDto petDto) {
-        PetResponseDto createdPet = petService.createPet(petDto);
-        return new ResponseEntity<>(createdPet, HttpStatus.CREATED);
+    @Operation(summary = "새로운 동물 등록", description = "이름(20자), 종(6타입), 성별(3타입), 생일(YYYY-MM-DD) 형식 제한")
+    public ResponseEntity<ApiResponse<PetResponseDto>> createPet(
+            @RequestBody PetRequestDto petDto,
+            @AuthenticationPrincipal UserDetails userDetails // JWT에서 사용자 정보 추출
+    ) {
+        if (userDetails == null) {
+            throw new AuthUserException(AuthUserErrorCode.NOT_AN_AUTHENTICATED_USER);
+        }
+        String email = userDetails.getUsername();
+        Long authUserId = authUserService.loadAuthUserByEmail(email).getId();
+        PetResponseDto createdPet = petService.createPet(petDto, authUserId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ApiResponse.success(createdPet)
+        );
     }
 
     // Read (Single info of Pet)
-    @GetMapping("/{id}")
-    public ResponseEntity<PetResponseDto> getPetById(@PathVariable Long id) {
-        PetResponseDto pet = petService.getPetById(id);
-        return new ResponseEntity<>(pet, HttpStatus.OK);
+    @GetMapping("/{petId}")
+    @Operation(summary = "동물 한 마리 정보 조회", description = "반려동물 ID로 반려동물 정보 조회")
+    public ResponseEntity<ApiResponse<PetResponseDto>> getPetById(@PathVariable Long petId) {
+        PetResponseDto pet = petService.getPetById(petId);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponse.success(pet)
+        );
     }
 
     // Read (List of Pets)
     @GetMapping
-    public ResponseEntity<List<PetResponseDto>> getAllPets() {
-        List<PetResponseDto> pets = petService.getAllPets();
-        return new ResponseEntity<>(pets, HttpStatus.OK);
+    @Operation(summary = "모든 동물 정보 조회", description = "사용자의 모든 반려동물 정보 조회")
+    public ResponseEntity<ApiResponse<List<PetListResponseDto>>> getAllPets() {
+        List<PetListResponseDto> pets = petService.getAllPets();
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponse.success(pets)
+        );
     }
 
     // Update (Pet info)
-    @PutMapping("/{id}")
-    public ResponseEntity<PetResponseDto> updatePet(@PathVariable Long id, @RequestBody PetRequestDto petDto) {
-        PetResponseDto updatedPet = petService.updatePet(id, petDto);
-        return new ResponseEntity<>(updatedPet, HttpStatus.OK);
+    @PutMapping("/{petId}")
+    @Operation(summary = "동물 정보 수정", description = "반려동물 ID로 반려동물 정보 수정")
+    public ResponseEntity<ApiResponse<PetResponseDto>> updatePet(
+            @PathVariable Long petId,
+            @RequestBody PetRequestDto petDto
+    ) {
+        PetResponseDto updatedPet = petService.updatePet(petId, petDto);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponse.success(updatedPet)
+        );
     }
 
     // Update (Pet List info) - 즐겨찾기 동물 (isFavorite) 변경
-    @PostMapping("/api/pets/favorites")
-    public ResponseEntity<List<PetFavoriteResponseDTO>> updateFavoritesInBatch(
-            @RequestBody List<PetFavoriteRequestDTO> requestDtos) {
-        List<PetFavoriteResponseDTO> response = petService.updateFavoriteBatch(requestDtos);
-        return ResponseEntity.ok(response);
+    @PatchMapping("/favorites/batch-updates")
+    @Operation(summary = "즐겨찾기 동물 목록 업데이트", description = "즐겨찾기 동물 목록을 일괄 업데이트")
+    public ResponseEntity<ApiResponse<List<PetFavoriteResponseDto>>> updateFavoritesInBatch(
+            @RequestBody List<PetFavoriteRequestDto> requestDtos) {
+        List<PetFavoriteResponseDto> favoriteBatchResponse = petService.updateFavoriteBatch(requestDtos);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponse.success(favoriteBatchResponse)
+        );
     }
 
     // Delete (Pet)
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePet(@PathVariable Long id) {
-        petService.deletePet(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    @DeleteMapping("/{petId}")
+    @Operation(summary = "동물 삭제", description = "반려동물 ID로 반려동물 정보 삭제")
+    public ResponseEntity<ApiResponse<Void>> deletePet(@PathVariable Long petId) {
+        petService.deletePet(petId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
+                ApiResponse.success(null)
+        );
     }
 }

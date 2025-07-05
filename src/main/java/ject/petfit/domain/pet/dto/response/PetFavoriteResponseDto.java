@@ -1,15 +1,13 @@
-package ject.petfit.domain.pet.dto.request;
+package ject.petfit.domain.pet.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PetFavoriteRequestDTO {
+public class PetFavoriteResponseDto {
     private Long petId;
     private Boolean isFavorite;
 }

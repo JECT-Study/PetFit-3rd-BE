@@ -33,5 +33,14 @@ public class CookieUtils {
             }
         }
     }
+
+    public static Cookie deleteCookieByName(String name) {
+        Cookie cookie = new Cookie(name, null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        return cookie;
+    }
 }
 

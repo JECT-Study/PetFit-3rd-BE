@@ -1,6 +1,6 @@
 package ject.petfit.domain.pet.dto.response;
 
-import java.time.LocalDate;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,12 +8,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PetResponseDto {
-
+public class PetListResponseDto {
     private Long id;
     private String name;
-    private String type;
-    private String gender;
-    private LocalDate birthDate;
     private Boolean isFavorite;
 }
