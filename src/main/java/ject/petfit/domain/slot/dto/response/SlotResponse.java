@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Schema(description = "슬롯 초기화 응답 DTO")
-public class SlotInitializeResponse {
+public class SlotResponse {
     private boolean feedActivated;      // 사료 슬롯 활성화 여부
     private boolean waterActivated;     // 음수 슬롯 활성화 여부
     private boolean walkActivated;      // 산책 슬롯 활성화 여부
@@ -20,8 +20,8 @@ public class SlotInitializeResponse {
     private Integer waterAmount;        // 음수 목표량
     private Integer walkAmount;         // 산책 목표량
 
-    public static SlotInitializeResponse from(Slot slot){
-        return SlotInitializeResponse.builder()
+    public static SlotResponse from(Slot slot){
+        return SlotResponse.builder()
                 .feedActivated(slot.isFeedActivated())
                 .waterActivated(slot.isWaterActivated())
                 .walkActivated(slot.isWalkActivated())
