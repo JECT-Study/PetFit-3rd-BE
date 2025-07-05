@@ -2,6 +2,7 @@ package ject.petfit.domain.pet.controller;
 
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import java.util.List;
 import ject.petfit.domain.pet.dto.request.PetFavoriteRequestDto;
 import ject.petfit.domain.pet.dto.request.PetRequestDto;
@@ -43,7 +44,7 @@ public class PetController {
     @PostMapping
     @Operation(summary = "새로운 동물 등록", description = "이름(20자), 종(6타입), 성별(3타입), 생일(YYYY-MM-DD) 형식 제한")
     public ResponseEntity<ApiResponse<PetResponseDto>> createPet(
-            @RequestBody PetRequestDto petDto,
+            @Valid @RequestBody PetRequestDto petDto,
             @AuthenticationPrincipal UserDetails userDetails // JWT에서 사용자 정보 추출
     ) {
         if (userDetails == null) {
@@ -82,7 +83,7 @@ public class PetController {
     @Operation(summary = "동물 정보 수정", description = "반려동물 ID로 반려동물 정보 수정")
     public ResponseEntity<ApiResponse<PetResponseDto>> updatePet(
             @PathVariable Long petId,
-            @RequestBody PetRequestDto petDto
+            @Valid @RequestBody PetRequestDto petDto
     ) {
         PetResponseDto updatedPet = petService.updatePet(petId, petDto);
         return ResponseEntity.status(HttpStatus.OK).body(
