@@ -22,7 +22,6 @@ import java.util.Collections;
 
 
 @RequiredArgsConstructor
-@Component
 @Slf4j
 public class JwtAuthFilter extends OncePerRequestFilter {
 
