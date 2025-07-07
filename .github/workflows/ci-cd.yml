@@ -1,0 +1,76 @@
+name: Petfit CI/CD using Github Actions & Docker
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+
+      # JDK Set Up
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Setting application.yml ..
+      - name: Git Checkout
+        uses: actions/checkout@v4
+
+      - name: Create and Upload application.yml
+        run: |
+          touch ./src/main/resources/application.yml
+          echo -e "${{secrets.APPLICATION}}" | base64 --decode > ./src/main/resources/application.yml
+      - uses: actions/upload-artifact@v4
+        with:
+          name: application.yml
+          path: ./src/main/resources/application.yml
+
+
+      # Configure Gradle for optimal use in GiHub Actions, including caching of downloaded dependencies.
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+
+      - name: Build with Gradle
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean build -x test
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      # Docker Build & Push
+      - name: Build Docker Image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/petfit-web .
+
+      - name: Push to DockerHub
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/petfit-web
+
+      # EC2 접속 및 도커 명령 | 액션으로 pull까지만 진행
+      - name: Docker Image Pull & Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }} # EC2 Public DNS
+          username: ubuntu
+          key: ${{ secrets.EC2_PRIVATE_KEY }} # pem key
+          script: |
+            sudo docker rm -f $(sudo docker ps -qa)
+            sudo docker pull ${{secrets.DOCKER_USERNAME}}/petfit-web:latest
+            sudo docker pull nginx:latest
+            sudo docker pull certbot/certbot
+            sudo docker compose up -d
+            sudo docker image prune -f
