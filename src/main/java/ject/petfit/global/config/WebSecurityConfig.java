@@ -52,7 +52,6 @@ public class WebSecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-
                                 "/api/auth/**",
                                 "/error",
                                 "/swagger-ui/**",
@@ -75,7 +74,8 @@ public class WebSecurityConfig {
                                 "/public/**",
                                 "/css/**",
                                 "/js/**",
-                                "/resources/**"
+                                "/resources/**",
+                                "/"
 
 
                         ).permitAll()
