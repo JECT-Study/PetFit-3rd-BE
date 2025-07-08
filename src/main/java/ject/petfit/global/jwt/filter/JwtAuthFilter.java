@@ -35,34 +35,31 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
         // 인증이 필요 없는 엔드포인트는 토큰 체크 건너뛰기
-
         String uri = request.getRequestURI();
-        if (
-            uri.startsWith("/api/auth/") ||
-            uri.equals("/error") ||
-            uri.startsWith("/swagger-ui") ||
-            uri.startsWith("/v3/api-docs") ||
-            uri.startsWith("/swagger-resources") ||
-            uri.startsWith("/health") ||
-
-            // 개발용으로 허용
-            uri.startsWith("/api/routines/") ||
-            uri.startsWith("/api/remarks/") ||
-            uri.startsWith("/api/schedules/") ||
-            uri.startsWith("/api/slots/") ||
-            uri.startsWith("/api/entries/") ||
-            uri.startsWith("/api/pets/") ||
-            uri.startsWith("/api/members/")
-        ) {
-
+        String method = request.getMethod();
+        log.info("=== JWT Filter Start ===");
+        log.info("Request Method: {}, URI: {}", method, uri);
+        
+        // URI 체크 로직 디버깅
+        boolean shouldSkip = shouldSkipJwtCheck(uri);
+        log.info("URI: '{}', shouldSkip: {}", uri, shouldSkip);
+        
+        // 인증이 필요 없는 엔드포인트 체크를 가장 먼저 수행
+        if (shouldSkip) {
+            log.info("✅ Skipping JWT check for URI: {}", uri);
+            log.info("=== JWT Filter End (Skipped) ===");
             filterChain.doFilter(request, response);
             return;
         }
 
-        for (String headerName : Collections.list(request.getHeaderNames())) {
-            if (headerName.equals("Authorization")) {
-                log.info("Header {}: {}", headerName, request.getHeader(headerName));
-            }
+        log.info("🔒 JWT check required for URI: {}", uri);
+
+        // Authorization 헤더 로깅
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null) {
+            log.info("Authorization header found: {}", authHeader.substring(0, Math.min(20, authHeader.length())) + "...");
+        } else {
+            log.info("No Authorization header found");
         }
 
         try {
@@ -70,9 +67,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String token = jwtUtil.resolveAccessToken(request);
 
             if (token != null) {
+                log.info("Token extracted successfully");
                 if (jwtUtil.isTokenValid(token)) {
+                    log.info("Token is valid");
                     // 2. 토큰에서 이메일 추출
                     String email = jwtUtil.getEmail(token);
+                    log.info("Email from token: {}", email);
 
                     // 3. DB에서 사용자 조회
                     UserDetails userDetails = authUserService.loadAuthUserByEmail(email);
@@ -82,18 +82,43 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     userDetails, null, userDetails.getAuthorities()
                             );
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                    log.info("Authentication set successfully for user: {}", email);
                 } else {
+                    log.warn("Token is invalid");
                     throw new TokenException(TokenErrorCode.AUTH_INVALID_TOKEN);
                 }
+            } else {
+                log.info("No token found, proceeding without authentication");
             }
         } catch (ExpiredJwtException e) {
             log.error("Token expired", e);
             request.setAttribute("jwt-exception", "토큰 만료");
         }
         catch (Exception e) {
+            log.error("JWT processing error", e);
             throw new TokenException(TokenErrorCode.AUTH_INVALID_TOKEN);
         }
 
+        log.info("=== JWT Filter End ===");
         filterChain.doFilter(request, response);
+    }
+
+    private boolean shouldSkipJwtCheck(String uri) {
+        boolean result = uri.startsWith("/api/auth") ||
+               uri.equals("/error") ||
+               uri.startsWith("/swagger-ui") ||
+               uri.startsWith("/v3/api-docs") ||
+               uri.startsWith("/swagger-resources") ||
+               uri.startsWith("/health") ||
+               uri.startsWith("/api/routines") ||
+               uri.startsWith("/api/remarks") ||
+               uri.startsWith("/api/schedules") ||
+               uri.startsWith("/api/slots") ||
+               uri.startsWith("/api/entries") ||
+               uri.startsWith("/api/pets") ||
+               uri.startsWith("/api/members");
+
+        log.info("Final result: {}", result);
+        return result;
     }
 }

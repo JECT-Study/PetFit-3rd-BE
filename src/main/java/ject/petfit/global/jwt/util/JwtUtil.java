@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
@@ -32,22 +33,40 @@ public class JwtUtil {
             @Value("${spring.jwt.secret}") final String secretKey,
             @Value("${spring.jwt.access-token-time}") final long accessTokenValidityMilliseconds) {
         this.issuer = issuer;
-        this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        // JWT Secret Key를 안전하게 생성
+        this.secretKey = createSecretKey(secretKey);
         this.accessTokenValidityMilliseconds = accessTokenValidityMilliseconds;
     }
 
-    // 오류
-    // 프 -> 백 헤더 추가 곤련
+    private SecretKey createSecretKey(String secretKeyString) {
+        try {
+            // 환경변수에서 받은 secret을 사용하여 SecretKey 생성
+            byte[] keyBytes = secretKeyString.getBytes(StandardCharsets.UTF_8);
+            
+            // 키 길이가 256비트(32바이트) 미만이면 안전한 키 생성
+            if (keyBytes.length < 32) {
+                log.warn("JWT secret key is too short ({} bits). Generating a secure key.", keyBytes.length * 8);
+                return Keys.secretKeyFor(SignatureAlgorithm.HS256);
+            }
+            
+            return Keys.hmacShaKeyFor(keyBytes);
+        } catch (Exception e) {
+            log.warn("Failed to create JWT secret key from environment variable. Generating a secure key.", e);
+            return Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        }
+    }
+
+    // 토큰이 없을 때 null을 반환하도록 수정
     public String resolveAccessToken(HttpServletRequest request) {
         String authorization = request.getHeader("Authorization");
         // Authorization 헤더가 없는 경우 / 비어있는 경우 / Bearer로 시작하지 않는 경우 / 토큰이 없는 경우
-        if (authorization == null){
-            throw new TokenException(TokenErrorCode.TOKEN_NOT_FOUND);
+        if (authorization == null || authorization.trim().isEmpty()) {
+            return null;
         }
+        
         String[] parts = authorization.split(" ");
-        if (authorization.trim().isEmpty() || !authorization.startsWith("Bearer ")
-                || parts.length != 2 || parts[1].trim().isEmpty()) {
-            throw new TokenException(TokenErrorCode.TOKEN_NOT_FOUND);
+        if (!authorization.startsWith("Bearer ") || parts.length != 2 || parts[1].trim().isEmpty()) {
+            return null;
         }
         return parts[1].trim();
     }
