@@ -93,10 +93,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         } catch (ExpiredJwtException e) {
             log.error("Token expired", e);
             request.setAttribute("jwt-exception", "토큰 만료");
-        }
-        catch (Exception e) {
-            log.error("JWT processing error", e);
-            throw new TokenException(TokenErrorCode.AUTH_INVALID_TOKEN);
+        } catch (TokenException e) {
+            log.error("Invalid token", e);
+            request.setAttribute("jwt-exception", "유효하지 않은 토큰");
+        } catch (Exception e) {
+            log.error("Unexpected JWT processing error", e);
         }
 
         log.info("=== JWT Filter End ===");
@@ -105,6 +106,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private boolean shouldSkipJwtCheck(String uri) {
         boolean result = uri.startsWith("/api/auth") ||
+                uri.startsWith("/") ||
                uri.equals("/error") ||
                uri.startsWith("/swagger-ui") ||
                uri.startsWith("/v3/api-docs") ||
@@ -118,6 +120,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                uri.startsWith("/api/pets") ||
                uri.startsWith("/api/members") ||
                 uri.startsWith("/favicon.ico") ||
+                uri.startsWith("/favicon.png") ||
                 uri.startsWith("/static/") ||
                 uri.startsWith("/css/") ||
                 uri.startsWith("/js/") ||
