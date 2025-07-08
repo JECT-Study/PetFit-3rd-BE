@@ -116,7 +116,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                uri.startsWith("/api/slots") ||
                uri.startsWith("/api/entries") ||
                uri.startsWith("/api/pets") ||
-               uri.startsWith("/api/members");
+               uri.startsWith("/api/members") ||
+                uri.startsWith("/favicon.ico") ||
+                uri.startsWith("/static/") ||
+                uri.startsWith("/css/") ||
+                uri.startsWith("/js/") ||
+                uri.startsWith("/resources/");
 
         log.info("Final result: {}", result);
         return result;
