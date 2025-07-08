@@ -40,10 +40,14 @@ public class KakaoUtil {
 
             // 토큰을 받은 후 로깅
             if (token != null) {
+                log.info("Kakao OAuth token received successfully");
+                return token;
+            } else {
+                log.error("Failed to receive Kakao OAuth token");
                 throw new AuthUserException(AuthUserErrorCode.OAUTH_SERVER_ERROR);
             }
-            return token;
         } catch (Exception e) {
+            log.error("Error requesting Kakao OAuth token", e);
             throw new AuthUserException(AuthUserErrorCode.OAUTH_SERVER_ERROR);
         }
     }
