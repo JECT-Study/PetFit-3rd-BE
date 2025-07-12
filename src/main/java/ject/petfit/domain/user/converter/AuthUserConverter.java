@@ -24,7 +24,7 @@ public class AuthUserConverter {
                 .accessToken(accessToken)
                 .role(authUser.getMember().getRole())
                 .isNewUser(authUser.getIsNewUser())
-                .refreshToken(refreshToken)
+                .refreshToken(refreshToken.getToken())
                 .build();
     }
 
