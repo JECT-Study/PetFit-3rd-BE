@@ -21,6 +21,6 @@ public class AuthUserResponseDto {
         private String accessToken;
         private Role role;
         private boolean isNewUser;
-        private RefreshToken refreshToken;
+        private String refreshToken;
     }
 }
