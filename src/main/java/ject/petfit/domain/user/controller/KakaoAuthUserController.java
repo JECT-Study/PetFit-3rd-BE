@@ -59,6 +59,8 @@ public class KakaoAuthUserController {
         httpServletResponse.addCookie(CookieUtils.addCookie("access_token", accessToken));
         httpServletResponse.addCookie(CookieUtils.addCookie("refresh_token", refreshToken.getToken()));
 
+        httpServletResponse.sendRedirect("http://localhost:5173");
+
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
