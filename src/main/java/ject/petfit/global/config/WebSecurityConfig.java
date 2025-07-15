@@ -55,8 +55,7 @@ public class WebSecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-//                                "/api/auth/**",
-                                "/api/auth/kakao/login/**",
+                                "/api/auth/**",
                                 "/error",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -77,8 +76,10 @@ public class WebSecurityConfig {
                                 "/static/**",
                                 "/public/**",
                                 "/css/**",
+                                "/images/**",
                                 "/js/**",
                                 "/resources/**",
+                                "/locales/**",
                                 "/"
 
 

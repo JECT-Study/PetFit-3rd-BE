@@ -106,8 +106,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private boolean shouldSkipJwtCheck(String uri) {
         boolean result =
-//                uri.startsWith("/api/auth") ||
-                uri.startsWith("/api/auth/kakao/login") ||
+                uri.startsWith("/api/auth") ||
                 uri.equals("/") ||
                uri.equals("/error") ||
                uri.startsWith("/swagger-ui") ||
@@ -126,6 +125,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 uri.startsWith("/static/") ||
                 uri.startsWith("/css/") ||
                 uri.startsWith("/js/") ||
+                uri.startsWith("/locales/") ||
+                uri.startsWith("/public/") ||
+                uri.startsWith("/images/") ||
                 uri.startsWith("/resources/");
 
         log.info("Final result: {}", result);
