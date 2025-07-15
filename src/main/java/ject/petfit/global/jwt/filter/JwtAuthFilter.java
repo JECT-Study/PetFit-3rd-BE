@@ -105,7 +105,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     private boolean shouldSkipJwtCheck(String uri) {
-        boolean result = uri.startsWith("/api/auth") ||
+        boolean result =
+//                uri.startsWith("/api/auth") ||
                 uri.equals("/") ||
                uri.equals("/error") ||
                uri.startsWith("/swagger-ui") ||
