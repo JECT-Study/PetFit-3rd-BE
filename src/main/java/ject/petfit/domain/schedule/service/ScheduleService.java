@@ -74,7 +74,7 @@ public class ScheduleService {
     public ScheduleResponse createSchedule(Long petId, ScheduleRegisterRequest request) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
-        LocalDate targetDate = LocalDate.parse(request.getTargetDate());
+        LocalDate targetDate = request.getTargetDate();
 
         // (펫ID & 날짜)의 entry가 있으면 반환, 없으면 생성해서 반환
         Entry entry = entryService.getOrCreateEntry(pet, targetDate);

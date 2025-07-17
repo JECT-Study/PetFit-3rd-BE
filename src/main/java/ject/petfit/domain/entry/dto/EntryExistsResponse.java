@@ -1,5 +1,6 @@
 package ject.petfit.domain.entry.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import ject.petfit.domain.entry.entity.Entry;
 import lombok.AllArgsConstructor;
@@ -7,14 +8,17 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Schema(description = "달력에서 기록 존재 여부 응답 DTO")
 public class EntryExistsResponse {
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Schema(description = "날짜", example = "2025-07-01")
-    private String entryDate; // 날짜
+    private LocalDate entryDate; // 날짜
 
     @Schema(description = "루틴체크 존재 여부", example = "true")
     private boolean isChecked; // 루틴체크 존재 여부
@@ -30,7 +34,7 @@ public class EntryExistsResponse {
 
     public static EntryExistsResponse from(Entry entry) {
         return EntryExistsResponse.builder()
-                .entryDate(entry.getEntryDate().toString())
+                .entryDate(entry.getEntryDate())
                 .isChecked(entry.getIsChecked())
                 .isMemo(entry.getIsMemo())
                 .isRemarked(entry.getIsRemarked())
