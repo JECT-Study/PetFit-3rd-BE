@@ -43,7 +43,6 @@ public class EntryController {
     @GetMapping("/{petId}/weekly/{week}")
     @Operation(summary = "주간 루틴, 특이사항 조회",
             description = "특정 주의 루틴 체크, 메모, 특이사항을 조회 <br> " +
-                    "{week}는 주간의 시작 날짜를 yyyy-MM-dd 형식으로 입력 <br> " +
                     "해당 주의 루틴 체크, 메모, 특이사항을 모두 조회 <br> " +
                     "월간 조회처럼 유무 값도 포함 <br>" +
                     "주간 조회 응답에서 일간 조회 뽑아서 사용하면 API 요청을 줄일 수 있으니 일간 조회API를 따로 만들지 않았음")
