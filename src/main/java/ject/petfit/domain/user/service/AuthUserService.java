@@ -106,6 +106,7 @@ public class AuthUserService {
                 kakaoProfile.getId(),
                 kakaoProfile.getKakao_account().getEmail(),
                 kakaoProfile.getKakao_account().getProfile().getNickname(),
+                kakaoProfile.getKakao_account().getProfile().getNickname(),
                 encodedPassword,
                 true
         );

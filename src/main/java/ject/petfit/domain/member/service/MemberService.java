@@ -1,12 +1,15 @@
 package ject.petfit.domain.member.service;
 
 
+import jakarta.transaction.Transactional;
 import ject.petfit.domain.member.dto.request.MemberRequestDto;
 import ject.petfit.domain.member.dto.response.MemberResponseDto;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.member.exception.MemberErrorCode;
 import ject.petfit.domain.member.exception.MemberException;
 import ject.petfit.domain.member.repository.MemberRepository;
+import ject.petfit.domain.user.entity.AuthUser;
+import ject.petfit.domain.user.repository.AuthUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +25,19 @@ public class MemberService {
         return new MemberResponseDto(member.getId(), member.getNickname(), member.getRole());
     }
 
+    @Transactional
     public MemberResponseDto editMember(Long memberId, MemberRequestDto memberRequestDto) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+
         member.editNickname(memberRequestDto.getNickname());
-        Member updatedMember = memberRepository.save(member);
+
+        AuthUser authUser = member.getAuthUser();
+        if (authUser == null) {
+            throw new MemberException(MemberErrorCode.MEMBER_NOT_FOUND);
+        }
+        authUser.editNickname(memberRequestDto.getNickname());
+
         return new MemberResponseDto(member.getId(), member.getNickname(), member.getRole());
     }
 }

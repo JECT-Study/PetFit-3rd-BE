@@ -1,6 +1,7 @@
 package ject.petfit.domain.user.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.global.jwt.refreshtoken.RefreshToken;
 import lombok.AccessLevel;
@@ -34,6 +35,9 @@ public class AuthUser implements UserDetails {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "name")
+    private String name;
+
     @Column(name = "nickname")
     private String nickname;
 
@@ -53,9 +57,10 @@ public class AuthUser implements UserDetails {
     private RefreshToken refreshToken;
 
     @Builder
-    public AuthUser(Long kakaoUUID, String email, String nickname, String encodedPassword, boolean isNewUser) {
+    public AuthUser(Long kakaoUUID, String email, String name, String nickname, String encodedPassword, boolean isNewUser) {
         this.kakaoUUID = kakaoUUID;
         this.email = email;
+        this.name = name;
         this.nickname = nickname;
         this.encodedPassword = encodedPassword;
         this.isNewUser = isNewUser;
@@ -116,5 +121,12 @@ public class AuthUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void editNickname(@Size(max = 10, message = "내용은 10자 이내여야 합니다.") String nickname) {
+        if (nickname == null || nickname.isBlank()) {
+            throw new IllegalArgumentException("닉네임은 비어있을 수 없습니다.");
+        }
+        this.nickname = nickname;
     }
 }
