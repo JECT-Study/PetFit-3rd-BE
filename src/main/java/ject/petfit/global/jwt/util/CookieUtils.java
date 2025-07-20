@@ -3,6 +3,8 @@ package ject.petfit.global.jwt.util;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +43,19 @@ public class CookieUtils {
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         return cookie;
+    }
+
+    public static String getCookieValue(HttpServletRequest req, String name) {
+        return Optional
+                .ofNullable(req.getCookies())
+                .flatMap(cookies ->
+                        Arrays.stream(cookies)
+                                .filter(cookie -> cookie.getName().equals(name))
+                                .map(Cookie::getValue)
+                                .filter(value -> !value.isBlank())
+                                .findFirst()
+                )
+                .orElse(null);
     }
 }
 

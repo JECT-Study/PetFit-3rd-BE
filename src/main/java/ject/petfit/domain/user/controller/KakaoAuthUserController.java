@@ -1,9 +1,11 @@
 package ject.petfit.domain.user.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ject.petfit.domain.user.converter.AuthUserConverter;
 import ject.petfit.domain.user.dto.request.WithdrawAuthUserRequestDto;
 import ject.petfit.domain.user.dto.response.AuthUserResponseDto;
+import ject.petfit.domain.user.dto.response.AuthUserSimpleResponseDto;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.service.AuthUserService;
 import ject.petfit.global.common.ApiResponse;
@@ -134,6 +136,17 @@ public class KakaoAuthUserController {
         // 회원 탈퇴 처리
         authUserService.withdraw(user.getId(), request.getRefreshToken());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
+                ApiResponse.success(null)
+        );
+    }
+
+    @GetMapping("/accesscookie")
+    public ResponseEntity<ApiResponse<AuthUserSimpleResponseDto>> refreshTokenToInfoCookie(
+            HttpServletRequest request, HttpServletResponse response
+    ) {
+        String refreshToken = CookieUtils.getCookieValue(request, "refresh_token");
+        AuthUserSimpleResponseDto memberInfo = authUserService.getMemberInfoFromRefreshTokenCookie(refreshToken);
+        return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.success(null)
         );
     }

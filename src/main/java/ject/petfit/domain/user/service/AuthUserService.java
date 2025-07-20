@@ -7,6 +7,7 @@ import ject.petfit.domain.member.repository.MemberRepository;
 import ject.petfit.domain.user.common.util.KakaoUtil;
 import ject.petfit.domain.user.converter.AuthUserConverter;
 import ject.petfit.domain.user.dto.KakaoDto;
+import ject.petfit.domain.user.dto.response.AuthUserSimpleResponseDto;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.exception.AuthUserErrorCode;
 import ject.petfit.domain.user.exception.AuthUserException;
@@ -106,6 +107,7 @@ public class AuthUserService {
                 kakaoProfile.getId(),
                 kakaoProfile.getKakao_account().getEmail(),
                 kakaoProfile.getKakao_account().getProfile().getNickname(),
+                kakaoProfile.getKakao_account().getProfile().getNickname(),
                 encodedPassword,
                 true
         );
@@ -138,5 +140,18 @@ public class AuthUserService {
                 .then()
                 .block();
 
+    }
+
+    public AuthUserSimpleResponseDto getMemberInfoFromRefreshTokenCookie(String refreshToken) {
+        AuthUser authUser = refreshTokenRepository.findByToken(refreshToken)
+                .map(refreshTokenEntity -> refreshTokenEntity.getAuthUser())
+                .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.REFRESH_TOKEN_NOT_FOUND));
+
+        return AuthUserSimpleResponseDto.builder()
+                .memberId(authUser.getMember().getId())
+                .name(authUser.getName())
+                .nickname(authUser.getNickname())
+                .email(authUser.getEmail())
+                .build();
     }
 }
