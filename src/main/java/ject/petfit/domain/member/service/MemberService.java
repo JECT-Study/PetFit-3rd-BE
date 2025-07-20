@@ -9,7 +9,6 @@ import ject.petfit.domain.member.exception.MemberErrorCode;
 import ject.petfit.domain.member.exception.MemberException;
 import ject.petfit.domain.member.repository.MemberRepository;
 import ject.petfit.domain.user.entity.AuthUser;
-import ject.petfit.domain.user.repository.AuthUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -40,4 +39,5 @@ public class MemberService {
 
         return new MemberResponseDto(member.getId(), member.getNickname(), member.getRole());
     }
+
 }
