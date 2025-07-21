@@ -59,13 +59,12 @@ public class RoutineService {
     // ------------------------------ API 메서드 -----------------------------------
 
     // 루틴 조회 - 일간
-    public List<RoutineResponse> getDailyRoutines(Long petId, String date) {
+    public List<RoutineResponse> getDailyRoutines(Long petId, LocalDate entryDate) {
 
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
 
         // 해당 날짜의 entry 조회 - entry가 없으면 빈 리스트 반환
-        LocalDate entryDate = LocalDate.parse(date);
         Entry entry = entryRepository.findByPetAndEntryDate(pet, entryDate);
         if (entry == null) {
             return List.of(); 
@@ -82,12 +81,11 @@ public class RoutineService {
 
     // 루틴 체크(V) 완료
     @Transactional
-    public String checkRoutine(Long petId, String date, String category) {
+    public String checkRoutine(Long petId, LocalDate entryDate, String category) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
 
         // 해당 날짜의 entry가 있으면 조회 없으면 생성
-        LocalDate entryDate = LocalDate.parse(date);
         Entry entry = entryService.getOrCreateEntry(pet, entryDate);
 
         // 카테고리 따라 목표량 달라짐
@@ -119,12 +117,11 @@ public class RoutineService {
 
     // 루틴 세모
     @Transactional
-    public RoutineResponse createRoutineMemo(Long petId, String date, String category, RoutineMemoRequest request) {
+    public RoutineResponse createRoutineMemo(Long petId, LocalDate entryDate, String category, RoutineMemoRequest request) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
 
         // 해당 날짜의 entry가 있으면 조회 없으면 생성
-        LocalDate entryDate = LocalDate.parse(date);
         Entry entry = entryService.getOrCreateEntry(pet, entryDate);
 
         // 카테고리 따라 목표량 달라짐
@@ -156,11 +153,10 @@ public class RoutineService {
 
     // 루틴 해제
     @Transactional
-    public String uncheckRoutine(Long petId, String date, String category) {
+    public String uncheckRoutine(Long petId, LocalDate entryDate, String category) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
         // 해당 날짜의 entry가 없으면 예외 발생
-        LocalDate entryDate = LocalDate.parse(date);
         Entry entry = entryService.getEntry(pet, entryDate);
 
         // 루틴 조회

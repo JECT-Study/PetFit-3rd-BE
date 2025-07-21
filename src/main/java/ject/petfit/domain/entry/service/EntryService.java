@@ -68,11 +68,11 @@ public class EntryService {
 
     // ------------------------------ API 메서드 -----------------------------------
     // 월간 루틴체크, 메모, 특이사항, (일정) 유무 조회
-    public List<EntryExistsResponse> getMonthlyEntries(Long petId, String month) {
+    public List<EntryExistsResponse> getMonthlyEntries(Long petId, LocalDate month) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new EntryException(EntryErrorCode.ENTRY_NOT_FOUND));
 
-        LocalDate startDate = LocalDate.parse(month + "-01");
+        LocalDate startDate = month.withDayOfMonth(1);
         LocalDate endDate = startDate.plusMonths(1).minusDays(1);
 
         List<Entry> entries = entryRepository.findAllByPetAndEntryDateBetween(pet, startDate, endDate);
@@ -83,10 +83,9 @@ public class EntryService {
     }
 
     // 주간 루틴, 특이사항 조회
-    public List<EntryDailyResponse> getWeeklyEntries(Long petId, String week) {
+    public List<EntryDailyResponse> getWeeklyEntries(Long petId, LocalDate startDate) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new EntryException(EntryErrorCode.ENTRY_NOT_FOUND));
-        LocalDate startDate = LocalDate.parse(week);
         LocalDate endDate = startDate.plusDays(6);
         List<Entry> entries = entryRepository.findAllByPetAndEntryDateBetween(pet, startDate, endDate);
 

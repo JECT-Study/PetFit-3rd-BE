@@ -1,6 +1,7 @@
 package ject.petfit.domain.routine.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import ject.petfit.domain.routine.dto.request.RoutineMemoRequest;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -24,11 +26,11 @@ public class RoutineController {
     // 루틴 조회 - 일간
     @GetMapping("/{petId}/daily/{date}")
     @Operation(summary = "일간 루틴 조회", description = "특정 날짜의 일간 루틴들을 조회 <br> " +
-            "{date}는 yyyy-MM-dd 형식으로 입력 <br> " +
             "체크나 세모 등록된 값들만 응답" )
     public ResponseEntity<ApiResponse<List<RoutineResponse>>> getDailyRoutines(
             @PathVariable Long petId,
-            @PathVariable String date
+            @Parameter(description = "yyyy-MM-dd 형식으로 입력", example = "2025-07-01")
+            @PathVariable LocalDate date
     ) {
         return ResponseEntity.ok(
                 ApiResponse.success(routineService.getDailyRoutines(petId, date))
@@ -37,11 +39,12 @@ public class RoutineController {
 
     // 루틴 체크(V) 완료
     @PostMapping("/{petId}/{date}/{category}/check")
-    @Operation(summary = "루틴 체크 완료", description = "루틴을 체크 완료 상태로 변경 <br> " +
-            "{date}는 yyyy-MM-dd 형식으로 입력 <br>{category}는 루틴 종류 - feed, water, walk, potty, dental, skin")
+    @Operation(summary = "루틴 체크 완료", description = "루틴을 체크 완료 상태로 변경")
     public ResponseEntity<ApiResponse<String>> checkRoutine(
             @PathVariable Long petId,
-            @PathVariable String date,
+            @Parameter(description = "yyyy-MM-dd 형식으로 입력", example = "2025-07-01")
+            @PathVariable LocalDate date,
+            @Parameter(description = "루틴 종류 - feed, water, walk, potty, dental, skin", example = "feed")
             @PathVariable String category
 //            @RequestBody RoutineRequest routineRequest
     ) {
@@ -54,11 +57,13 @@ public class RoutineController {
     // 루틴 세모
     @PostMapping("/{petId}/{date}/{category}/memo")
     @Operation(summary = "루틴 메모(세모)", description = "루틴을 메모 상태로 작성 <br> " +
-            "{date}는 yyyy-MM-dd 형식으로 입력 <br>{category}는 루틴 종류 - feed, water, walk, potty, dental, skin <br> " +
-            "content가 산책, 사료, 음수일때는 내용 | 배변, 치아, 피부일때는 메모로 사용")
+            "content가 산책, 사료, 음수일때는 내용 | 배변, 치아, 피부일때는 메모로 사용 <br>" +
+            "actualAmount는 배변, 치아, 피부에서 0~99999 이내 아무값이나 입력" )
     public ResponseEntity<ApiResponse<RoutineResponse>> createRoutineMemo(
             @PathVariable Long petId,
-            @PathVariable String date,
+            @Parameter(description = "yyyy-MM-dd 형식으로 입력", example = "2025-07-01")
+            @PathVariable LocalDate date,
+            @Parameter(description = "루틴 종류 - feed, water, walk, potty, dental, skin", example = "feed")
             @PathVariable String category,
             @Valid @RequestBody RoutineMemoRequest routineMemoRequest
     ) {
@@ -73,7 +78,9 @@ public class RoutineController {
             "{date}는 yyyy-MM-dd 형식으로 입력 <br>{category}는 루틴 종류 - feed, water, walk, potty, dental, skin")
     public ResponseEntity<ApiResponse<String>> uncheckRoutine(
             @PathVariable Long petId,
-            @PathVariable String date,
+            @Parameter(description = "yyyy-MM-dd 형식으로 입력", example = "2025-07-01")
+            @PathVariable LocalDate date,
+            @Parameter(description = "루틴 종류 - feed, water, walk, potty, dental, skin", example = "feed")
             @PathVariable String category
     ) {
         return ResponseEntity.ok(
