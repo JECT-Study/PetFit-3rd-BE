@@ -1,5 +1,6 @@
 package ject.petfit.global.jwt.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.global.common.ApiResponse;
@@ -32,9 +33,9 @@ public class TokenController {
 
     // Refresh Token 재발급
     @PostMapping("/auth/refresh")
-    public ResponseEntity<ApiResponse<Void>> refresh(@RequestBody RefreshTokenRequestDto request, HttpServletResponse httpServletResponse) {
+    public ResponseEntity<ApiResponse<Void>> refresh(HttpServletRequest request, HttpServletResponse httpServletResponse) {
         // 토큰 유효성 검사 및 삭제
-        AuthUser authUser = refreshTokenService.validateAndRotateToken(request.getRefreshToken());
+        AuthUser authUser = refreshTokenService.validateAndRotateToken(request.getHeader("Authorization"));
         // 새로운 access 토큰 발급
         String newAccessToken = jwtUtil.createAccessToken(authUser.getEmail(), authUser.getMember().getRole().name());
         // 새로운 refresh 토큰 발급
