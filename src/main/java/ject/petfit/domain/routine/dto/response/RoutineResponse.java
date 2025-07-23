@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Schema(description = "루틴 응답 DTO")
+@Schema(description = "단일 루틴 응답 DTO")
 public class RoutineResponse {
     @Schema(description = "루틴 ID", example = "1")
     private Long routineId; // 루틴 ID

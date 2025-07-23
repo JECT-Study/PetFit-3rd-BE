@@ -3,6 +3,7 @@ package ject.petfit.domain.entry.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import ject.petfit.domain.remark.dto.response.RemarkResponse;
+import ject.petfit.domain.routine.dto.response.DailyAllRoutineResponse;
 import ject.petfit.domain.routine.dto.response.RoutineResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,8 +36,10 @@ public class EntryDailyResponse {
     @Schema(description = "일정 존재 여부", example = "false")
     private boolean isScheduled; // 일정 존재 여부
 
-    List<RoutineResponse> routineResponseList;
     List<RemarkResponse> remarkResponseList;
+
+    List<RoutineResponse> routineResponseList; // 아래로 변경
+//    DailyAllRoutineResponse dailyAllRoutineResponse;
 
     public static EntryDailyResponse from(Entry entry) {
         return EntryDailyResponse.builder()

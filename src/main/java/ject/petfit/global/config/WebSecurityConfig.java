@@ -64,13 +64,13 @@ public class WebSecurityConfig {
                                 "/health/**",
 
                                 // 개발용으로 허용
-//                                "/api/pets/**",
-//                                "/api/routines/**",
-//                                "/api/remarks/**",
-//                                "/api/schedules/**",
-//                                "/api/slots/**",
-//                                "/api/entries/**",
-//                                "/api/members/**",
+                                "/api/pets/**",
+                                "/api/routines/**",
+                                "/api/remarks/**",
+                                "/api/schedules/**",
+                                "/api/slots/**",
+                                "/api/entries/**",
+                                "/api/members/**",
 
                                 "/favicon.ico",
                                 "/static/**",

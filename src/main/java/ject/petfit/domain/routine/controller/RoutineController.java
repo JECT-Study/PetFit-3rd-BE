@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import ject.petfit.domain.routine.dto.request.RoutineMemoRequest;
+import ject.petfit.domain.routine.dto.response.DailyAllRoutineResponse;
 import ject.petfit.domain.routine.dto.response.RoutineResponse;
 import ject.petfit.domain.routine.service.RoutineService;
 import ject.petfit.global.common.ApiResponse;
@@ -14,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,11 +23,13 @@ import java.util.List;
 public class RoutineController {
     private final RoutineService routineService;
 
-    // 루틴 조회 - 일간
+    // 일간 루틴 조회
     @GetMapping("/{petId}/daily/{date}")
-    @Operation(summary = "일간 루틴 조회", description = "특정 날짜의 일간 루틴들을 조회 <br> " +
-            "체크나 세모 등록된 값들만 응답" )
-    public ResponseEntity<ApiResponse<List<RoutineResponse>>> getDailyRoutines(
+    @Operation(summary = "일간 루틴 조회", description = "특정 날짜의 루틴들 상태 조회 <br> " +
+            "슬롯 활성화한 루틴들은 응답값 있음, 슬롯 비활성화 루틴은 null <br> " +
+            "슬롯 활성화환 루틴들의 상태는 CHECKED, MEMO, UNCHECKED 중 하나 <br> " +
+            "루틴 unchecked인 경우 routineId는 null" )
+    public ResponseEntity<ApiResponse<DailyAllRoutineResponse>> getDailyRoutines(
             @PathVariable Long petId,
             @Parameter(description = "yyyy-MM-dd 형식으로 입력", example = "2025-07-01")
             @PathVariable LocalDate date
@@ -37,9 +39,9 @@ public class RoutineController {
         );
     }
 
-    // 루틴 체크(V) 완료
+    // 루틴 체크(V)
     @PostMapping("/{petId}/{date}/{category}/check")
-    @Operation(summary = "루틴 체크 완료", description = "루틴을 체크 완료 상태로 변경")
+    @Operation(summary = "루틴 체크함", description = "루틴을 체크 상태로 변경")
     public ResponseEntity<ApiResponse<String>> checkRoutine(
             @PathVariable Long petId,
             @Parameter(description = "yyyy-MM-dd 형식으로 입력", example = "2025-07-01")
