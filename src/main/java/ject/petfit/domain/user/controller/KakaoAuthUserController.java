@@ -6,6 +6,7 @@ import ject.petfit.domain.user.converter.AuthUserConverter;
 import ject.petfit.domain.user.dto.request.WithdrawAuthUserRequestDto;
 import ject.petfit.domain.user.dto.response.AuthUserResponseDto;
 import ject.petfit.domain.user.dto.response.AuthUserSimpleResponseDto;
+import ject.petfit.domain.user.dto.response.AuthUserTokenResponseDto;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.service.AuthUserService;
 import ject.petfit.global.common.ApiResponse;
@@ -52,7 +53,7 @@ public class KakaoAuthUserController {
 
     // 소셜 로그인/회원가입 -> 쿠키
     @GetMapping("/kakao/login")
-    public ResponseEntity<ApiResponse<Void>> kakaoLogin(
+    public ResponseEntity<ApiResponse<AuthUserTokenResponseDto>> kakaoLogin(
             @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) throws IOException {
         AuthUser user = authUserService.oAuthLogin(accessCode);
 
@@ -61,12 +62,17 @@ public class KakaoAuthUserController {
         user.addRefreshToken(refreshToken);
 
         // Cookie
-        httpServletResponse.addCookie(CookieUtils.addCookie("access_token", accessToken));
-        httpServletResponse.addCookie(CookieUtils.addCookie("refresh_token", refreshToken.getToken()));
+//        httpServletResponse.addCookie(CookieUtils.addCookie("access_token", accessToken));
+//        httpServletResponse.addCookie(CookieUtils.addCookie("refresh_token", refreshToken.getToken()));
 
-        httpServletResponse.sendRedirect(frontDomain);
+//        httpServletResponse.sendRedirect(frontDomain);
+        httpServletResponse.setHeader("Authorization", "Bearer " + accessToken);
 
-        return ResponseEntity.ok(ApiResponse.success(null));
+        AuthUserTokenResponseDto tokenResponseDto = new AuthUserTokenResponseDto(accessToken, refreshToken.getToken());
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponse.success(tokenResponseDto)
+        );
     }
 
     // 소셜 로그인/회원가입 -> DEV
