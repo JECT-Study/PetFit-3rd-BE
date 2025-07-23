@@ -89,6 +89,7 @@ public class EntryService {
         LocalDate endDate = startDate.plusDays(6);
         List<Entry> entries = entryRepository.findAllByPetAndEntryDateBetween(pet, startDate, endDate);
 
+
         return entries.stream()
                 .map(EntryDailyResponse::from)
                 .toList();

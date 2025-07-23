@@ -15,7 +15,8 @@ import org.springframework.context.annotation.Configuration;
         info = @Info(
                 title = "펫핏 API 명세서",
                 version = "v1",
-                description = "펫핏 API 명세서입니다"
+                description = "펫핏 API 명세서입니다 <br> " +
+                        "사용할 petId에 해당하는 슬롯 초기화(post /api/slots/{petId})를 반드시 실행하고 나머지 API를 진행해주세요"
         ),
         servers = {
 //                @Server(url = "배포할 도메인", description = "운영 서버"),
