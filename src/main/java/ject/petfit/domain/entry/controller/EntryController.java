@@ -21,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/entries")
 @Tag(name = "Entry 수정중 - 루틴완료 로직 변경중, 일간 조회 추가예정", description = "달력에서 기록 조회 API")
-public class EntryController { //
+public class EntryController {
     private final EntryService entryService;
 
     // 월간 루틴체크,메모,특이사항,(일정) 유무 조회
