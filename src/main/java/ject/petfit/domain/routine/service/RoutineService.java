@@ -17,6 +17,8 @@ import ject.petfit.domain.routine.exception.RoutineErrorCode;
 import ject.petfit.domain.routine.exception.RoutineException;
 import ject.petfit.domain.routine.repository.RoutineRepository;
 import ject.petfit.domain.slot.entity.Slot;
+import ject.petfit.domain.slot.exception.SlotErrorCode;
+import ject.petfit.domain.slot.exception.SlotException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -96,6 +98,10 @@ public class RoutineService {
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
 
         Slot slot = pet.getSlot();
+        // 슬롯이 없으면 예외 발생
+        if (slot == null) {
+            throw new SlotException(SlotErrorCode.SLOT_NOT_FOUND);
+        }
 
         // 슬롯 활성화되어 있으면 unchecked 루틴 생성, 슬롯 비활성화이면 null로 설정
         RoutineResponse feedRoutine = slot.isFeedActivated()?
