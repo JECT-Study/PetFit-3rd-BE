@@ -87,7 +87,9 @@ public class KakaoAuthUserController {
     // UX 고려하여 카카오 계정과의 unlink 처리는 X
     @PostMapping("/kakao/logout")
     public ResponseEntity<ApiResponse<?>> logout(
-            @CookieValue("refresh_token") String refreshToken, HttpServletResponse response) {
+         @CookieValue(name = "access_token", required = false) String accessToken,
+         @CookieValue(name = "refresh_token", required = false) String refreshToken, HttpServletResponse response) {
+        authUserService.logout(accessToken);
         // 리프레시 토큰 무효화
         refreshTokenService.findTokenByPlain(refreshToken)
                 .ifPresent(refreshTokenRepository::delete);
