@@ -44,6 +44,9 @@ public class KakaoAuthUserController {
     @Value("${spring.kakao.auth.admin}")
     private String adminKey;
 
+    @Value("${spring.kakao.redirect}")
+    private String frontDomain;
+
 
     // 소셜 로그인/회원가입 -> 쿠키
     @GetMapping("/kakao/login")
@@ -59,7 +62,7 @@ public class KakaoAuthUserController {
         httpServletResponse.addCookie(CookieUtils.addCookie("access_token", accessToken));
         httpServletResponse.addCookie(CookieUtils.addCookie("refresh_token", refreshToken.getToken()));
 
-        httpServletResponse.sendRedirect("http://localhost:5173");
+        httpServletResponse.sendRedirect(frontDomain);
 
         return ResponseEntity.ok(ApiResponse.success(null));
     }
