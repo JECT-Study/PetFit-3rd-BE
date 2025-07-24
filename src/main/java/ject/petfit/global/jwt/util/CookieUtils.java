@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 
@@ -18,6 +19,16 @@ public class CookieUtils {
         cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(7 * 24 * 60 * 60);
+        return cookie;
+    }
+
+    public static ResponseCookie createTokenCookie(String name, String value) {
+        ResponseCookie cookie = ResponseCookie.from(name, value)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60)
+                .build();
         return cookie;
     }
 

@@ -21,6 +21,7 @@ import ject.petfit.global.jwt.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -53,7 +54,7 @@ public class KakaoAuthUserController {
 
     // 소셜 로그인/회원가입 -> 쿠키
     @GetMapping("/kakao/login")
-    public ResponseEntity<ApiResponse<AuthUserTokenResponseDto>> kakaoLogin(
+    public ResponseEntity<ApiResponse<Void>> kakaoLogin(
             @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) throws IOException {
         AuthUser user = authUserService.oAuthLogin(accessCode);
 
@@ -66,12 +67,16 @@ public class KakaoAuthUserController {
 //        httpServletResponse.addCookie(CookieUtils.addCookie("refresh_token", refreshToken.getToken()));
 
 //        httpServletResponse.sendRedirect(frontDomain);
-        httpServletResponse.setHeader("Authorization", "Bearer " + accessToken);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+        headers.add(HttpHeaders.SET_COOKIE, CookieUtils.createTokenCookie("access_token", accessToken).toString());
+        headers.add(HttpHeaders.SET_COOKIE, CookieUtils.createTokenCookie("refresh_token", refreshToken.getToken()).toString());
 
-        AuthUserTokenResponseDto tokenResponseDto = new AuthUserTokenResponseDto(accessToken, refreshToken.getToken());
-
+//        AuthUserTokenResponseDto tokenResponseDto = new AuthUserTokenResponseDto(accessToken, refreshToken.getToken());
+//
+        httpServletResponse.sendRedirect(frontDomain +"token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
         return ResponseEntity.status(HttpStatus.OK).body(
-                ApiResponse.success(tokenResponseDto)
+                ApiResponse.success(null)
         );
     }
 
