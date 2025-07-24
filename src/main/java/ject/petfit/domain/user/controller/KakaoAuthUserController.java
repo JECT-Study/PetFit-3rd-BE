@@ -48,7 +48,7 @@ public class KakaoAuthUserController {
     @Value("${spring.kakao.auth.admin}")
     private String adminKey;
 
-    @Value("ㅁㅇㄴㄹㅁㄴㅇㄹ")
+    @Value("${spring.front}")
     private String frontDomain;
 
 

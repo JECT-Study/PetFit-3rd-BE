@@ -35,7 +35,7 @@ public class WebSecurityConfig {
     private final AuthUserService authUserService;
     private final JwtUtil jwtUtil;
 
-    @Value("${spring.kakao.redirect}")
+    @Value("${spring.front}")
     private String frontDomain;
 
     @Bean
