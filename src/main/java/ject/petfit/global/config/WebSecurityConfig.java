@@ -5,6 +5,7 @@ import ject.petfit.global.jwt.filter.JwtAuthFilter;
 import ject.petfit.global.jwt.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -33,6 +34,9 @@ public class WebSecurityConfig {
 
     private final AuthUserService authUserService;
     private final JwtUtil jwtUtil;
+
+    @Value("${spring.kakao.redirect}")
+    private String frontDomain;
 
     @Bean
     public JwtAuthFilter jwtAuthFilter() {
@@ -101,7 +105,8 @@ public class WebSecurityConfig {
         config.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:5173",
                 "http://127.0.0.1:5173",
-                "https://petfit-ject.duckdns.org"
+                "https://petfit-ject.duckdns.org",
+                frontDomain
         ));
 
         config.addAllowedHeader("*");
