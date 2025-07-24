@@ -54,7 +54,7 @@ public class KakaoAuthUserController {
 
     // 소셜 로그인/회원가입 -> 쿠키
     @GetMapping("/kakao/login")
-    public ResponseEntity<ApiResponse<Void>> kakaoLogin(
+    public void kakaoLogin(
             @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) throws IOException {
         AuthUser user = authUserService.oAuthLogin(accessCode);
 
@@ -75,9 +75,6 @@ public class KakaoAuthUserController {
 //        AuthUserTokenResponseDto tokenResponseDto = new AuthUserTokenResponseDto(accessToken, refreshToken.getToken());
 //
         httpServletResponse.sendRedirect(frontDomain +"token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
-        return ResponseEntity.status(HttpStatus.OK).body(
-                ApiResponse.success(null)
-        );
     }
 
     // 소셜 로그인/회원가입 -> DEV
