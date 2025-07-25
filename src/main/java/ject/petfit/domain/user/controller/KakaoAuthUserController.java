@@ -67,14 +67,13 @@ public class KakaoAuthUserController {
 //        httpServletResponse.addCookie(CookieUtils.addCookie("refresh_token", refreshToken.getToken()));
 
 //        httpServletResponse.sendRedirect(frontDomain);
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
-        headers.add(HttpHeaders.SET_COOKIE, CookieUtils.createTokenCookie("access_token", accessToken).toString());
-        headers.add(HttpHeaders.SET_COOKIE, CookieUtils.createTokenCookie("refresh_token", refreshToken.getToken()).toString());
+        // 쿠키 설정 (헤더가 아닌 HttpServletResponse의 addCookie 사용)
+        httpServletResponse.addCookie(CookieUtils.addCookie("access_token", accessToken, httpServletResponse));
+        httpServletResponse.addCookie(CookieUtils.addCookie("refresh_token", refreshToken.getToken(), httpServletResponse));
 
+        // 리다이렉트
+        httpServletResponse.sendRedirect(frontDomain + "token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
 //        AuthUserTokenResponseDto tokenResponseDto = new AuthUserTokenResponseDto(accessToken, refreshToken.getToken());
-//
-        httpServletResponse.sendRedirect(frontDomain +"token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
     }
 
     // 소셜 로그인/회원가입 -> DEV
