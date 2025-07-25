@@ -113,13 +113,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                uri.startsWith("/v3/api-docs") ||
                uri.startsWith("/swagger-resources") ||
                uri.startsWith("/health") ||
-               uri.startsWith("/api/routines") ||
-               uri.startsWith("/api/remarks") ||
-               uri.startsWith("/api/schedules") ||
-               uri.startsWith("/api/slots") ||
-               uri.startsWith("/api/entries") ||
-               uri.startsWith("/api/pets") ||
-               uri.startsWith("/api/members") ||
+//               uri.startsWith("/api/routines") ||
+//               uri.startsWith("/api/remarks") ||
+//               uri.startsWith("/api/schedules") ||
+//               uri.startsWith("/api/slots") ||
+//               uri.startsWith("/api/entries") ||
+//               uri.startsWith("/api/pets") ||
+//               uri.startsWith("/api/members") ||
                 uri.startsWith("/favicon.ico") ||
                 uri.startsWith("/favicon.png") ||
                 uri.startsWith("/static/") ||
