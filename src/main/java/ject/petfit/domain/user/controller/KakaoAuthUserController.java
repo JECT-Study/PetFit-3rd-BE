@@ -1,5 +1,7 @@
 package ject.petfit.domain.user.controller;
 
+import static ject.petfit.global.jwt.util.CookieUtils.addCookie;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ject.petfit.domain.user.converter.AuthUserConverter;
@@ -68,8 +70,8 @@ public class KakaoAuthUserController {
 
 //        httpServletResponse.sendRedirect(frontDomain);
         // 쿠키 설정 (헤더가 아닌 HttpServletResponse의 addCookie 사용)
-        httpServletResponse.addCookie(CookieUtils.addCookie("access_token", accessToken, httpServletResponse));
-        httpServletResponse.addCookie(CookieUtils.addCookie("refresh_token", refreshToken.getToken(), httpServletResponse));
+        CookieUtils.addCookie("access_token", accessToken, httpServletResponse);
+        CookieUtils.addCookie("refresh_token", refreshToken.getToken(), httpServletResponse);
 
         // 리다이렉트
         httpServletResponse.sendRedirect(frontDomain + "token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
