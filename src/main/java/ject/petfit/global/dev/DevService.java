@@ -15,12 +15,14 @@ import ject.petfit.domain.routine.service.RoutineService;
 import ject.petfit.domain.slot.entity.Slot;
 import ject.petfit.domain.slot.service.SlotService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DevService {
@@ -37,7 +39,6 @@ public class DevService {
         Slot slot = pet.getSlot();
         Entry entry = entryRepository.findByPetAndEntryDate(pet, entryDate)
                 .orElse(null); // 해당 날짜의 entry가 없다면 빈 리스트 반환
-
         /**
          * DB에 저장된 CHECKED/MEMO 루틴이 없다면(=Entry가 없다) 할 일 없음
          */
@@ -53,13 +54,16 @@ public class DevService {
         List<String> activatedSlotOptions = slotService.getActivatedSlotOptions(slot);
 
         /* 슬롯 활성화해놓고 CHECKED나 MEMO한 루틴이지만 밤 12시 시점에 비활성화된 슬롯이면 삭제함 */
-        for(Routine routine : routineListInDB){
-            if (!activatedSlotOptions.contains(routine.getCategory())) {
-                routineRepository.delete(routine);
-                routineListInDB.remove(routine);
-            }
-        }
-        routineRepository.flush();
+        // 에러를 아직 못잡음
+//        log.info("삭제 로직 전");
+//        for(Routine routine : routineListInDB){
+//            if (!activatedSlotOptions.contains(routine.getCategory())) {
+//                routineRepository.delete(routine);
+//                routineListInDB.remove(routine);
+//            }
+//        }
+//        routineRepository.flush();
+//        log.info("삭제 로직 후");
 
         /**
          * DB에 저장된 루틴 리스트가 활성화된 옵션 개수와 같다면 '루틴 완료' 업데이트하고 종료

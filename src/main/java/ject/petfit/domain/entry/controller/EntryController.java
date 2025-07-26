@@ -6,8 +6,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import ject.petfit.domain.entry.dto.EntryDailyResponse;
 import ject.petfit.domain.entry.dto.EntryExistsResponse;
 import ject.petfit.domain.entry.service.EntryService;
+import ject.petfit.domain.routine.dto.response.RoutineResponse;
+import ject.petfit.domain.routine.service.RoutineService;
 import ject.petfit.global.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,14 +18,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/entries")
 @Tag(name = "달력 API")
 public class EntryController {
     private final EntryService entryService;
+    private final RoutineService routineService;
 
     // 월간 루틴체크,메모,특이사항,(일정) 유무 조회
     @GetMapping("/{petId}/monthly/{month}")
@@ -64,8 +70,17 @@ public class EntryController {
             @Parameter(description = "yyyy-MM-dd 형식으로 입력", example = "2025-07-01")
             @PathVariable LocalDate date
     ) {
+
+        List<RoutineResponse> routineResponseList = new ArrayList<>();
+        if (date.equals(LocalDate.now())) {
+            routineResponseList = routineService.getTodayRoutines(petId, date);
+        }else if(date.isBefore(LocalDate.now())) {
+            routineResponseList = routineService.getPastRoutines(petId, date);
+        }
+        log.info("루틴 응답 리스트: {}", routineResponseList);
+
         return ResponseEntity.ok(
-                ApiResponse.success(entryService.getDailyEntries(petId, date))
+                ApiResponse.success(entryService.getDailyEntries(petId, date, routineResponseList))
         );
     }
 

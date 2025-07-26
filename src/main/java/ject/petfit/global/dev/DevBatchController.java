@@ -20,7 +20,7 @@ public class DevBatchController {
 
     private final DevService devService;
 
-    @PostMapping("/entry/flush")
+    @PostMapping("/flush")
     @Operation(summary = "하루 기록 수동 업데이트",
             description = "1. 해당 날짜의 루틴 완료 여부 업데이트 <br>" +
                     "2. 해당 날짜의 미체크 루틴을 DB에 추가 <br> " +
@@ -30,7 +30,8 @@ public class DevBatchController {
             @RequestParam Long petId
     ) {
         devService.entryDateFlush(petId, entryDate);
-        return ResponseEntity
-                .ok(ApiResponse.success(devService.getEntryFlushResponse(petId, entryDate)));
+        return ResponseEntity.ok(
+                ApiResponse.success(devService.getEntryFlushResponse(petId, entryDate))
+        );
     }
 }

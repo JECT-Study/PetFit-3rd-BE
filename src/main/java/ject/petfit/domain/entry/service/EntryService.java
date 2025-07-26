@@ -9,6 +9,9 @@ import ject.petfit.domain.entry.exception.EntryException;
 import ject.petfit.domain.entry.repository.EntryRepository;
 import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.pet.repository.PetRepository;
+import ject.petfit.domain.routine.dto.response.RoutineResponse;
+import ject.petfit.domain.routine.repository.RoutineRepository;
+import ject.petfit.domain.routine.service.RoutineService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,7 @@ import java.util.Optional;
 public class EntryService {
     private final EntryRepository entryRepository;
     private final PetRepository petRepository;
+    private final RoutineRepository routineRepository;
 
     // ----------------------------- 엔트리 공통 메서드 -----------------------------------
     // (Pet, LocalDate)의 entry가 있으면 조회, 없으면 생성
@@ -71,18 +75,13 @@ public class EntryService {
     // ------------------------------ API 메서드 -----------------------------------
     // 월간 루틴체크, 메모, 특이사항, (일정) 유무 조회
     public List<EntryExistsResponse> getMonthlyEntries(Long petId, String month) {
-        log.info("진입1");
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new EntryException(EntryErrorCode.ENTRY_NOT_FOUND));
 
-        log.info("진입2");
         LocalDate startDate = LocalDate.parse(month + "-01");
-        log.info("진입3");
         LocalDate endDate = startDate.plusMonths(1).minusDays(1);
 
-        log.info("진입4");
         List<Entry> entries = entryRepository.findAllByPetAndEntryDateBetween(pet, startDate, endDate);
-        log.info("진입5");
 
         return entries.stream()
                 .map(EntryExistsResponse::from)
@@ -102,18 +101,31 @@ public class EntryService {
                 .toList();
     }
 
-    public EntryDailyResponse getDailyEntries(Long petId, LocalDate date) {
+    // 일간 특이사항 + 루틴 리스트 조회
+    public EntryDailyResponse getDailyEntries(Long petId, LocalDate date, List<RoutineResponse> routineResponseList) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new EntryException(EntryErrorCode.ENTRY_NOT_FOUND));
         Entry entry = entryRepository.findByPetAndEntryDate(pet, date)
                 .orElse(null);
 
-        // entry가 없을 경우 모든 여부 false와 빈 리스트로 응답
-        if (entry == null) {
-            return EntryDailyResponse.fromNull(date);
-        }
+        return entry == null ? EntryDailyResponse.ofNull(date, routineResponseList) : EntryDailyResponse.of(entry, routineResponseList);
 
-        // entry가 있을 경우 해당 entry로 응답
-        return EntryDailyResponse.from(entry);
+        /**
+         *  오늘일 경우
+         *  entry가 null || 루틴 DB에 오늘의 entry 데이터가 없을 경우 생성해서 반환
+         *  루틴 DB에 오늘의 entry 데이터가 있을 경우 entry로 응답
+         */
+//        if (date.isEqual(LocalDate.now())) {
+//            return entry == null || !routineRepository.existsByEntry(entry) ?
+//                    EntryDailyResponse.ofNull(date, getTodayUNRoutines(petId, date)) :
+//                    EntryDailyResponse.from(entry);
+//        }
+
+        /**
+         * 과거의 경우
+         * entry가 없을 경우 모든 여부 false와 빈 리스트로 응답
+         * entry가 있을 경우 entry로 응답
+         */
+//        return entry == null ? EntryDailyResponse.fromNull(date) : EntryDailyResponse.from(entry);
     }
 }

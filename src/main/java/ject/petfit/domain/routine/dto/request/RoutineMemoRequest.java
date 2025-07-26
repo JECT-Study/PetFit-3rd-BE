@@ -13,10 +13,10 @@ import lombok.ToString;
 public class RoutineMemoRequest {
     @Min(value = 0, message = "분량은 0 이상이어야 합니다.")
     @Max(value = 99999, message = "분량은 5자리 이하여야 합니다.")
-    @Schema(description = "실제량(사료, 음수, 산책)", example = "0")
+    @Schema(description = "실제량(사료, 음수, 산책)", example = "50")
     private Integer actualAmount;   // 실제량 (사료, 음수, 산책에만 응답)
 
     @Size(max = 200, message = "내용은 200자 이내여야 합니다.")
-    @Schema(description = "내용 or 메모", example = "비와서 산책 안 감")
+    @Schema(description = "내용 or 메모", example = "다이어트중")
     private String content;         // 내용 or 메모
 }

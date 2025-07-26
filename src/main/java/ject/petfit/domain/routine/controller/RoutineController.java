@@ -21,8 +21,9 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/routines")
-@Tag(name = "오늘의 루틴 API", description = "오늘의 루틴 조회, 체크, 메모, 미체크 API")
-public class TodayRoutineController {
+@Tag(name = "루틴 API", description = "루틴 조회, 체크, 메모, 미체크 API <br> " +
+        "활성화되어 있는 슬롯의 루틴만 조작 가능")
+public class RoutineController {
     private final RoutineService routineService;
 
     // 일간 루틴 조회
@@ -50,7 +51,7 @@ public class TodayRoutineController {
 
     // 루틴 체크(V)
     @PostMapping("/{petId}/{date}/{category}/check")
-    @Operation(summary = "루틴 체크함", description = "루틴을 체크 상태로 변경")
+    @Operation(summary = "루틴 체크", description = "루틴을 체크 상태로 변경")
     public ResponseEntity<ApiResponse<String>> checkRoutine(
             @PathVariable Long petId,
             @Parameter(description = "yyyy-MM-dd 형식으로 입력", example = "2025-07-01")
@@ -83,9 +84,9 @@ public class TodayRoutineController {
         );
     }
 
-    // 루틴 해제
+    // 루틴 미체크
     @DeleteMapping("/{petId}/{date}/{category}/uncheck")
-    @Operation(summary = "루틴 해제", description = "루틴을 해제(DB 삭제) <br> " +
+    @Operation(summary = "루틴 미체크", description = "루틴을 미체크 상태로 변경 <br> " +
             "{category}는 루틴 종류 - feed, water, walk, potty, dental, skin")
     public ResponseEntity<ApiResponse<String>> uncheckRoutine(
             @PathVariable Long petId,

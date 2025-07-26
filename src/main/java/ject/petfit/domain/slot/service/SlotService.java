@@ -36,7 +36,7 @@ public class SlotService {
         return slot;
     }
 
-    // 슬롯 활성화된 옵션명만 조회
+    // 슬롯 활성화된 옵션명 리스트 조회
     public List<String> getActivatedSlotOptions(Slot slot) {
         List<String> activatedOptions = new ArrayList<>();
         if(slot.isFeedActivated()){
@@ -58,6 +58,43 @@ public class SlotService {
             activatedOptions.add("skin");
         }
         return activatedOptions;
+    }
+
+    // 해당 카테고리가 슬롯에서 활성화되어 있는지 확인
+    public void isCategorySlotActivated(Slot slot, String category) {
+        switch (category) {
+            case "feed" -> {
+                if (!slot.isFeedActivated()) {
+                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED);
+                }
+            }
+            case "water" -> {
+                if (!slot.isWaterActivated()) {
+                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED);
+                }
+            }
+            case "walk" -> {
+                if (!slot.isWalkActivated()) {
+                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED);
+                }
+            }
+            case "potty" -> {
+                if (!slot.isPottyActivated()) {
+                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED);
+                }
+            }
+            case "dental" -> {
+                if (!slot.isDentalActivated()) {
+                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED);
+                }
+            }
+            case "skin" -> {
+                if (!slot.isSkinActivated()) {
+                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED);
+                }
+            }
+            default -> throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED);
+        };
     }
 
     // ------------------------------ API 메서드 -----------------------------------

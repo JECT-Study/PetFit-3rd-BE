@@ -53,13 +53,6 @@ public class RoutineService {
         };
     }
 
-    // 루틴 해제 후 체크 존재 여부로 entry 업데이트
-    public void updateEntryChecked(Entry entry) {
-        if (!routineRepository.existsByEntryAndStatus(entry, RoutineStatus.CHECKED)) {
-            entry.updateCheckedFalse();
-        }
-    }
-
     // 루틴 해제 후 메모 존재 여부로 entry 업데이트
     public void updateEntryMemo(Entry entry) {
         if (!routineRepository.existsByEntryAndStatus(entry, RoutineStatus.MEMO)) {
@@ -95,72 +88,6 @@ public class RoutineService {
 
     // ------------------------------ API 메서드 -----------------------------------
 
-    // 루틴 일간 조회
-//    public DailyAllRoutineResponse getDailyRoutinesOld(Long petId, LocalDate entryDate) {
-//
-//        Pet pet = petRepository.findById(petId)
-//                .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
-//
-//        Slot slot = pet.getSlot();
-//        // 슬롯이 없으면 예외 발생
-//        if (slot == null) {
-//            throw new SlotException(SlotErrorCode.SLOT_NOT_FOUND);
-//        }
-//
-//        // 슬롯 활성화되어 있으면 unchecked 루틴 생성, 슬롯 비활성화이면 null로 설정
-//        RoutineResponse feedRoutine = slot.isFeedActivated()?
-//                uncheckedRoutineResponse(entryDate, "feed", slot.getFeedAmount()) : null;
-//        RoutineResponse waterRoutine = slot.isWaterActivated()?
-//                uncheckedRoutineResponse(entryDate, "water", slot.getWaterAmount()) : null;
-//        RoutineResponse walkRoutine = slot.isWalkActivated()?
-//                uncheckedRoutineResponse(entryDate, "walk", slot.getWalkAmount()) : null;
-//        RoutineResponse pottyRoutine = slot.isPottyActivated()?
-//                uncheckedRoutineResponse(entryDate, "potty", null) : null;
-//        RoutineResponse dentalRoutine = slot.isDentalActivated()?
-//                uncheckedRoutineResponse(entryDate, "dental", null) : null;
-//        RoutineResponse skinRoutine = slot.isSkinActivated()?
-//                uncheckedRoutineResponse(entryDate, "skin", null) : null;
-//
-//        // 해당 날짜의 루틴이 하나라도 있는지 조회
-//        // 기록이 없는 날이면 루틴 조회하지 않고 바로 반환
-//        Entry entry = entryRepository.findByPetAndEntryDate(pet, entryDate);
-//        if (entry == null || routineRepository.existsByEntry(entry)) {
-//            return DailyAllRoutineResponse.builder()
-//                    .feedRoutine(feedRoutine)
-//                    .waterRoutine(waterRoutine)
-//                    .walkRoutine(walkRoutine)
-//                    .pottyRoutine(pottyRoutine)
-//                    .dentalRoutine(dentalRoutine)
-//                    .skinRoutine(skinRoutine)
-//                    .build();
-//        }
-//
-//        // 기록이 있는 날이면 루틴 있는 경우에만 상태 세팅
-////        List<Routine> routines = routineRepository.findAllByEntry(entry);
-//        List<Routine> routineList = entry.getRoutines();
-//
-//        // 해당 날짜 저장된 루틴 있는 경우에는 상태 세팅
-//        for (Routine routine : routineList) {
-//            switch (routine.getCategory()) {
-//                case "feed" -> feedRoutine = createRoutineResponse(routine);
-//                case "water" -> waterRoutine = createRoutineResponse(routine);
-//                case "walk" -> walkRoutine = createRoutineResponse(routine);
-//                case "potty" -> pottyRoutine = createRoutineResponse(routine);
-//                case "dental" -> dentalRoutine = createRoutineResponse(routine);
-//                case "skin" -> skinRoutine = createRoutineResponse(routine);
-//            }
-//        }
-//
-//        return DailyAllRoutineResponse.builder()
-//                .feedRoutine(feedRoutine)
-//                .waterRoutine(waterRoutine)
-//                .walkRoutine(walkRoutine)
-//                .pottyRoutine(pottyRoutine)
-//                .dentalRoutine(dentalRoutine)
-//                .skinRoutine(skinRoutine)
-//                .build();
-//    }
-
     // 과거의 루틴 조회
     public List<RoutineResponse> getPastRoutines(Long petId, LocalDate entryDate) {
         Pet pet = petRepository.findById(petId)
@@ -190,7 +117,8 @@ public class RoutineService {
 
         // 오늘 날짜의 엔트리 조회
         // 홈화면에 처음 접속하면 오늘 날짜의 Entry DB를 생성
-        Entry entry = entryService.getOrCreateEntry(pet, entryDate);
+        Entry entry = entryRepository.findByPetAndEntryDate(pet, entryDate)
+                .orElse(null);
 
         // 루틴 응답 리스트
         List<RoutineResponse> routineResponseList = new ArrayList<>();
@@ -237,6 +165,9 @@ public class RoutineService {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
 
+        // 활성화된 슬롯의 요청인지 확인
+        slotService.isCategorySlotActivated(pet.getSlot(), category);
+
         // 해당 날짜의 entry가 있으면 조회 없으면 생성
         Entry entry = entryService.getOrCreateEntry(pet, entryDate);
 
@@ -274,6 +205,9 @@ public class RoutineService {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
 
+        // 활성화된 슬롯의 요청인지 확인
+        slotService.isCategorySlotActivated(pet.getSlot(), category);
+
         // 해당 날짜의 entry가 있으면 조회 없으면 생성
         Entry entry = entryService.getOrCreateEntry(pet, entryDate);
 
@@ -309,6 +243,10 @@ public class RoutineService {
     public String uncheckRoutine(Long petId, LocalDate entryDate, String category) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
+
+        // 활성화된 슬롯의 요청인지 확인
+        slotService.isCategorySlotActivated(pet.getSlot(), category);
+
         // 해당 날짜의 entry가 없으면 예외 발생
         Entry entry = entryService.getEntry(pet, entryDate);
 
@@ -319,12 +257,6 @@ public class RoutineService {
         // 루틴 삭제
         routineRepository.delete(routine);
 
-        // 기록 여부 업데이트
-        if (routine.getStatus() == RoutineStatus.CHECKED) {
-            updateEntryChecked(entry);
-        } else if (routine.getStatus() == RoutineStatus.MEMO) {
-            updateEntryMemo(entry);
-        }
 
         return "UNCHECKED";
     }
