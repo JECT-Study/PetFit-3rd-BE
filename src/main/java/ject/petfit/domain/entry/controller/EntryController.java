@@ -26,7 +26,7 @@ public class EntryController {
 
     // 월간 루틴체크,메모,특이사항,(일정) 유무 조회
     @GetMapping("/{petId}/monthly/{month}")
-    @Operation(summary = "월간 루틴체크,메모,특이사항,(일정) 유무 조회",
+    @Operation(summary = "월간 루틴완료,메모,특이사항,(일정) 유무 조회",
             description = "특정 월의 루틴완료, 메모, 특이사항, (일정) 유무를 조회 <br> " +
                     "요구사항은 아니지만 일정 유무도 응답에 포함 ")
     public ResponseEntity<ApiResponse<List<EntryExistsResponse>>> getMonthlyEntries(
@@ -58,6 +58,7 @@ public class EntryController {
 
     // 일간 특이사항 + 루틴 리스트 조회
     @GetMapping("/{petId}/daily/{date}")
+    @Operation(summary = "일간 특이사항 + 루틴 리스트 조회")
     public ResponseEntity<ApiResponse<EntryDailyResponse>> getDailyEntries(
             @PathVariable Long petId,
             @Parameter(description = "yyyy-MM-dd 형식으로 입력", example = "2025-07-01")

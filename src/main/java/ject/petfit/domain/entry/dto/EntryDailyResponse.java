@@ -23,17 +23,17 @@ public class EntryDailyResponse {
     @Schema(description = "날짜", example = "2025-07-01")
     private LocalDate entryDate; // 날짜
 
-    @Schema(description = "루틴체크 존재 여부", example = "true")
-    private boolean isChecked; // 루틴체크 존재 여부
-
-    @Schema(description = "메모 존재 여부", example = "true")
-    private boolean isMemo; // 메모 존재 여부
-
-    @Schema(description = "특이사항 존재 여부", example = "true")
-    private boolean isRemarked; // 특이사항 존재 여부
-
-    @Schema(description = "일정 존재 여부", example = "false")
-    private boolean isScheduled; // 일정 존재 여부
+//    @Schema(description = "루틴체크 존재 여부", example = "true")
+//    private boolean isChecked; // 루틴체크 존재 여부
+//
+//    @Schema(description = "메모 존재 여부", example = "true")
+//    private boolean isMemo; // 메모 존재 여부
+//
+//    @Schema(description = "특이사항 존재 여부", example = "true")
+//    private boolean isRemarked; // 특이사항 존재 여부
+//
+//    @Schema(description = "일정 존재 여부", example = "false")
+//    private boolean isScheduled; // 일정 존재 여부
 
     List<RemarkResponse> remarkResponseList;
 
@@ -43,10 +43,10 @@ public class EntryDailyResponse {
     public static EntryDailyResponse from(Entry entry) {
         return EntryDailyResponse.builder()
                 .entryDate(entry.getEntryDate())
-                .isChecked(entry.getIsChecked())
-                .isMemo(entry.getIsMemo())
-                .isRemarked(entry.getIsRemarked())
-                .isScheduled(entry.getIsScheduled())
+//                .isChecked(entry.getIsChecked())
+//                .isMemo(entry.getIsMemo())
+//                .isRemarked(entry.getIsRemarked())
+//                .isScheduled(entry.getIsScheduled())
                 .routineResponseList(entry.getRoutines().stream()
                         .map(RoutineResponse::from)
                         .toList())
@@ -59,10 +59,10 @@ public class EntryDailyResponse {
     public static EntryDailyResponse fromNull(LocalDate date) {
         return EntryDailyResponse.builder()
                 .entryDate(date)
-                .isChecked(false)
-                .isMemo(false)
-                .isRemarked(false)
-                .isScheduled(false)
+//                .isChecked(false)
+//                .isMemo(false)
+//                .isRemarked(false)
+//                .isScheduled(false)
                 .remarkResponseList(List.of())
                 .routineResponseList(List.of())
                 .build();

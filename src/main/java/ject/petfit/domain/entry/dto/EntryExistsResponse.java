@@ -20,8 +20,8 @@ public class EntryExistsResponse {
     @Schema(description = "날짜", example = "2025-07-01")
     private LocalDate entryDate; // 날짜
 
-    @Schema(description = "루틴체크 존재 여부", example = "true")
-    private boolean isChecked; // 루틴체크 존재 여부
+    @Schema(description = "루틴완료 여부", example = "true")
+    private boolean isCompleted; // 루틴완료 여부
 
     @Schema(description = "메모 존재 여부", example = "true")
     private boolean isMemo; // 메모 존재 여부
@@ -35,7 +35,7 @@ public class EntryExistsResponse {
     public static EntryExistsResponse from(Entry entry) {
         return EntryExistsResponse.builder()
                 .entryDate(entry.getEntryDate())
-                .isChecked(entry.getIsChecked())
+                .isCompleted(entry.getIsCompleted())
                 .isMemo(entry.getIsMemo())
                 .isRemarked(entry.getIsRemarked())
                 .isScheduled(entry.getIsScheduled())

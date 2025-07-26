@@ -21,7 +21,7 @@ public class RoutineResponse {
     private Long routineId; // 루틴 ID
     @Schema(description = "루틴 카테고리", example = "feed")
     private String category; // 루틴 카테고리
-    @Schema(description = "루틴 상태 (체크 완료, 세모 등)", example = "CHECKED")
+    @Schema(description = "루틴 상태 (체크, 메모, 미체크)", example = "CHECKED")
     private RoutineStatus status; // 루틴 상태 (체크 완료, 세모 등)
     @Schema(description = "목표량", example = "150")
     private Integer targetAmount; // 목표량
