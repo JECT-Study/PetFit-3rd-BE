@@ -64,7 +64,7 @@ public class EntryController {
 
     // 일간 특이사항 + 루틴 리스트 조회
     @GetMapping("/{petId}/daily/{date}")
-    @Operation(summary = "일간 특이사항 + 루틴 리스트 조회")
+    @Operation(summary = "일간 특이사항 리스트 + 루틴 리스트 조회")
     public ResponseEntity<ApiResponse<EntryDailyResponse>> getDailyEntries(
             @PathVariable Long petId,
             @Parameter(description = "yyyy-MM-dd 형식으로 입력", example = "2025-07-01")
@@ -77,7 +77,6 @@ public class EntryController {
         }else if(date.isBefore(LocalDate.now())) {
             routineResponseList = routineService.getPastRoutines(petId, date);
         }
-        log.info("루틴 응답 리스트: {}", routineResponseList);
 
         return ResponseEntity.ok(
                 ApiResponse.success(entryService.getDailyEntries(petId, date, routineResponseList))

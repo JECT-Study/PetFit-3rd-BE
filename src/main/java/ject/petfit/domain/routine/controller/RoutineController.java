@@ -22,7 +22,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/routines")
 @Tag(name = "루틴 API", description = "루틴 조회, 체크, 메모, 미체크 API <br> " +
-        "활성화되어 있는 슬롯의 루틴만 조작 가능")
+        "활성화되어 있는 슬롯의 루틴만 조작 가능 <br> " +
+        "{category}는 루틴 종류 feed, water, walk, potty, dental, skin 중 하나 입력")
 public class RoutineController {
     private final RoutineService routineService;
 
@@ -86,8 +87,7 @@ public class RoutineController {
 
     // 루틴 미체크
     @DeleteMapping("/{petId}/{date}/{category}/uncheck")
-    @Operation(summary = "루틴 미체크", description = "루틴을 미체크 상태로 변경 <br> " +
-            "{category}는 루틴 종류 - feed, water, walk, potty, dental, skin")
+    @Operation(summary = "루틴 미체크", description = "루틴을 미체크 상태로 변경")
     public ResponseEntity<ApiResponse<String>> uncheckRoutine(
             @PathVariable Long petId,
             @Parameter(description = "yyyy-MM-dd 형식으로 입력", example = "2025-07-01")

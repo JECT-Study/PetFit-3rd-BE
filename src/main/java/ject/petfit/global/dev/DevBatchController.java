@@ -24,7 +24,7 @@ public class DevBatchController {
     @Operation(summary = "하루 기록 수동 업데이트",
             description = "1. 해당 날짜의 루틴 완료 여부 업데이트 <br>" +
                     "2. 해당 날짜의 미체크 루틴을 DB에 추가 <br> " +
-                    "*기록된 루틴 CHECKED, 루틴 MEMO, 특이사항, 일정이 있는 경우에만 업데이트")
+                    "기록된 루틴 CHECKED, 루틴 MEMO, 특이사항, 일정이 있는 경우에만 업데이트")
     public ResponseEntity<ApiResponse<EntryFlushResponse>> flushEntries(
             @RequestParam LocalDate entryDate,
             @RequestParam Long petId
