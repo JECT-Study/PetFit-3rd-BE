@@ -10,11 +10,14 @@ import ject.petfit.domain.entry.repository.EntryRepository;
 import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.pet.repository.PetRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EntryService {
@@ -22,16 +25,14 @@ public class EntryService {
     private final PetRepository petRepository;
 
     // ----------------------------- 엔트리 공통 메서드 -----------------------------------
-    // (펫ID & 날짜)의 entry가 있으면 조회, 없으면 생성 - 다른 서비스에서 사용
+    // (Pet, LocalDate)의 entry가 있으면 조회, 없으면 생성
     @Transactional
     public Entry getOrCreateEntry(Pet pet, LocalDate entryDate) {
-        Entry entry;
         if(!isEntryExist(pet, entryDate)) {
-            entry = createEntry(pet, entryDate);
-        }else{
-            entry = getEntry(pet, entryDate);
+            return createEntry(pet, entryDate);
         }
-        return entry;
+        return entryRepository.findByPetAndEntryDate(pet, entryDate)
+                    .orElseThrow(() -> new EntryException(EntryErrorCode.ENTRY_NOT_IMPLEMENTED)); // 작성했지만 이 예외는 실행되면 안됨
     }
 
     // Entry 초기화
@@ -63,19 +64,25 @@ public class EntryService {
         if (!isEntryExist(pet, targetDate)) {
             throw new EntryException(EntryErrorCode.ENTRY_NOT_FOUND);
         }
-        return entryRepository.findByPetAndEntryDate(pet, targetDate);
+        return entryRepository.findByPetAndEntryDate(pet, targetDate)
+                .orElseThrow(() -> new EntryException(EntryErrorCode.ENTRY_NOT_FOUND));
     }
 
     // ------------------------------ API 메서드 -----------------------------------
     // 월간 루틴체크, 메모, 특이사항, (일정) 유무 조회
-    public List<EntryExistsResponse> getMonthlyEntries(Long petId, LocalDate month) {
+    public List<EntryExistsResponse> getMonthlyEntries(Long petId, String month) {
+        log.info("진입1");
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new EntryException(EntryErrorCode.ENTRY_NOT_FOUND));
 
-        LocalDate startDate = month.withDayOfMonth(1);
+        log.info("진입2");
+        LocalDate startDate = LocalDate.parse(month + "-01");
+        log.info("진입3");
         LocalDate endDate = startDate.plusMonths(1).minusDays(1);
 
+        log.info("진입4");
         List<Entry> entries = entryRepository.findAllByPetAndEntryDateBetween(pet, startDate, endDate);
+        log.info("진입5");
 
         return entries.stream()
                 .map(EntryExistsResponse::from)
@@ -94,5 +101,19 @@ public class EntryService {
                 .map(EntryDailyResponse::from)
                 .toList();
     }
-}
 
+    public EntryDailyResponse getDailyEntries(Long petId, LocalDate date) {
+        Pet pet = petRepository.findById(petId)
+                .orElseThrow(() -> new EntryException(EntryErrorCode.ENTRY_NOT_FOUND));
+        Entry entry = entryRepository.findByPetAndEntryDate(pet, date)
+                .orElse(null);
+
+        // entry가 없을 경우 모든 여부 false와 빈 리스트로 응답
+        if (entry == null) {
+            return EntryDailyResponse.fromNull(date);
+        }
+
+        // entry가 있을 경우 해당 entry로 응답
+        return EntryDailyResponse.from(entry);
+    }
+}

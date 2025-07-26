@@ -16,9 +16,11 @@ import ject.petfit.domain.routine.enums.RoutineStatus;
 import ject.petfit.domain.routine.exception.RoutineErrorCode;
 import ject.petfit.domain.routine.exception.RoutineException;
 import ject.petfit.domain.routine.repository.RoutineRepository;
+import ject.petfit.domain.slot.dto.response.SlotResponse;
 import ject.petfit.domain.slot.entity.Slot;
 import ject.petfit.domain.slot.exception.SlotErrorCode;
 import ject.petfit.domain.slot.exception.SlotException;
+import ject.petfit.domain.slot.service.SlotService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -36,6 +39,7 @@ public class RoutineService {
     private final PetRepository petRepository;
     private final EntryService entryService;
     private final EntryRepository entryRepository;
+    private final SlotService slotService;
 
     // ------------------------------ 루틴 공통 메서드 -----------------------------------
     // 카테고리에 따른 슬롯 목표량 or null 반환
@@ -76,8 +80,8 @@ public class RoutineService {
                 .build();
     }
 
-    // 루틴 unchecked 응답
-    public RoutineResponse uncheckedRoutineResponse(LocalDate date, String category, Integer targetAmount) {
+    // 오늘의 루틴 UNCHECKED 응답
+    public RoutineResponse uncheckedRoutineResponse(LocalDate todayDate, String category, Integer targetAmount) {
         return RoutineResponse.builder()
                 .routineId(null)
                 .category(category)
@@ -85,76 +89,146 @@ public class RoutineService {
                 .targetAmount(targetAmount)
                 .actualAmount(0)
                 .content(null)
-                .date(date)
+                .date(todayDate)
                 .build();
     }
 
     // ------------------------------ API 메서드 -----------------------------------
 
     // 루틴 일간 조회
-    public DailyAllRoutineResponse getDailyRoutines(Long petId, LocalDate entryDate) {
+//    public DailyAllRoutineResponse getDailyRoutinesOld(Long petId, LocalDate entryDate) {
+//
+//        Pet pet = petRepository.findById(petId)
+//                .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
+//
+//        Slot slot = pet.getSlot();
+//        // 슬롯이 없으면 예외 발생
+//        if (slot == null) {
+//            throw new SlotException(SlotErrorCode.SLOT_NOT_FOUND);
+//        }
+//
+//        // 슬롯 활성화되어 있으면 unchecked 루틴 생성, 슬롯 비활성화이면 null로 설정
+//        RoutineResponse feedRoutine = slot.isFeedActivated()?
+//                uncheckedRoutineResponse(entryDate, "feed", slot.getFeedAmount()) : null;
+//        RoutineResponse waterRoutine = slot.isWaterActivated()?
+//                uncheckedRoutineResponse(entryDate, "water", slot.getWaterAmount()) : null;
+//        RoutineResponse walkRoutine = slot.isWalkActivated()?
+//                uncheckedRoutineResponse(entryDate, "walk", slot.getWalkAmount()) : null;
+//        RoutineResponse pottyRoutine = slot.isPottyActivated()?
+//                uncheckedRoutineResponse(entryDate, "potty", null) : null;
+//        RoutineResponse dentalRoutine = slot.isDentalActivated()?
+//                uncheckedRoutineResponse(entryDate, "dental", null) : null;
+//        RoutineResponse skinRoutine = slot.isSkinActivated()?
+//                uncheckedRoutineResponse(entryDate, "skin", null) : null;
+//
+//        // 해당 날짜의 루틴이 하나라도 있는지 조회
+//        // 기록이 없는 날이면 루틴 조회하지 않고 바로 반환
+//        Entry entry = entryRepository.findByPetAndEntryDate(pet, entryDate);
+//        if (entry == null || routineRepository.existsByEntry(entry)) {
+//            return DailyAllRoutineResponse.builder()
+//                    .feedRoutine(feedRoutine)
+//                    .waterRoutine(waterRoutine)
+//                    .walkRoutine(walkRoutine)
+//                    .pottyRoutine(pottyRoutine)
+//                    .dentalRoutine(dentalRoutine)
+//                    .skinRoutine(skinRoutine)
+//                    .build();
+//        }
+//
+//        // 기록이 있는 날이면 루틴 있는 경우에만 상태 세팅
+////        List<Routine> routines = routineRepository.findAllByEntry(entry);
+//        List<Routine> routineList = entry.getRoutines();
+//
+//        // 해당 날짜 저장된 루틴 있는 경우에는 상태 세팅
+//        for (Routine routine : routineList) {
+//            switch (routine.getCategory()) {
+//                case "feed" -> feedRoutine = createRoutineResponse(routine);
+//                case "water" -> waterRoutine = createRoutineResponse(routine);
+//                case "walk" -> walkRoutine = createRoutineResponse(routine);
+//                case "potty" -> pottyRoutine = createRoutineResponse(routine);
+//                case "dental" -> dentalRoutine = createRoutineResponse(routine);
+//                case "skin" -> skinRoutine = createRoutineResponse(routine);
+//            }
+//        }
+//
+//        return DailyAllRoutineResponse.builder()
+//                .feedRoutine(feedRoutine)
+//                .waterRoutine(waterRoutine)
+//                .walkRoutine(walkRoutine)
+//                .pottyRoutine(pottyRoutine)
+//                .dentalRoutine(dentalRoutine)
+//                .skinRoutine(skinRoutine)
+//                .build();
+//    }
 
+    // 과거의 루틴 조회
+    public List<RoutineResponse> getPastRoutines(Long petId, LocalDate entryDate) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
+        Entry entry = entryRepository.findByPetAndEntryDate(pet, entryDate)
+                .orElse(null); // 해당 날짜의 entry가 없다면 빈 리스트 반환
 
+        /**
+         * 과거의 루틴 응답 리스트 생성 방법
+         * DB에 저장된 CHECKED, MEMO, UNCHECKED 루틴 리스트 응답
+         */
+        // DB에 저장된 루틴 리스트를 조회
+        List<Routine> routineListInDB = new ArrayList<>(routineRepository.findAllByEntry(entry));
+
+        // 루틴 응답 리스트 생성
+        return new ArrayList<>(routineListInDB.stream()
+                .map(this::createRoutineResponse)
+                .toList());
+    }
+
+
+    // 오늘의 루틴 조회
+    public List<RoutineResponse> getTodayRoutines(Long petId, LocalDate entryDate) {
+        Pet pet = petRepository.findById(petId)
+                .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
         Slot slot = pet.getSlot();
-        // 슬롯이 없으면 예외 발생
-        if (slot == null) {
-            throw new SlotException(SlotErrorCode.SLOT_NOT_FOUND);
+
+        // 오늘 날짜의 엔트리 조회
+        // 홈화면에 처음 접속하면 오늘 날짜의 Entry DB를 생성
+        Entry entry = entryService.getOrCreateEntry(pet, entryDate);
+
+        // 루틴 응답 리스트
+        List<RoutineResponse> routineResponseList = new ArrayList<>();
+
+        /**
+         * 오늘의 루틴 응답 리스트 생성 방법
+         * 1. DB에 저장된 CHECKED, MEMO 루틴을 응답에 추가
+         * 2. 슬롯 활성화된 옵션 중에 DB에 없는 루틴을 UNCHECKED로 간주하여 응답에 추가
+        */
+        // 1. DB에 저장된 CHECKED, MEMO 루틴 리스트를 추가
+        List<Routine> routineListInDB = new ArrayList<>();
+        routineListInDB.addAll(routineRepository.findAllByEntry(entry));
+        routineResponseList.addAll(routineListInDB.stream()
+                .map(this::createRoutineResponse)
+                .toList());
+
+        // 2. 현재 활성화된 슬롯 옵션 중에 UNCHECKED인 루틴 리스트를 추가
+        // 활성화된 슬롯 옵션명 조회
+        List<String> activatedSlotOptions = slotService.getActivatedSlotOptions(slot);
+
+        // DB에 저장된 루틴이 활성화된 슬롯 옵션 개수와 같으면(루틴 완료) 이대로 반환
+        if(routineResponseList.size() == activatedSlotOptions.size()){
+            return routineResponseList;
         }
 
-        // 슬롯 활성화되어 있으면 unchecked 루틴 생성, 슬롯 비활성화이면 null로 설정
-        RoutineResponse feedRoutine = slot.isFeedActivated()?
-                uncheckedRoutineResponse(entryDate, "feed", slot.getFeedAmount()) : null;
-        RoutineResponse waterRoutine = slot.isWaterActivated()?
-                uncheckedRoutineResponse(entryDate, "water", slot.getWaterAmount()) : null;
-        RoutineResponse walkRoutine = slot.isWalkActivated()?
-                uncheckedRoutineResponse(entryDate, "walk", slot.getWalkAmount()) : null;
-        RoutineResponse pottyRoutine = slot.isPottyActivated()?
-                uncheckedRoutineResponse(entryDate, "potty", null) : null;
-        RoutineResponse dentalRoutine = slot.isDentalActivated()?
-                uncheckedRoutineResponse(entryDate, "dental", null) : null;
-        RoutineResponse skinRoutine = slot.isSkinActivated()?
-                uncheckedRoutineResponse(entryDate, "skin", null) : null;
-
-        // 해당 날짜의 루틴이 하나라도 있는지 조회
-        // 기록이 없는 날이면 루틴 조회하지 않고 바로 반환
-        Entry entry = entryRepository.findByPetAndEntryDate(pet, entryDate);
-        if (entry == null || routineRepository.existsByEntry(entry)) {
-            return DailyAllRoutineResponse.builder()
-                    .feedRoutine(feedRoutine)
-                    .waterRoutine(waterRoutine)
-                    .walkRoutine(walkRoutine)
-                    .pottyRoutine(pottyRoutine)
-                    .dentalRoutine(dentalRoutine)
-                    .skinRoutine(skinRoutine)
-                    .build();
-        }
-
-        // 기록이 있는 날이면 루틴 있는 경우에만 상태 세팅
-//        List<Routine> routines = routineRepository.findAllByEntry(entry);
-        List<Routine> routineList = entry.getRoutines();
-
-        // 해당 날짜 저장된 루틴 있는 경우에는 상태 세팅
-        for (Routine routine : routineList) {
-            switch (routine.getCategory()) {
-                case "feed" -> feedRoutine = createRoutineResponse(routine);
-                case "water" -> waterRoutine = createRoutineResponse(routine);
-                case "walk" -> walkRoutine = createRoutineResponse(routine);
-                case "potty" -> pottyRoutine = createRoutineResponse(routine);
-                case "dental" -> dentalRoutine = createRoutineResponse(routine);
-                case "skin" -> skinRoutine = createRoutineResponse(routine);
+        // 활성화된 옵션 리스트에서 UNCHECKED 루틴들만 남겨놓음
+        for(Routine routine : routineListInDB){
+            if (activatedSlotOptions.contains(routine.getCategory())) {
+                activatedSlotOptions.remove(routine.getCategory());
             }
         }
 
-        return DailyAllRoutineResponse.builder()
-                .feedRoutine(feedRoutine)
-                .waterRoutine(waterRoutine)
-                .walkRoutine(walkRoutine)
-                .pottyRoutine(pottyRoutine)
-                .dentalRoutine(dentalRoutine)
-                .skinRoutine(skinRoutine)
-                .build();
+        // 남은 활성화된 옵션들로 응답에 UNCHECKED 루틴들 추가
+        routineResponseList.addAll(activatedSlotOptions.stream()
+                .map(category -> uncheckedRoutineResponse(entryDate, category, getTargetAmountByCategory(slot, category)))
+                .toList());
+
+       return routineResponseList;
     }
 
     // 루틴 체크(V) 완료

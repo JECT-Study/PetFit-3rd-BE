@@ -1,11 +1,7 @@
 package ject.petfit.global.dev;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import ject.petfit.domain.entry.service.EntryService;
-import ject.petfit.domain.pet.entity.Pet;
-import ject.petfit.domain.pet.exception.PetErrorCode;
-import ject.petfit.domain.pet.exception.PetException;
 import ject.petfit.domain.pet.repository.PetRepository;
 import ject.petfit.global.common.ApiResponse;
 import ject.petfit.global.exception.CustomException;
@@ -14,10 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 
 @RestController
-@Tag(name = "개발용 테스트 API")
 @RequestMapping("/dev")
 @RequiredArgsConstructor
 public class DevController {
@@ -50,15 +44,15 @@ public class DevController {
         throw new CustomException(ErrorCode.DEV_NOT_FOUND);
     }
 
-    @PostMapping("/entries/{petId}/{entryDate}")
-    public ResponseEntity<ApiResponse<String>> createEntry(
-            @PathVariable Long petId,
-            @PathVariable String entryDate
-    ) {
-        Pet pet = petRepository.findById(petId)
-                .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
-        entryService.createEntry(pet, LocalDate.parse(entryDate));
-        return ResponseEntity
-                .ok(ApiResponse.success("Entry 생성 성공"));
-    }
+//    @PostMapping("/entries/{petId}/{entryDate}")
+//    public ResponseEntity<ApiResponse<String>> createEntry(
+//            @PathVariable Long petId,
+//            @PathVariable String entryDate
+//    ) {
+//        Pet pet = petRepository.findById(petId)
+//                .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
+//        entryService.createEntry(pet, LocalDate.parse(entryDate));
+//        return ResponseEntity
+//                .ok(ApiResponse.success("Entry 생성 성공"));
+//    }
 }

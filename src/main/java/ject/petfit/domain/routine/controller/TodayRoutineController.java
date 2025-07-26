@@ -5,8 +5,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import ject.petfit.domain.routine.dto.request.RoutineMemoRequest;
-import ject.petfit.domain.routine.dto.response.DailyAllRoutineResponse;
 import ject.petfit.domain.routine.dto.response.RoutineResponse;
+import ject.petfit.domain.routine.exception.RoutineErrorCode;
+import ject.petfit.domain.routine.exception.RoutineException;
 import ject.petfit.domain.routine.service.RoutineService;
 import ject.petfit.global.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,28 +16,36 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/routines")
-@Tag(name = "Routine", description = "홈화면 오늘의 루틴 API")
-public class RoutineController {
+@Tag(name = "오늘의 루틴 API", description = "오늘의 루틴 조회, 체크, 메모, 미체크 API")
+public class TodayRoutineController {
     private final RoutineService routineService;
 
     // 일간 루틴 조회
     @GetMapping("/{petId}/daily/{date}")
-    @Operation(summary = "일간 루틴 조회", description = "특정 날짜의 루틴들 상태 조회 <br> " +
-            "슬롯 활성화한 루틴들은 응답값 있음, 슬롯 비활성화 루틴은 null <br> " +
-            "슬롯 활성화환 루틴들의 상태는 CHECKED, MEMO, UNCHECKED 중 하나 <br> " +
-            "루틴 unchecked인 경우 routineId는 null" )
-    public ResponseEntity<ApiResponse<DailyAllRoutineResponse>> getDailyRoutines(
+    @Operation(summary = "일간 루틴 조회", description = "오늘 혹은 과거 날짜의 루틴들 상태 조회 <br> " +
+            "미래에 대한 조회는 막아둠 <br>" +
+            "실제 사용은 홈화면 오늘의 루틴 조회 용도 / 과거의 루틴은 QA용")
+    public ResponseEntity<ApiResponse<List<RoutineResponse>>> getDailyRoutines(
             @PathVariable Long petId,
             @Parameter(description = "yyyy-MM-dd 형식으로 입력", example = "2025-07-01")
             @PathVariable LocalDate date
     ) {
-        return ResponseEntity.ok(
-                ApiResponse.success(routineService.getDailyRoutines(petId, date))
-        );
+        if (date.equals(LocalDate.now())) {
+            return ResponseEntity.ok(
+                    ApiResponse.success(routineService.getTodayRoutines(petId, date))
+            );
+        }else if( date.isBefore(LocalDate.now())) {
+            return ResponseEntity.ok(
+                    ApiResponse.success(routineService.getPastRoutines(petId, date))
+            );
+        } else {
+            throw new RoutineException(RoutineErrorCode.ROUTINE_FUTURE_DATE);
+        }
     }
 
     // 루틴 체크(V)
@@ -77,7 +86,7 @@ public class RoutineController {
     // 루틴 해제
     @DeleteMapping("/{petId}/{date}/{category}/uncheck")
     @Operation(summary = "루틴 해제", description = "루틴을 해제(DB 삭제) <br> " +
-            "{date}는 yyyy-MM-dd 형식으로 입력 <br>{category}는 루틴 종류 - feed, water, walk, potty, dental, skin")
+            "{category}는 루틴 종류 - feed, water, walk, potty, dental, skin")
     public ResponseEntity<ApiResponse<String>> uncheckRoutine(
             @PathVariable Long petId,
             @Parameter(description = "yyyy-MM-dd 형식으로 입력", example = "2025-07-01")
@@ -89,4 +98,7 @@ public class RoutineController {
                 ApiResponse.success(routineService.uncheckRoutine(petId, date, category))
         );
     }
+
+
+
 }

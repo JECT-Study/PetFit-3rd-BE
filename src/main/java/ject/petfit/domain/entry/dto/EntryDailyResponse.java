@@ -3,7 +3,6 @@ package ject.petfit.domain.entry.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import ject.petfit.domain.remark.dto.response.RemarkResponse;
-import ject.petfit.domain.routine.dto.response.DailyAllRoutineResponse;
 import ject.petfit.domain.routine.dto.response.RoutineResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -54,6 +53,18 @@ public class EntryDailyResponse {
                 .remarkResponseList(entry.getRemarks().stream()
                         .map(RemarkResponse::from)
                         .toList())
+                .build();
+    }
+
+    public static EntryDailyResponse fromNull(LocalDate date) {
+        return EntryDailyResponse.builder()
+                .entryDate(date)
+                .isChecked(false)
+                .isMemo(false)
+                .isRemarked(false)
+                .isScheduled(false)
+                .remarkResponseList(List.of())
+                .routineResponseList(List.of())
                 .build();
     }
 }

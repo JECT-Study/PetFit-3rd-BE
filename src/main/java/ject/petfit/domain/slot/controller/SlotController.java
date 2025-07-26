@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/slots")
-@Tag(name = "Slot", description = "슬롯 설정 API")
+@Tag(name = "슬롯 설정 API")
 public class SlotController {
     private final SlotService slotService;
 

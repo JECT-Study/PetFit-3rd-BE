@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Remark", description = "특이사항 API")
+@Tag(name = "특이사항 API")
 @RequestMapping("/api/remarks")
 public class RemarkController {
     private final ject.petfit.domain.remark.service.RemarkService remarkService;

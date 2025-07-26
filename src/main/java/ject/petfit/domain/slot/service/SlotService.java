@@ -15,13 +15,17 @@ import ject.petfit.domain.slot.repository.SlotRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class SlotService {
     private final PetRepository petRepository;
     private final SlotRepository slotRepository;
 
-    // 공통 메서드 - 특정 반려동물의 슬롯 조회
+    // ------------------------------ 슬롯 공통 메서드 -----------------------------------
+    // 특정 반려동물의 슬롯 조회
     private Slot getSlotOrThrow(Long petId) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
@@ -32,6 +36,31 @@ public class SlotService {
         return slot;
     }
 
+    // 슬롯 활성화된 옵션명만 조회
+    public List<String> getActivatedSlotOptions(Slot slot) {
+        List<String> activatedOptions = new ArrayList<>();
+        if(slot.isFeedActivated()){
+            activatedOptions.add("feed");
+        }
+        if(slot.isWaterActivated()){
+            activatedOptions.add("water");
+        }
+        if(slot.isWalkActivated()){
+            activatedOptions.add("walk");
+        }
+        if(slot.isPottyActivated()){
+            activatedOptions.add("potty");
+        }
+        if(slot.isDentalActivated()){
+            activatedOptions.add("dental");
+        }
+        if(slot.isSkinActivated()){
+            activatedOptions.add("skin");
+        }
+        return activatedOptions;
+    }
+
+    // ------------------------------ API 메서드 -----------------------------------
     // 슬롯 초기화 (회원가입 슬롯 설정)
     @Transactional
     public SlotResponse initializePetSlot(Long petId, SlotInitializeRequest request) {

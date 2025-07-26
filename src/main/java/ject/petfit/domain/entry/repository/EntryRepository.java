@@ -6,11 +6,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface EntryRepository extends JpaRepository<Entry, Long> {
     boolean existsByPetAndEntryDate(Pet pet, LocalDate entryDate);
 
-    Entry findByPetAndEntryDate(Pet pet, LocalDate targetDate);
+//    Entry findByPetAndEntryDate(Pet pet, LocalDate targetDate);
+    Optional<Entry> findByPetAndEntryDate(Pet pet, LocalDate entryDate);
 
     // isScheduled
     List<Entry> findAllByPetAndIsScheduledTrue(Pet pet);
