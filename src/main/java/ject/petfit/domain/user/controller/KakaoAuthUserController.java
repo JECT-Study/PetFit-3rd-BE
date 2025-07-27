@@ -6,7 +6,6 @@ import ject.petfit.domain.user.converter.AuthUserConverter;
 import ject.petfit.domain.user.dto.response.AuthUserIsNewResponseDto;
 import ject.petfit.domain.user.dto.response.AuthUserResponseDto;
 import ject.petfit.domain.user.dto.response.AuthUserSimpleResponseDto;
-import ject.petfit.domain.user.dto.response.TokenIsAuthenticatedResponseDto;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.service.AuthUserService;
 import ject.petfit.global.common.ApiResponse;
@@ -183,7 +182,7 @@ public class KakaoAuthUserController {
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<ApiResponse<TokenIsAuthenticatedResponseDto>> verifyCookies(HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<Boolean>> verifyCookies(HttpServletRequest request) {
 
         // Set-Cookie 헤더에서 토큰 추출
         String accessToken = refreshTokenService.extractTokenFromSetCookie(request, "access_token");
@@ -193,7 +192,7 @@ public class KakaoAuthUserController {
                 && (refreshToken != null && !refreshToken.isEmpty());
 
         return ResponseEntity.status(HttpStatus.OK).body(
-                ApiResponse.success(new TokenIsAuthenticatedResponseDto(isAuthenticated))
+                ApiResponse.success(isAuthenticated)
         );
     }
 
