@@ -1,12 +1,15 @@
 package ject.petfit.domain.user.service;
 
 import jakarta.transaction.Transactional;
+import java.util.List;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.member.entity.Role;
 import ject.petfit.domain.member.repository.MemberRepository;
+import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.user.common.util.KakaoUtil;
 import ject.petfit.domain.user.converter.AuthUserConverter;
 import ject.petfit.domain.user.dto.KakaoDto;
+import ject.petfit.domain.user.dto.response.AuthUserIsNewResponseDto;
 import ject.petfit.domain.user.dto.response.AuthUserSimpleResponseDto;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.exception.AuthUserErrorCode;
@@ -162,5 +165,18 @@ public class AuthUserService {
                 .nickname(authUser.getNickname())
                 .email(authUser.getEmail())
                 .build();
+    }
+
+    public AuthUserIsNewResponseDto isNewUserFromRefreshToken(String refreshToken) {
+        AuthUser authUser = refreshTokenRepository.findByToken(refreshToken)
+                .map(refreshTokenEntity -> refreshTokenEntity.getAuthUser())
+                .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.REFRESH_TOKEN_NOT_FOUND));
+
+        List<Pet> existingPets = authUser.getMember().getPets();
+        if (existingPets.isEmpty()) {
+            return new AuthUserIsNewResponseDto(false);
+        } else {
+            return new AuthUserIsNewResponseDto(true);
+        }
     }
 }
