@@ -165,7 +165,7 @@ public class KakaoAuthUserController {
 
     @PostMapping("/token/cookie")
     public ResponseEntity<ApiResponse<AuthUserIsNewResponseDto>> returnTokenCookie(
-            @RequestParam String accessToken, @RequestParam String refreshToken, HttpServletResponse response) {
+            @RequestParam String accessToken, @RequestParam String refreshToken) {
         AuthUserIsNewResponseDto isNewResponseDto = authUserService.isNewUserFromRefreshToken(refreshToken);
 
         // SameSite=None이 적용된 쿠키 생성
