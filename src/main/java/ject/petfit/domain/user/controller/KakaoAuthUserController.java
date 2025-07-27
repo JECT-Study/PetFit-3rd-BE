@@ -6,6 +6,7 @@ import ject.petfit.domain.user.converter.AuthUserConverter;
 import ject.petfit.domain.user.dto.response.AuthUserIsNewResponseDto;
 import ject.petfit.domain.user.dto.response.AuthUserResponseDto;
 import ject.petfit.domain.user.dto.response.AuthUserSimpleResponseDto;
+import ject.petfit.domain.user.dto.response.TokenIsAuthenticatedResponseDto;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.service.AuthUserService;
 import ject.petfit.global.common.ApiResponse;
@@ -180,4 +181,17 @@ public class KakaoAuthUserController {
                 );
     }
 
+    @GetMapping("/verify")
+    public ResponseEntity<ApiResponse<TokenIsAuthenticatedResponseDto>> verifyCookies(
+            @CookieValue(name = "access_token", required = false) String accessToken,
+            @CookieValue(name = "refresh_token", required = false) String refreshToken) {
+
+        // 둘 중 하나라도 없으면 false
+        boolean isAuthenticated = (accessToken != null && !accessToken.isEmpty())
+                && (refreshToken != null && !refreshToken.isEmpty());
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponse.success(new TokenIsAuthenticatedResponseDto(isAuthenticated))
+        );
+    }
 }
