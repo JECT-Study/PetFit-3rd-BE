@@ -46,11 +46,21 @@ public class CookieUtils {
         }
     }
 
+    public static Cookie createCookie(String name, String value) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setSecure(true);
+        cookie.setDomain(frontDomain);
+        cookie.setPath("/");
+        cookie.setMaxAge(7 * 24 * 60 * 60);
+        return cookie;
+    }
+
     public static ResponseCookie createTokenCookie(String name, String value) {
         ResponseCookie cookie = ResponseCookie.from(name, value)
-                .httpOnly(true)
                 .secure(true)
+                .domain(frontDomain)
                 .path("/")
+                .sameSite("none")
                 .maxAge(7 * 24 * 60 * 60)
                 .build();
         return cookie;

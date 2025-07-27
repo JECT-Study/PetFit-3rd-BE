@@ -1,14 +1,11 @@
 package ject.petfit.domain.user.controller;
 
-import static ject.petfit.global.jwt.util.CookieUtils.addCookie;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ject.petfit.domain.user.converter.AuthUserConverter;
-import ject.petfit.domain.user.dto.request.WithdrawAuthUserRequestDto;
+import ject.petfit.domain.user.dto.response.AuthUserIsNewResponseDto;
 import ject.petfit.domain.user.dto.response.AuthUserResponseDto;
 import ject.petfit.domain.user.dto.response.AuthUserSimpleResponseDto;
-import ject.petfit.domain.user.dto.response.AuthUserTokenResponseDto;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.service.AuthUserService;
 import ject.petfit.global.common.ApiResponse;
@@ -25,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -70,8 +68,8 @@ public class KakaoAuthUserController {
 
 //        httpServletResponse.sendRedirect(frontDomain);
         // 쿠키 설정 (헤더가 아닌 HttpServletResponse의 addCookie 사용)
-        CookieUtils.addCookie("access_token", accessToken, httpServletResponse);
-        CookieUtils.addCookie("refresh_token", refreshToken.getToken(), httpServletResponse);
+//        CookieUtils.addCookie("access_token", accessToken, httpServletResponse);
+//        CookieUtils.addCookie("refresh_token", refreshToken.getToken(), httpServletResponse);
 
         // 리다이렉트
         httpServletResponse.sendRedirect(frontDomain + "token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
@@ -163,6 +161,23 @@ public class KakaoAuthUserController {
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.success(null)
         );
+    }
+
+    @PostMapping("/token/cookie")
+    public ResponseEntity<ApiResponse<AuthUserIsNewResponseDto>> returnTokenCookie(
+            @RequestParam String accessToken, @RequestParam String refreshToken, HttpServletResponse response) {
+        AuthUserIsNewResponseDto isNewResponseDto = authUserService.isNewUserFromRefreshToken(refreshToken);
+
+        // SameSite=None이 적용된 쿠키 생성
+        ResponseCookie accessCookie = CookieUtils.createTokenCookie("access_token", accessToken);
+        ResponseCookie refreshCookie = CookieUtils.createTokenCookie("refresh_token", refreshToken);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .body(
+                        ApiResponse.success(isNewResponseDto)
+                );
     }
 
 }
