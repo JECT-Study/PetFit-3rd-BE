@@ -174,6 +174,7 @@ public class KakaoAuthUserController {
         ResponseCookie refreshCookie = CookieUtils.createTokenCookie("refresh_token", refreshToken);
 
         return ResponseEntity.status(HttpStatus.OK)
+                .header("Authorization", "Bearer " + accessToken)
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
                 .body(
@@ -182,11 +183,12 @@ public class KakaoAuthUserController {
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<ApiResponse<TokenIsAuthenticatedResponseDto>> verifyCookies(
-            @CookieValue(name = "access_token", required = false) String accessToken,
-            @CookieValue(name = "refresh_token", required = false) String refreshToken) {
+    public ResponseEntity<ApiResponse<TokenIsAuthenticatedResponseDto>> verifyCookies(HttpServletRequest request) {
 
-        // 둘 중 하나라도 없으면 false
+        // Set-Cookie 헤더에서 토큰 추출
+        String accessToken = refreshTokenService.extractTokenFromSetCookie(request, "access_token");
+        String refreshToken = refreshTokenService.extractTokenFromSetCookie(request, "refresh_token");
+
         boolean isAuthenticated = (accessToken != null && !accessToken.isEmpty())
                 && (refreshToken != null && !refreshToken.isEmpty());
 
@@ -194,4 +196,5 @@ public class KakaoAuthUserController {
                 ApiResponse.success(new TokenIsAuthenticatedResponseDto(isAuthenticated))
         );
     }
+
 }
