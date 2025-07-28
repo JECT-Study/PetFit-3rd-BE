@@ -78,7 +78,7 @@ public class KakaoAuthUserController {
 
     // 소셜 로그인/회원가입 -> DEV
     @GetMapping("/kakao/login/dev")
-    public ResponseEntity<ApiResponse<AuthUserResponseDto.JoinResultDTO>> kakaoLoginDev(
+    public void kakaoLoginDev(
             @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) throws IOException {
         AuthUser user = authUserService.oAuthLogin(accessCode);
 
@@ -86,11 +86,7 @@ public class KakaoAuthUserController {
         RefreshToken refreshToken = refreshTokenService.createOrUpdateRefreshToken(user, UUID.randomUUID().toString(), refreshTokenValiditySeconds);
         user.addRefreshToken(refreshToken);
 
-        AuthUserResponseDto.JoinResultDTO joinResultDTO = AuthUserConverter.toJoinResultDTO(user, accessToken, refreshToken);
-
-        return ResponseEntity.status(HttpStatus.OK).body(
-                ApiResponse.success(joinResultDTO)
-        );
+        httpServletResponse.sendRedirect(frontDomain + "token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
     }
 
     // 서비스만 로그아웃 -> 쿠키 삭제
