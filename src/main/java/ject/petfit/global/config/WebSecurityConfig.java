@@ -67,13 +67,13 @@ public class WebSecurityConfig {
 
                                 // 개발용으로 허용
                                 "/dev/**",
-                                "/api/pets/**",
-                                "/api/routines/**",
-                                "/api/remarks/**",
-                                "/api/schedules/**",
-                                "/api/slots/**",
-                                "/api/entries/**",
-                                "/api/members/**",
+                                // "/api/pets/**",
+                                // "/api/routines/**",
+                                // "/api/remarks/**",
+                                // "/api/schedules/**",
+                                // "/api/slots/**",
+                                // "/api/entries/**",
+                                // "/api/members/**",
 
                                 "/favicon.ico",
                                 "/static/**",
