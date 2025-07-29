@@ -86,7 +86,7 @@ public class KakaoAuthUserController {
         RefreshToken refreshToken = refreshTokenService.createOrUpdateRefreshToken(user, UUID.randomUUID().toString(), refreshTokenValiditySeconds);
         user.addRefreshToken(refreshToken);
 
-        httpServletResponse.sendRedirect("http://localhost:5173" + "token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
+        httpServletResponse.sendRedirect("http://localhost:5173" + "/token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
     }
 
     // 서비스만 로그아웃 -> 쿠키 삭제
