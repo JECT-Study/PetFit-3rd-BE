@@ -128,7 +128,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 uri.startsWith("/locales/") ||
                 uri.startsWith("/public/") ||
                 uri.startsWith("/images/") ||
-                uri.startsWith("/resources/");
+                uri.startsWith("/resources/") ||
+                uri.startsWith("/token");
 
         log.info("Final result: {}", result);
         return result;

@@ -84,7 +84,8 @@ public class WebSecurityConfig {
                                 "/js/**",
                                 "/resources/**",
                                 "/locales/**",
-                                "/"
+                                "/",
+                                "/token/**"
 
 
                         ).permitAll()
