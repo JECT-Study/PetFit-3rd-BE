@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,4 +23,8 @@ public class ScheduleUpdateRequest {
     @Size(max = 200, message = "내용은 200자 이내여야 합니다.")
     @Schema(description = "일정 내용", example = "제일 조은 동물병원, 치석 제거")
     private String content;      // 일정 내용
+
+    @NotNull(message = "날짜는 필수입니다.")
+    @Schema(description = "일정 날짜 (yyyy-MM-dd 형식)", example = "2025-08-01")
+    private LocalDate targetDate;  // 일정 날짜 (yyyy-MM-dd 형식)
 }
