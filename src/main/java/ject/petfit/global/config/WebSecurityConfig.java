@@ -58,8 +58,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 // 인증이 필요한 엔드포인트
-//                                "/api/pets/**",
-//                                "/api/members/**"
+                                "/api/pets/**",
                                 "/api/members/**"
                         ).authenticated()
                         .anyRequest().permitAll()
