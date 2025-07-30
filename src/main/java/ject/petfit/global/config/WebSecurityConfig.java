@@ -57,38 +57,12 @@ public class WebSecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/auth/**",
-                                "/error",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs/**",
-                                "/swagger-resources/**",
-                                "/health/**",
-
-                                // 개발용으로 허용
-                                "/dev/**",
-                                // "/api/pets/**",
-                                // "/api/routines/**",
-                                // "/api/remarks/**",
-                                // "/api/schedules/**",
-                                // "/api/slots/**",
-                                // "/api/entries/**",
-                                // "/api/members/**",
-
-                                "/favicon.ico",
-                                "/static/**",
-                                "/public/**",
-                                "/css/**",
-                                "/images/**",
-                                "/js/**",
-                                "/resources/**",
-                                "/locales/**",
-                                "/",
-                                "/token/**"
-
-
-                        ).permitAll()
-                        .anyRequest().authenticated()
+                                // 인증이 필요한 엔드포인트
+//                                "/api/pets/**",
+//                                "/api/members/**"
+                                "/api/members/**"
+                        ).authenticated()
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
