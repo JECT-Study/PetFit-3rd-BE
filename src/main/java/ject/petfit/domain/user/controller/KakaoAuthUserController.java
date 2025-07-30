@@ -48,8 +48,8 @@ public class KakaoAuthUserController {
     @Value("${spring.kakao.auth.admin}")
     private String adminKey;
 
-    @Value("${spring.front}")
-    private String frontDomain;
+//    @Value("${spring.front}")
+//    private String frontDomain;
 
 
     // 소셜 로그인/회원가입 -> 쿠키
@@ -72,7 +72,7 @@ public class KakaoAuthUserController {
 //        CookieUtils.addCookie("refresh_token", refreshToken.getToken(), httpServletResponse);
 
         // 리다이렉트
-        httpServletResponse.sendRedirect(frontDomain + "token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
+        httpServletResponse.sendRedirect("https://pet-fit-3rd-fe.vercel.app/" + "token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
 //        AuthUserTokenResponseDto tokenResponseDto = new AuthUserTokenResponseDto(accessToken, refreshToken.getToken());
     }
 
