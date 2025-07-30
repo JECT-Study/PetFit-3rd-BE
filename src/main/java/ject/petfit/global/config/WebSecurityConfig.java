@@ -33,9 +33,6 @@ public class WebSecurityConfig {
     private final AuthUserService authUserService;
     private final JwtUtil jwtUtil;
 
-    @Value("${spring.front}")
-    private String frontDomain;
-
     @Bean
     public JwtAuthFilter jwtAuthFilter() {
         return new JwtAuthFilter(jwtUtil, authUserService);
@@ -78,8 +75,8 @@ public class WebSecurityConfig {
         config.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:5173",
                 "http://127.0.0.1:5173",
-                "https://petfit-ject.duckdns.org",
-                frontDomain
+//                "https://petfit-ject.duckdns.org",
+                "https://pet-fit-3rd-fe.vercel.app"
         ));
 
         config.addAllowedHeader("*");
