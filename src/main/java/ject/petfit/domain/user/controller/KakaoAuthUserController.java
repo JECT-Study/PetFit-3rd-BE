@@ -72,7 +72,7 @@ public class KakaoAuthUserController {
 //        CookieUtils.addCookie("refresh_token", refreshToken.getToken(), httpServletResponse);
 
         // 리다이렉트
-        httpServletResponse.sendRedirect(frontDomain + "/token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
+        httpServletResponse.sendRedirect(frontDomain + "token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
 //        AuthUserTokenResponseDto tokenResponseDto = new AuthUserTokenResponseDto(accessToken, refreshToken.getToken());
     }
 
