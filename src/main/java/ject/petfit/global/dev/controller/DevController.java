@@ -41,10 +41,12 @@ public class DevController {
     private long refreshTokenValiditySeconds;
 
     @Operation(summary = "토큰 발급 API ",
-            description = "준비된 <테스트0> 계정으로 액세스 토큰과 리프레시 토큰을 발급합니다.")
+            description = "준비된 테스트 계정으로 액세스 토큰과 리프레시 토큰을 발급합니다.")
     @GetMapping("/login/{testId}")
     public ResponseEntity<ApiResponse<TokenResponse>> login(
-            @Parameter(description = "테스트용 사용자 ID (0, -1, -2,... -10)까지 준비되어있음")
+            @Parameter(description = "테스트용 사용자 ID (0, -1, -2,... -10)까지 준비되어있음 <br>" +
+                    "0번 계정은 슬롯 활성화되어있으며 해당 계정에 연결된 petId가 1~10번 (루틴 기록 시나리오 테스트용) <br>" +
+                    "-1 ~ -10번 계정은 멤버 정보까지만 기입되어있으며 맨처음 온보딩(동물 등록과 슬롯 초기화)부터 진행해야함 ")
             @PathVariable Long testId
     ) {
         AuthUser authUser = authUserRepository.findById(testId)
