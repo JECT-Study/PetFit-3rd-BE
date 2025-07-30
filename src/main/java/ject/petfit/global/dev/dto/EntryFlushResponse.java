@@ -1,4 +1,4 @@
-package ject.petfit.global.dev;
+package ject.petfit.global.dev.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import ject.petfit.domain.routine.dto.response.RoutineResponse;

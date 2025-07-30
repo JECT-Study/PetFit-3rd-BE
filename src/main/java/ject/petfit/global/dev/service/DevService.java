@@ -1,4 +1,4 @@
-package ject.petfit.global.dev;
+package ject.petfit.global.dev.service;
 
 import jakarta.transaction.Transactional;
 import ject.petfit.domain.entry.entity.Entry;
@@ -14,6 +14,7 @@ import ject.petfit.domain.routine.repository.RoutineRepository;
 import ject.petfit.domain.routine.service.RoutineService;
 import ject.petfit.domain.slot.entity.Slot;
 import ject.petfit.domain.slot.service.SlotService;
+import ject.petfit.global.dev.dto.EntryFlushResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
