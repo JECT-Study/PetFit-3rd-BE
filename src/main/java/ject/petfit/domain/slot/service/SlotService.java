@@ -1,10 +1,14 @@
 package ject.petfit.domain.slot.service;
 
 import jakarta.transaction.Transactional;
+import ject.petfit.domain.entry.entity.Entry;
+import ject.petfit.domain.entry.repository.EntryRepository;
 import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.pet.exception.PetErrorCode;
 import ject.petfit.domain.pet.exception.PetException;
 import ject.petfit.domain.pet.repository.PetRepository;
+import ject.petfit.domain.routine.entity.Routine;
+import ject.petfit.domain.routine.repository.RoutineRepository;
 import ject.petfit.domain.slot.dto.request.SlotInitializeRequest;
 import ject.petfit.domain.slot.dto.request.SlotRequest;
 import ject.petfit.domain.slot.dto.response.SlotResponse;
@@ -15,14 +19,18 @@ import ject.petfit.domain.slot.repository.SlotRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class SlotService {
     private final PetRepository petRepository;
     private final SlotRepository slotRepository;
+    private final RoutineRepository routineRepository;
+    private final EntryRepository entryRepository;
 
     // ------------------------------ 슬롯 공통 메서드 -----------------------------------
     // 특정 반려동물의 슬롯 조회
@@ -39,22 +47,22 @@ public class SlotService {
     // 슬롯 활성화된 옵션명 리스트 조회
     public List<String> getActivatedSlotOptions(Slot slot) {
         List<String> activatedOptions = new ArrayList<>();
-        if(slot.isFeedActivated()){
+        if (slot.isFeedActivated()) {
             activatedOptions.add("feed");
         }
-        if(slot.isWaterActivated()){
+        if (slot.isWaterActivated()) {
             activatedOptions.add("water");
         }
-        if(slot.isWalkActivated()){
+        if (slot.isWalkActivated()) {
             activatedOptions.add("walk");
         }
-        if(slot.isPottyActivated()){
+        if (slot.isPottyActivated()) {
             activatedOptions.add("potty");
         }
-        if(slot.isDentalActivated()){
+        if (slot.isDentalActivated()) {
             activatedOptions.add("dental");
         }
-        if(slot.isSkinActivated()){
+        if (slot.isSkinActivated()) {
             activatedOptions.add("skin");
         }
         return activatedOptions;
@@ -94,7 +102,8 @@ public class SlotService {
                 }
             }
             default -> throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED);
-        };
+        }
+        ;
     }
 
     // ------------------------------ API 메서드 -----------------------------------
@@ -136,34 +145,96 @@ public class SlotService {
     @Transactional
     public SlotResponse setSlotActivated(Long petId, SlotRequest request) {
         Slot slot = getSlotOrThrow(petId);
-        slot.updateSlot(request);
+
+        // 비활성화된 슬롯 리스트
+        List<String> deActivatedList = new ArrayList<>();
+
+        // 활성화 여부 업데이트
+        Boolean feedActivated = request.getFeedActivated();
+        if (feedActivated != null) {
+            slot.updateFeedActivated(feedActivated);
+            if (!feedActivated) {
+                deActivatedList.add("feed");
+            }
+        }
+
+        Boolean waterActivated = request.getWaterActivated();
+        if (waterActivated != null) {
+            slot.updateWaterActivated(waterActivated);
+            if (!waterActivated) {
+                deActivatedList.add("water");
+            }
+        }
+
+        Boolean walkActivated = request.getWalkActivated();
+        if (walkActivated != null) {
+            slot.updateWalkActivated(walkActivated);
+            if (!walkActivated) {
+                deActivatedList.add("walk");
+            }
+        }
+
+        Boolean dentalActivated = request.getDentalActivated();
+        if (dentalActivated != null) {
+            slot.updatePottyActivated(dentalActivated);
+            if (!dentalActivated) {
+                deActivatedList.add("potty");
+            }
+        }
+
+        Boolean skinActivated = request.getSkinActivated();
+        if (skinActivated != null) {
+            slot.updateDentalActivated(skinActivated);
+            if (!skinActivated) {
+                deActivatedList.add("dental");
+            }
+        }
+
+        Boolean pottyActivated = request.getPottyActivated();
+        if (pottyActivated != null) {
+            slot.updateSkinActivated(pottyActivated);
+            if (!pottyActivated) {
+                deActivatedList.add("skin");
+            }
+        }
+
+        // 목표량
+        if (request.getFeedAmount() != null) {
+            slot.updateFeedAmount(request.getFeedAmount());
+        }
+        if (request.getWaterAmount() != null) {
+            slot.updateWaterAmount(request.getWaterAmount());
+        }
+        if (request.getWalkAmount() != null) {
+            slot.updateWalkAmount(request.getWalkAmount());
+        }
         slotRepository.save(slot);
+
+        /**
+         * 비활성화로 슬롯을 변경했을때, 해당 루틴 CHECKED나 MEMO인 오늘의 루틴이 DB에 있다면 삭제
+         */
+        // 비활성화된 슬롯이 없다면 이대로 반환
+        if (deActivatedList.isEmpty()) {
+            return SlotResponse.from(slot);
+        }
+
+        Pet pet = petRepository.findById(petId)
+                .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
+        Optional<Entry> entry = entryRepository.findByPetAndEntryDate(pet, LocalDate.now());
+
+        // 오늘의 entry가 없다면 이대로 반환
+        if (entry.isEmpty()) {
+            return SlotResponse.from(slot);
+        }
+
+        // 비활성화된 슬롯에 해당하는 루틴이 DB에 들어있다면 삭제
+        for (String category : deActivatedList) {
+            Optional<Routine> routine = routineRepository.findByEntryAndCategory(entry.get(), category);
+            routine.ifPresent(routineRepository::delete);
+        }
+
         return SlotResponse.from(slot);
     }
-
-//    // 사료, 음수, 배변 목표량 조회
-//    public SlotAmountResponse getSlotAmounts(Long petId) {
-//        Slot slot = getSlotOrThrow(petId);
-//        return SlotAmountResponse.from(slot);
-//    }
-//
-//    // 사료, 음수, 배변 목표량 설정
-//    @Transactional
-//    public SlotAmountResponse setSlotAmounts(Long petId, @Valid SlotAmountRequest request) {
-//        Slot slot = getSlotOrThrow(petId);
-//
-//        // 사료, 음수, 산책 목표량 업데이트 (null 값은 수정하지 않음)
-//        if (request.getFeedAmount() != null) {
-//            slot.updateFeedAmount(request.getFeedAmount());
-//        }
-//        if (request.getWaterAmount() != null) {
-//            slot.updateWaterAmount(request.getWaterAmount());
-//        }
-//        if (request.getWalkAmount() != null) {
-//            slot.updateWalkAmount(request.getWalkAmount());
-//        }
-//
-//        slotRepository.save(slot);
-//        return SlotAmountResponse.from(slot);
-//    }
 }
+
+

@@ -43,6 +43,24 @@ public class Slot {
     @JoinColumn(name = "pet_id")
     private Pet pet;
 
+    public void updateFeedActivated(boolean activated) {
+        this.feedActivated = activated;
+    }
+    public void updateWaterActivated(boolean activated) {
+        this.waterActivated = activated;
+    }
+    public void updateWalkActivated(boolean activated) {
+        this.walkActivated = activated;
+    }
+    public void updatePottyActivated(boolean activated) {
+        this.pottyActivated = activated;
+    }
+    public void updateDentalActivated(boolean activated) {
+        this.dentalActivated = activated;
+    }
+    public void updateSkinActivated(boolean activated) {
+        this.skinActivated = activated;
+    }
     public void updateFeedAmount(Integer amount) {
         this.feedAmount = amount;
     }
@@ -52,6 +70,7 @@ public class Slot {
     public void updateWalkAmount(Integer amount) {
         this.walkAmount = amount;
     }
+
 
     public void updateSlot(SlotRequest request) {
         // 활성화 여부
