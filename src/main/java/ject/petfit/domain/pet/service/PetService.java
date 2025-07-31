@@ -60,17 +60,28 @@ public class PetService {
                 pet.getBirthDate(), pet.getIsFavorite());
     }
 
-    public List<PetListResponseDto> getAllPets() {
-        return petRepository.findAll()
+    public List<PetListResponseDto> getAllPets(String memberEmail) {
+        Member member = memberRepository.findByAuthUserEmail(memberEmail)
+                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        return petRepository.findByMember(member)
                 .stream()
                 .map(p -> new PetListResponseDto(p.getId(), p.getName(), p.getIsFavorite()))
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public PetResponseDto updatePet(Long petId, PetRequestDto petDto) {
+    public PetResponseDto updatePet(Long petId, PetRequestDto petDto, String memberEmail) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
+
+        Member member = memberRepository.findByAuthUserEmail(memberEmail)
+                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        if (!pet.getMember().equals(member)) {
+            throw new PetException(PetErrorCode.PET_NOT_BELONG_TO_MEMBER);
+        }
+
         pet.updatePet(
                 petDto.getName(),
                 petDto.getType(),
@@ -92,7 +103,7 @@ public class PetService {
     }
 
     @Transactional
-    public List<PetFavoriteResponseDto> updateFavoriteBatch(List<PetFavoriteRequestDto> dtos) {
+    public List<PetFavoriteResponseDto> updateFavoriteBatch(List<PetFavoriteRequestDto> dtos, String memberEmail) {
         // ID 추출 (WHERE IN 절 사용)
         List<Long> petIds = dtos.stream()
                 .map(dto -> dto.getPetId())
@@ -103,14 +114,18 @@ public class PetService {
                 .stream()
                 .collect(Collectors.toMap(Pet::getId, pet -> pet));
 
+        Member member = memberRepository.findByAuthUserEmail(memberEmail)
+                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+
         // 업데이트 작업
         List<Pet> updatedPets = new ArrayList<>();
         for (PetFavoriteRequestDto dto : dtos) {
             Pet pet = petMap.get(dto.getPetId());
-            if (pet != null) {
-                pet.updateIsFavorite(dto.getIsFavorite());
-                updatedPets.add(pet);
+            if (!pet.getMember().equals(member)) {
+                throw new PetException(PetErrorCode.PET_NOT_BELONG_TO_MEMBER);
             }
+            pet.updateIsFavorite(dto.getIsFavorite());
+            updatedPets.add(pet);
         }
         // 일괄 저장 (batch update)
         petRepository.saveAll(updatedPets);
