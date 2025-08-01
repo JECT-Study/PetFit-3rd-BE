@@ -1,0 +1,71 @@
+name: Petfit-Backend CI/CD
+
+on:
+  push:
+    branches: [ "prod" ]
+  pull_request:
+    branches: [ "prod" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Git Checkout
+        uses: actions/checkout@v4
+
+      - name: Create and Upload application.yml
+        run: |
+          touch ./src/main/resources/application.yml
+          echo -e "${{secrets.PROD_APPLICATION}}" | base64 --decode > ./src/main/resources/application.yml
+      - uses: actions/upload-artifact@v4
+        with:
+          name: application.yml
+          path: ./src/main/resources/application.yml
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+
+      - name: Build with Gradle
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean build -x test
+
+      - name: Build Docker image
+        run: docker build -f Dockerfile.prod -t petfit-prod:latest .
+
+      - name: Save Docker image as tar
+        run: docker save petfit-prod:latest -o ./petfit-prod.tar
+
+      - name: Change tar file permission
+        run: chmod 644 ./petfit-prod.tar
+
+      - name: Copy image to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.PROD_EC2_HOST }}
+          username: ${{ secrets.PROD_EC2_USER }}
+          key: ${{ secrets.PROD_EC2_SSH_KEY }}
+          source: "./petfit-prod.tar"
+          target: "/home/${{ secrets.PROD_EC2_USER }}/"
+
+      - name: Load image and run container on EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PROD_EC2_HOST }}
+          username: ${{ secrets.PROD_EC2_USER }}
+          key: ${{ secrets.PROD_EC2_SSH_KEY }}
+          script: |
+            docker rm -f $(sudo docker ps -qa)
+            docker load -i /home/${{ secrets.EC2_USER }}/sales-system-fe.tar
+            docker compose up -d
+            docker image prune -f
