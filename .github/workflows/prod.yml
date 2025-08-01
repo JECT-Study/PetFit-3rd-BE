@@ -67,6 +67,6 @@ jobs:
           script: |
             docker rm -f $(sudo docker ps -qa)
             docker rmi -f petfit-prod:latest || true
-            docker load -i /home/${{ secrets.EC2_USER }}/petfit-prod.tar
+            docker load -i /home/${{ secrets.PROD_EC2_USER }}/petfit-prod.tar
             docker compose up -d
             docker image prune -f
