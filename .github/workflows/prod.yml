@@ -66,6 +66,6 @@ jobs:
           key: ${{ secrets.PROD_EC2_SSH_KEY }}
           script: |
             docker rm -f $(sudo docker ps -qa)
-            docker load -i /home/${{ secrets.EC2_USER }}/sales-system-fe.tar
+            docker load -i /home/${{ secrets.EC2_USER }}/petfit-prod.tar
             docker compose up -d
             docker image prune -f
