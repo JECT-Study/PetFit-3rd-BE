@@ -41,10 +41,10 @@ jobs:
           ./gradlew clean build -x test
 
       - name: Build Docker image
-        run: docker build -f Dockerfile.prod -t petfit-prod:latest .
+        run: docker build -f Dockerfile.prod -t petfit-prod .
 
       - name: Save Docker image as tar
-        run: docker save petfit-prod:latest -o ./petfit-prod.tar
+        run: docker save petfit-prod -o ./petfit-prod.tar
 
       - name: Change tar file permission
         run: chmod 644 ./petfit-prod.tar
