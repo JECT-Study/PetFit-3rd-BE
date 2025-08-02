@@ -68,7 +68,7 @@ jobs:
           username: ${{ secrets.PROD_EC2_USER }}
           key: ${{ secrets.PROD_EC2_SSH_KEY }}
           script: |
-            docker rm -f $(sudo docker ps -qa)
+            docker rm -f $(docker ps -qa)
             docker rmi -f petfit-prod:latest || true
             docker load -i /home/${{ secrets.PROD_EC2_USER }}/petfit-prod.tar
             docker compose up -d
