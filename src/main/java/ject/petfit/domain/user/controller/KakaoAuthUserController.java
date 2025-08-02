@@ -49,8 +49,10 @@ public class KakaoAuthUserController {
     @Value("${spring.kakao.auth.admin}")
     private String adminKey;
 
-    @Value("${spring.front}")
+    @Value("${app.front-domain}")
     private String frontDomain;
+    @Value("${app.front-local}")
+    private String frontLocal;
 
 
     // 소셜 로그인/회원가입 -> 쿠키
@@ -81,7 +83,7 @@ public class KakaoAuthUserController {
         user.addRefreshToken(refreshToken);
 
 //        httpServletResponse.sendRedirect(frontDomain + "/token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
-        httpServletResponse.sendRedirect(frontDomain + "/token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
+        httpServletResponse.sendRedirect(frontLocal + "/token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
     }
 
     // 서비스만 로그아웃 -> 쿠키 삭제

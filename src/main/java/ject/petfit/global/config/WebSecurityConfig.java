@@ -33,7 +33,11 @@ public class WebSecurityConfig {
     private final AuthUserService authUserService;
     private final JwtUtil jwtUtil;
 
-    @Value("${spring.front}")
+    @Value("${app.front-local}")
+    private String frontLocal;
+    @Value("${app.front-vercel}")
+    private String frontVercel;
+    @Value("${app.front-domain}")
     private String frontDomain;
 
     @Bean
@@ -76,6 +80,8 @@ public class WebSecurityConfig {
 //        config.addAllowedOrigin("*"); // 프론트엔드 주소 -> setAllowCredentials(true)와 함께 사용 불가
 
         config.setAllowedOriginPatterns(Arrays.asList(
+                frontLocal,
+                frontVercel,
                 frontDomain
         ));
 

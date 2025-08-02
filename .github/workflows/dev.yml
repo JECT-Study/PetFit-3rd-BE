@@ -1,4 +1,4 @@
-name: Petfit CI/CD using Github Actions & Docker
+name: Petfit-Backend CI/CD Development Workflow
 
 on:
   push:
