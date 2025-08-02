@@ -1,5 +1,5 @@
-FROM openjdk:17
+FROM openjdk:17-jdk
 
-COPY *.jar app.jar
+COPY build/libs/*0.0.1-SNAPSHOT.jar app.jar
 
-ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=dev", "app.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=dev", "-jar", "app.jar"]
