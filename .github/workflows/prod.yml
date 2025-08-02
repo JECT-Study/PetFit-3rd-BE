@@ -23,6 +23,9 @@ jobs:
       - name: Git Checkout
         uses: actions/checkout@v4
 
+      - name: Create resources directory
+        run: mkdir -p ./src/main/resources
+
       - name: Create and Upload application.yml
         run: |
           touch ./src/main/resources/application.yml
