@@ -1,4 +1,4 @@
-name: Petfit-Backend CI/CD #
+name: Petfit-Backend CI/CD Production Workflow
 
 on:
   push:
