@@ -1,5 +1,6 @@
 package ject.petfit.domain.user.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ject.petfit.domain.user.converter.AuthUserConverter;
@@ -54,6 +55,7 @@ public class KakaoAuthUserController {
 
     // 소셜 로그인/회원가입 -> 쿠키
     @GetMapping("/kakao/login")
+    @Operation(summary = "카카오 로그인 (운영용)", description = "카카오 로그인 후 토큰을 쿠키에 저장합니다.")
     public void kakaoLogin(
             @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) throws IOException {
         AuthUser user = authUserService.oAuthLogin(accessCode);
@@ -62,22 +64,14 @@ public class KakaoAuthUserController {
         RefreshToken refreshToken = refreshTokenService.createOrUpdateRefreshToken(user, UUID.randomUUID().toString(), refreshTokenValiditySeconds);
         user.addRefreshToken(refreshToken);
 
-        // Cookie
-//        httpServletResponse.addCookie(CookieUtils.addCookie("access_token", accessToken));
-//        httpServletResponse.addCookie(CookieUtils.addCookie("refresh_token", refreshToken.getToken()));
-
-//        httpServletResponse.sendRedirect(frontDomain);
-        // 쿠키 설정 (헤더가 아닌 HttpServletResponse의 addCookie 사용)
-//        CookieUtils.addCookie("access_token", accessToken, httpServletResponse);
-//        CookieUtils.addCookie("refresh_token", refreshToken.getToken(), httpServletResponse);
-
         // 리다이렉트
-        httpServletResponse.sendRedirect(frontDomain + "token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
+        httpServletResponse.sendRedirect(frontDomain + "/token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
 //        AuthUserTokenResponseDto tokenResponseDto = new AuthUserTokenResponseDto(accessToken, refreshToken.getToken());
     }
 
     // 소셜 로그인/회원가입 -> DEV
     @GetMapping("/kakao/login/dev")
+    @Operation( summary = "카카오 로그인 (개발용)", description = "개발 환경에서 카카오 로그인 후 토큰을 쿠키에 저장합니다.")
     public void kakaoLoginDev(
             @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) throws IOException {
         AuthUser user = authUserService.oAuthLogin(accessCode);
@@ -87,12 +81,13 @@ public class KakaoAuthUserController {
         user.addRefreshToken(refreshToken);
 
 //        httpServletResponse.sendRedirect(frontDomain + "/token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
-        httpServletResponse.sendRedirect("http://localhost:5173" + "/token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
+        httpServletResponse.sendRedirect(frontDomain + "/token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
     }
 
     // 서비스만 로그아웃 -> 쿠키 삭제
     // UX 고려하여 카카오 계정과의 unlink 처리는 X
     @PostMapping("/kakao/logout")
+    @Operation(summary = "카카오 로그아웃 (운영용)", description = "카카오 로그아웃 후 쿠키를 삭제합니다.")
     public ResponseEntity<ApiResponse<?>> logout(
          @CookieValue(name = "access_token", required = false) String accessToken,
          @CookieValue(name = "refresh_token", required = false) String refreshToken, HttpServletResponse response) {
@@ -111,6 +106,7 @@ public class KakaoAuthUserController {
 
     // 서비스만 로그아웃 -> Dev
     @PostMapping("/kakao/logout/dev")
+    @Operation(summary = "카카오 로그아웃 (개발용)", description = "개발 환경에서 카카오 로그아웃 후 쿠키를 삭제합니다.")
     public ResponseEntity<ApiResponse<?>> logoutDev(
             @RequestBody RefreshTokenRequestDto request, HttpServletResponse response) {
         // 리프레시 토큰 무효화
@@ -127,6 +123,7 @@ public class KakaoAuthUserController {
     // 회원 탈퇴 (JWT 기반 Refresh Token 삭제 후 카카오 계정과의 unlink 처리)
     // UX 고려하여 회원 탈퇴 시 카카오 계정과의 unlink 처리
     @PostMapping("/kakao/withdraw")
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴 시 카카오 계정과의 unlink 처리 및 Refresh Token 삭제")
     public ResponseEntity<ApiResponse<Void>> withdraw(HttpServletRequest request,
                                          Authentication authentication) {
         // JWT 필터에서 이미 검증된 정보 사용
@@ -161,6 +158,7 @@ public class KakaoAuthUserController {
     }
 
     @PostMapping("/token/cookie")
+    @Operation(summary = "토큰 쿠키 반환", description = "Access Token과 Refresh Token을 쿠키로 반환합니다.")
     public ResponseEntity<ApiResponse<AuthUserIsNewResponseDto>> returnTokenCookie(
             @RequestParam String accessToken, @RequestParam String refreshToken) {
         AuthUserIsNewResponseDto isNewResponseDto = authUserService.isNewUserFromRefreshToken(refreshToken);
