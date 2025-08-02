@@ -2,9 +2,9 @@ name: Petfit-Backend CI/CD Production Workflow
 
 on:
   push:
-    branches: [ "prod" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "prod" ]
+    branches: [ "main" ]
 
 jobs:
   build-and-deploy:

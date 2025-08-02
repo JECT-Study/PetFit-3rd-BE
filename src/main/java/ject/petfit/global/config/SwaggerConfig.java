@@ -18,8 +18,8 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
     public static final String JWT_SECURITY_SCHEME = "JWT Token";
 
-    @Value("${app.swagger-url}")
-    private String swaggerUrl;
+    @Value("${app.swagger-server}")
+    private String swaggerServer;
     @Value("${app.swagger-description}")
     private String swaggerDescription;
 
@@ -35,7 +35,7 @@ public class SwaggerConfig {
                 .addList("Bearer Token");
 
         Info info = new Info()
-                .title("펫핏 API 명세서")
+                .title(swaggerServer + " API 명세서")
                 .version("v1")
                 .description("펫핏 API 명세서입니다");
 
@@ -43,6 +43,6 @@ public class SwaggerConfig {
                 .info(info)
                 .components(new Components().addSecuritySchemes("Bearer Token", apiKey))
                 .addSecurityItem(securityRequirement)
-                .servers(List.of(new Server().url("/").description(swaggerDescription)));
+                .servers(List.of(new Server().url("/").description(swaggerServer)));
     }
 }
