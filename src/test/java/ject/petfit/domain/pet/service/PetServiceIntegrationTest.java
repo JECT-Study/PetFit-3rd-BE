@@ -121,8 +121,8 @@ class PetServiceIntegrationTest {
         pet2.setMember(member);
         petRepository.save(pet1);
         petRepository.save(pet2);
-
-        List<PetListResponseDto> pets = petService.getAllPets();
+//
+        List<PetListResponseDto> pets = petService.getAllPets(member.getAuthUser().getEmail());
         assertThat(pets).hasSize(2);
     }
 
@@ -140,7 +140,7 @@ class PetServiceIntegrationTest {
         Pet savedPet = petRepository.save(pet);
 
         PetRequestDto updateDto = new PetRequestDto("냥냥이", "고양이", "여아", LocalDate.of(2021, 2, 2), false);
-        PetResponseDto updated = petService.updatePet(savedPet.getId(), updateDto);
+        PetResponseDto updated = petService.updatePet(savedPet.getId(), updateDto, member.getAuthUser().getEmail());
 
         assertThat(updated.getName()).isEqualTo("냥냥이");
         assertThat(updated.getType()).isEqualTo("고양이");
@@ -201,7 +201,7 @@ class PetServiceIntegrationTest {
         List<PetFavoriteRequestDto> batchRequest = Arrays.asList(req1, req2);
 
         // when
-        List<PetFavoriteResponseDto> result = petService.updateFavoriteBatch(batchRequest);
+        List<PetFavoriteResponseDto> result = petService.updateFavoriteBatch(batchRequest, member.getAuthUser().getEmail());
 
         // then
         assertThat(result).hasSize(2);

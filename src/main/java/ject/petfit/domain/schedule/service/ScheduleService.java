@@ -74,7 +74,7 @@ public class ScheduleService {
     public ScheduleResponse createSchedule(Long petId, ScheduleRegisterRequest request) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
-        LocalDate targetDate = LocalDate.parse(request.getTargetDate());
+        LocalDate targetDate = request.getTargetDate();
 
         // (펫ID & 날짜)의 entry가 있으면 반환, 없으면 생성해서 반환
         Entry entry = entryService.getOrCreateEntry(pet, targetDate);
@@ -102,14 +102,14 @@ public class ScheduleService {
                 .orElseThrow(() -> new ScheduleException(ScheduleErrorCode.SCHEDULE_NOT_FOUND));
         String requestTitle = request.getTitle();
         String requestContent = request.getContent();
+        LocalDate requestTargetDate = request.getTargetDate();
 
         // 제목이나 내용 수정
-        if (requestTitle != null && !requestTitle.isEmpty()) {
-            schedule.updateTitle(requestTitle);
-        }
+        schedule.updateTitle(requestTitle);
         if (requestContent != null && !requestContent.isEmpty()) {
             schedule.updateContent(requestContent);
         }
+        schedule.updateTargetDate(requestTargetDate.atStartOfDay());
 
         // 수정된 일정 저장
         Schedule updatedSchedule = scheduleRepository.save(schedule);

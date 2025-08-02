@@ -5,10 +5,11 @@ import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.global.jwt.refreshtoken.RefreshToken;
 
 public class AuthUserConverter {
-    public static AuthUser toUser(Long kakaoUUID, String email, String nickName, String password, boolean isNewUser) {
+    public static AuthUser toUser(Long kakaoUUID, String email, String name, String nickName, String password, boolean isNewUser) {
         return AuthUser.builder()
                 .kakaoUUID(kakaoUUID)
                 .email(email)
+                .name(name)
                 .nickname(nickName)
                 .encodedPassword(password)
                 .isNewUser(isNewUser)
@@ -24,7 +25,7 @@ public class AuthUserConverter {
                 .accessToken(accessToken)
                 .role(authUser.getMember().getRole())
                 .isNewUser(authUser.getIsNewUser())
-                .refreshToken(refreshToken)
+                .refreshToken(refreshToken.getToken())
                 .build();
     }
 

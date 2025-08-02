@@ -1,12 +1,16 @@
 package ject.petfit.domain.user.service;
 
 import jakarta.transaction.Transactional;
+import java.util.List;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.member.entity.Role;
 import ject.petfit.domain.member.repository.MemberRepository;
+import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.user.common.util.KakaoUtil;
 import ject.petfit.domain.user.converter.AuthUserConverter;
 import ject.petfit.domain.user.dto.KakaoDto;
+import ject.petfit.domain.user.dto.response.AuthUserIsNewResponseDto;
+import ject.petfit.domain.user.dto.response.AuthUserSimpleResponseDto;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.exception.AuthUserErrorCode;
 import ject.petfit.domain.user.exception.AuthUserException;
@@ -19,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.UUID;
+import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
@@ -106,6 +111,7 @@ public class AuthUserService {
                 kakaoProfile.getId(),
                 kakaoProfile.getKakao_account().getEmail(),
                 kakaoProfile.getKakao_account().getProfile().getNickname(),
+                kakaoProfile.getKakao_account().getProfile().getNickname(),
                 encodedPassword,
                 true
         );
@@ -119,6 +125,14 @@ public class AuthUserService {
     public AuthUser loadAuthUserByEmail(String email) {
         return authUserRepository.findByEmail(email)
                 .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.AUTH_EMAIL_USER_NOT_FOUND));
+    }
+
+    public Mono<Void> logout(String accessToken) {
+        return webClient.post()
+                .uri("https://kapi.kakao.com/v1/user/logout")
+                .header("Authorization", "Bearer " + accessToken)
+                .retrieve()
+                .bodyToMono(Void.class);
     }
 
     @Transactional
@@ -138,5 +152,31 @@ public class AuthUserService {
                 .then()
                 .block();
 
+    }
+
+    public AuthUserSimpleResponseDto getMemberInfoFromRefreshTokenCookie(String refreshToken) {
+        AuthUser authUser = refreshTokenRepository.findByToken(refreshToken)
+                .map(refreshTokenEntity -> refreshTokenEntity.getAuthUser())
+                .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.REFRESH_TOKEN_NOT_FOUND));
+
+        return AuthUserSimpleResponseDto.builder()
+                .memberId(authUser.getMember().getId())
+                .name(authUser.getName())
+                .nickname(authUser.getNickname())
+                .email(authUser.getEmail())
+                .build();
+    }
+
+    public AuthUserIsNewResponseDto isNewUserFromRefreshToken(String refreshToken) {
+        AuthUser authUser = refreshTokenRepository.findByToken(refreshToken)
+                .map(refreshTokenEntity -> refreshTokenEntity.getAuthUser())
+                .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.REFRESH_TOKEN_NOT_FOUND));
+
+        List<Pet> existingPets = authUser.getMember().getPets();
+        if (existingPets.isEmpty()) {
+            return new AuthUserIsNewResponseDto(true);
+        } else {
+            return new AuthUserIsNewResponseDto(false);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package ject.petfit.domain.member.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import ject.petfit.domain.member.dto.request.MemberRequestDto;
 import ject.petfit.domain.member.dto.response.MemberResponseDto;
 import ject.petfit.domain.member.service.MemberService;
@@ -37,7 +38,7 @@ public class MemberController {
     @PutMapping("/{memberId}")
     @Operation(summary = "마이페이지 닉네임 수정", description = "회원 ID로 닉네임 수정")
     public ResponseEntity<ApiResponse<MemberResponseDto>> editMemberNickNameById(@PathVariable Long memberId,
-                                                                    @RequestBody MemberRequestDto memberRequestDto) {
+                                                                    @Valid @RequestBody MemberRequestDto memberRequestDto) {
         MemberResponseDto editedMember = memberService.editMember(memberId, memberRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.success(editedMember)

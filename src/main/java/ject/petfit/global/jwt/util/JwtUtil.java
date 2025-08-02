@@ -37,19 +37,15 @@ public class JwtUtil {
     }
 
     // 오류
-    // 프 -> 백 헤더 추가 곤련
+    // 프 -> 백 헤더 추가
     public String resolveAccessToken(HttpServletRequest request) {
         String authorization = request.getHeader("Authorization");
-        // Authorization 헤더가 없는 경우 / 비어있는 경우 / Bearer로 시작하지 않는 경우 / 토큰이 없는 경우
-        if (authorization == null){
-            throw new TokenException(TokenErrorCode.TOKEN_NOT_FOUND);
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return null;
         }
-        String[] parts = authorization.split(" ");
-        if (authorization.trim().isEmpty() || !authorization.startsWith("Bearer ")
-                || parts.length != 2 || parts[1].trim().isEmpty()) {
-            throw new TokenException(TokenErrorCode.TOKEN_NOT_FOUND);
-        }
-        return parts[1].trim();
+
+        String token = authorization.substring(7).trim();
+        return token.isEmpty() ? null : token;
     }
 
     public String createAccessToken(String email, String role) {

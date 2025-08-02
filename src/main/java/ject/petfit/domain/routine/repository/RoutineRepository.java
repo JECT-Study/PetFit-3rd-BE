@@ -5,6 +5,7 @@ import ject.petfit.domain.routine.entity.Routine;
 import ject.petfit.domain.routine.enums.RoutineStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 

@@ -1,8 +1,7 @@
 package ject.petfit.domain.slot.entity;
 
 import jakarta.persistence.*;
-import ject.petfit.domain.slot.dto.request.SlotActivatedRequest;
-import ject.petfit.global.common.BaseTime;
+import ject.petfit.domain.slot.dto.request.SlotRequest;
 import lombok.*;
 import ject.petfit.domain.pet.entity.Pet;
 
@@ -44,6 +43,24 @@ public class Slot {
     @JoinColumn(name = "pet_id")
     private Pet pet;
 
+    public void updateFeedActivated(boolean activated) {
+        this.feedActivated = activated;
+    }
+    public void updateWaterActivated(boolean activated) {
+        this.waterActivated = activated;
+    }
+    public void updateWalkActivated(boolean activated) {
+        this.walkActivated = activated;
+    }
+    public void updatePottyActivated(boolean activated) {
+        this.pottyActivated = activated;
+    }
+    public void updateDentalActivated(boolean activated) {
+        this.dentalActivated = activated;
+    }
+    public void updateSkinActivated(boolean activated) {
+        this.skinActivated = activated;
+    }
     public void updateFeedAmount(Integer amount) {
         this.feedAmount = amount;
     }
@@ -54,7 +71,9 @@ public class Slot {
         this.walkAmount = amount;
     }
 
-    public void updateSlotActivated(SlotActivatedRequest request) {
+
+    public void updateSlot(SlotRequest request) {
+        // 활성화 여부
         if (request.getFeedActivated() != null) {
             this.feedActivated = request.getFeedActivated();
         }
@@ -72,6 +91,17 @@ public class Slot {
         }
         if (request.getSkinActivated() != null) {
             this.skinActivated = request.getSkinActivated();
+        }
+
+        // 목표량
+        if (request.getFeedAmount() != null) {
+            this.feedAmount = request.getFeedAmount();
+        }
+        if (request.getWaterAmount() != null) {
+            this.waterAmount = request.getWaterAmount();
+        }
+        if (request.getWalkAmount() != null) {
+            this.walkAmount = request.getWalkAmount();
         }
     }
 }

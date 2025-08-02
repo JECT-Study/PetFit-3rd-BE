@@ -35,5 +35,8 @@ public class Schedule extends BaseTime {
     public void updateContent(String content) {
         this.content = content;
     }
+    public void updateTargetDate(LocalDateTime targetDate) {
+        this.targetDate = targetDate;
+    }
 
 }

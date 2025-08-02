@@ -5,6 +5,7 @@ import ject.petfit.global.jwt.filter.JwtAuthFilter;
 import ject.petfit.global.jwt.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -16,8 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -31,6 +32,13 @@ public class WebSecurityConfig {
 
     private final AuthUserService authUserService;
     private final JwtUtil jwtUtil;
+
+    @Value("${app.front-local}")
+    private String frontLocal;
+    @Value("${app.front-vercel}")
+    private String frontVercel;
+    @Value("${app.front-domain}")
+    private String frontDomain;
 
     @Bean
     public JwtAuthFilter jwtAuthFilter() {
@@ -46,51 +54,45 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
         return http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-
-                                "/api/auth/**",
-                                "/error",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs/**",
-                                "/swagger-resources/**",
-                                "/health/**",
-
-                                // 개발용으로 허용
-                                "/api/pet/**",
-                                "/api/routines/**",
-                                "/api/remarks/**",
-                                "/api/schedules/**",
-                                "/api/slots/**",
-                                "/api/entries/**",
+                                // 인증이 필요한 엔드포인트
+                                "/api/pets/**",
                                 "/api/members/**"
-
-                        ).permitAll()
-                        .anyRequest().authenticated()
+                        ).authenticated()
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
     @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true);
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.addAllowedOrigin("*"); // 프론트엔드 주소
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+//        config.addAllowedOrigin("*"); // 프론트엔드 주소 -> setAllowCredentials(true)와 함께 사용 불가
+
+        config.setAllowedOriginPatterns(Arrays.asList(
+                frontLocal,
+                frontVercel,
+                frontDomain
+        ));
+
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.addExposedHeader("Authorization");
-        config.setAllowCredentials(true);
+        config.addExposedHeader("X-Clear-Tokens");
+        config.addExposedHeader("X-Redirect-URI");
 
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
+        return source;
     }
 }

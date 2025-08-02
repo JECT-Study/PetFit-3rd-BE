@@ -1,5 +1,6 @@
 package ject.petfit.domain.entry.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import ject.petfit.domain.remark.dto.response.RemarkResponse;
 import ject.petfit.domain.routine.dto.response.RoutineResponse;
@@ -9,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ject.petfit.domain.entry.entity.Entry;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -17,31 +19,30 @@ import java.util.List;
 @Builder
 @Schema(description = "달력에서 기록 주간 응답 DTO")
 public class EntryDailyResponse {
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Schema(description = "날짜", example = "2025-07-01")
-    private String entryDate; // 날짜
+    private LocalDate entryDate; // 날짜
 
-    @Schema(description = "루틴체크 존재 여부", example = "true")
-    private boolean isChecked; // 루틴체크 존재 여부
+//    @Schema(description = "루틴체크 존재 여부", example = "true")
+//    private boolean isChecked; // 루틴체크 존재 여부
+//
+//    @Schema(description = "메모 존재 여부", example = "true")
+//    private boolean isMemo; // 메모 존재 여부
+//
+//    @Schema(description = "특이사항 존재 여부", example = "true")
+//    private boolean isRemarked; // 특이사항 존재 여부
+//
+//    @Schema(description = "일정 존재 여부", example = "false")
+//    private boolean isScheduled; // 일정 존재 여부
 
-    @Schema(description = "메모 존재 여부", example = "true")
-    private boolean isMemo; // 메모 존재 여부
-
-    @Schema(description = "특이사항 존재 여부", example = "true")
-    private boolean isRemarked; // 특이사항 존재 여부
-
-    @Schema(description = "일정 존재 여부", example = "false")
-    private boolean isScheduled; // 일정 존재 여부
-
-    List<RoutineResponse> routineResponseList;
     List<RemarkResponse> remarkResponseList;
+
+    List<RoutineResponse> routineResponseList; // 아래로 변경
+//    DailyAllRoutineResponse dailyAllRoutineResponse;
 
     public static EntryDailyResponse from(Entry entry) {
         return EntryDailyResponse.builder()
-                .entryDate(entry.getEntryDate().toString())
-                .isChecked(entry.getIsChecked())
-                .isMemo(entry.getIsMemo())
-                .isRemarked(entry.getIsRemarked())
-                .isScheduled(entry.getIsScheduled())
+                .entryDate(entry.getEntryDate())
                 .routineResponseList(entry.getRoutines().stream()
                         .map(RoutineResponse::from)
                         .toList())
@@ -50,4 +51,34 @@ public class EntryDailyResponse {
                         .toList())
                 .build();
     }
+
+    public static EntryDailyResponse of(Entry entry, List<RoutineResponse> routineResponseList) {
+        return EntryDailyResponse.builder()
+                .entryDate(entry.getEntryDate())
+//                .routineResponseList(entry.getRoutines().stream()
+//                        .map(RoutineResponse::from)
+//                        .toList())
+                .routineResponseList(routineResponseList)
+                .remarkResponseList(entry.getRemarks().stream()
+                        .map(RemarkResponse::from)
+                        .toList())
+                .build();
+    }
+
+    public static EntryDailyResponse ofNull(LocalDate date, List<RoutineResponse> routineResponseList) {
+        return EntryDailyResponse.builder()
+                .entryDate(date)
+                .remarkResponseList(List.of())
+                .routineResponseList(routineResponseList)
+                .build();
+    }
+
+
+//    public static EntryDailyResponse ofNull(LocalDate date, List<RoutineResponse> routineResponseList) {
+//        return EntryDailyResponse.builder()
+//                .entryDate(date)
+//                .remarkResponseList(List.of())
+//                .routineResponseList(routineResponseList)
+//                .build();
+//    }
 }

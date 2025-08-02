@@ -28,6 +28,7 @@ public class Entry extends BaseTime {
     @Column(name = "entry_date", nullable = false)
     private LocalDate entryDate;
 
+    private Boolean isCompleted;
     private Boolean isChecked;
     private Boolean isMemo;
     private Boolean isRemarked;
@@ -46,6 +47,9 @@ public class Entry extends BaseTime {
     @JoinColumn(name = "pet_id")
     private Pet pet;
 
+    public void updateCompletedTrue() {
+        this.isCompleted = true;
+    }
     public void updateCheckedTrue() {
         this.isChecked = true;
     }
@@ -59,6 +63,9 @@ public class Entry extends BaseTime {
         this.isScheduled = true;
     }
 
+    public void updateCompletedFalse() {
+        this.isCompleted = false;
+    }
     public void updateScheduledFalse() {
         this.isScheduled = false;
     }
