@@ -43,6 +43,6 @@ public class SwaggerConfig {
                 .info(info)
                 .components(new Components().addSecuritySchemes("Bearer Token", apiKey))
                 .addSecurityItem(securityRequirement)
-                .servers(List.of(new Server().url(swaggerUrl).description(swaggerDescription)));
+                .servers(List.of(new Server().url("/").description(swaggerDescription)));
     }
 }
