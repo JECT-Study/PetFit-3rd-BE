@@ -111,6 +111,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                uri.equals("/error") ||
                uri.startsWith("/swagger-ui") ||
                uri.startsWith("/v3") ||
+               uri.startsWith("/api-docs") ||
                uri.startsWith("/swagger-resources") ||
                uri.startsWith("/health") ||
 //                uri.startsWith("/api/pets") ||

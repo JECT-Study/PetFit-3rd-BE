@@ -39,6 +39,8 @@ public class WebSecurityConfig {
     private String frontVercel;
     @Value("${app.front-domain}")
     private String frontDomain;
+    @Value("${app.swagger-url}")
+    private String swaggerUrl;
 
     @Bean
     public JwtAuthFilter jwtAuthFilter() {
@@ -82,7 +84,8 @@ public class WebSecurityConfig {
         config.setAllowedOriginPatterns(Arrays.asList(
                 frontLocal,
                 frontVercel,
-                frontDomain
+                frontDomain,
+                swaggerUrl
         ));
 
         config.addAllowedHeader("*");
