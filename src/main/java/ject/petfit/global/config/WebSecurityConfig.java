@@ -33,12 +33,14 @@ public class WebSecurityConfig {
     private final AuthUserService authUserService;
     private final JwtUtil jwtUtil;
 
-    @Value("${app.front-local}")
+    @Value("${app.front.local}")
     private String frontLocal;
-    @Value("${app.front-vercel}")
+    @Value("${app.front.vercel}")
     private String frontVercel;
-    @Value("${app.front-domain}")
+    @Value("${app.front.domain}")
     private String frontDomain;
+    @Value("${app.backend.domain}")
+    private String backendDomain;
 
     @Bean
     public JwtAuthFilter jwtAuthFilter() {
@@ -82,7 +84,8 @@ public class WebSecurityConfig {
         config.setAllowedOriginPatterns(Arrays.asList(
                 frontLocal,
                 frontVercel,
-                frontDomain
+                frontDomain,
+                backendDomain
         ));
 
         config.addAllowedHeader("*");

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CookieUtils {
 
-    @Value("${app.front-domain}")
+    @Value("${app.front.domain}")
     private static String frontDomain;
 
     public static void addCookie(String name, String value, HttpServletResponse response) {

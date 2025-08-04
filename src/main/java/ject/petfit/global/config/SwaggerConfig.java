@@ -7,21 +7,20 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
 @Configuration
-@Slf4j
 public class SwaggerConfig {
     public static final String JWT_SECURITY_SCHEME = "JWT Token";
 
-    @Value("${app.swagger-server}")
+    @Value("${app.swagger.server}")
     private String swaggerServer;
-    @Value("${app.swagger-description}")
+    @Value("${app.swagger.description}")
     private String swaggerDescription;
+    @Value("${app.backend.domain}")
+    private String backendDomain;
 
     @Bean
     public OpenAPI openAPI() {
@@ -37,12 +36,12 @@ public class SwaggerConfig {
         Info info = new Info()
                 .title(swaggerServer + " API 명세서")
                 .version("v1")
-                .description("펫핏 API 명세서입니다");
+                .description(swaggerDescription);
 
         return new OpenAPI()
                 .info(info)
                 .components(new Components().addSecuritySchemes("Bearer Token", apiKey))
                 .addSecurityItem(securityRequirement)
-                .servers(List.of(new Server().url("/").description(swaggerServer)));
+                .servers(List.of(new Server().url(backendDomain).description(swaggerServer)));
     }
 }
