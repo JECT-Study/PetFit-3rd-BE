@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @EnableJpaAuditing
 @SpringBootApplication
-public class PetfitApplication {
+public class PetfitApplication { //
 
 	public static void main(String[] args) {
 		SpringApplication.run(PetfitApplication.class, args);
