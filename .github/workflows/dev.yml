@@ -1,10 +1,10 @@
-name: Petfit CI/CD using Github Actions & Docker
+name: Petfit-Backend CI/CD Development Workflow
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "develop" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "develop" ]
 
 jobs:
   build:
@@ -27,6 +27,9 @@ jobs:
       # Setting application.yml ..
       - name: Git Checkout
         uses: actions/checkout@v4
+
+      - name: Create resources directory
+        run: mkdir -p ./src/main/resources
 
       - name: Create and Upload application.yml
         run: |
@@ -74,9 +77,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }} # pem key
           script: |
-            sudo docker rm -f $(sudo docker ps -qa)
-            sudo docker pull ${{secrets.DOCKER_USERNAME}}/petfit-web:latest
-            sudo docker pull nginx:latest
-            sudo docker pull certbot/certbot
-            sudo docker compose up -d
-            sudo docker image prune -f
+            docker rm -f $(docker ps -qa --filter "name!=petfit-postgres")
+            docker pull ${{secrets.DOCKER_USERNAME}}/petfit-web:latest
+            docker compose up -d
+            docker image prune -f
