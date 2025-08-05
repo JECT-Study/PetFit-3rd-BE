@@ -3,8 +3,6 @@ package ject.petfit.domain.routine.facade;
 import jakarta.transaction.Transactional;
 import ject.petfit.domain.entry.entity.Entry;
 import ject.petfit.domain.entry.repository.EntryRepository;
-import ject.petfit.domain.pet.entity.Pet;
-import ject.petfit.domain.pet.repository.PetRepository;
 import ject.petfit.domain.routine.entity.Routine;
 import ject.petfit.domain.routine.enums.RoutineStatus;
 import ject.petfit.domain.routine.repository.RoutineRepository;
@@ -12,12 +10,15 @@ import ject.petfit.domain.routine.service.RoutineService;
 import ject.petfit.domain.slot.entity.Slot;
 import ject.petfit.domain.slot.service.SlotService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class TodayRoutineFacade {
@@ -34,17 +35,26 @@ public class TodayRoutineFacade {
      * 4. UNCHECKED 상태의 루틴들을 DB에 저장
      */
     @Transactional
-    public void todayRoutineSave(LocalDate entryDate){
+    // @Transactional(propagation = Propagation.REQUIRES_NEW) 서비스 분리 , for문을 batch에서
+    public HashMap<Long, String> todayRoutineSave(LocalDate entryDate){
+        HashMap<Long, String> updatedPets = new HashMap<>();
+
         /** 1. 오늘날짜의 Entry를 모두 조회 */
         List<Entry> entryList = entryRepository.findAllByEntryDate(entryDate);
         for(Entry entry : entryList) {
-            /** 2. CHECKED나 MEMO한 루틴이 없다면 루틴 미완료로 저장 */
+            updatedPets.put(entry.getPet().getId(), entry.getPet().getName());
+
+            /** 2. CHECKED나 MEMO한 루틴이 없다면 루틴 미완료로 저장 및 종료 */
             if(!routineRepository.existsByEntryAndStatus(entry, RoutineStatus.CHECKED)
                 && !routineRepository.existsByEntryAndStatus(entry, RoutineStatus.MEMO)) {
                 entry.updateCompletedFalse(); // 루틴 미완료 업데이트
                 continue; // 3,4번 미실행
             }
 
+            /**
+             * 3. DB에 저장된 오늘의 루틴 개수와 활성화된 옵션 개수가 같다면 루틴 완료로 업데이트하고 종료
+             *    DB에 저장된 루틴 리스트가 활성화된 옵션 개수보다 적다면 루틴 미완료로 업데이트
+             */
             // DB에 저장된 CHECKED, MEMO 루틴 리스트를 조회
             List<Routine> routineListInDB = new ArrayList<>(routineRepository.findAllByEntry(entry));
 
@@ -52,13 +62,9 @@ public class TodayRoutineFacade {
             Slot slot = entry.getPet().getSlot();
             List<String> activatedSlotOptions = slotService.getActivatedSlotOptions(slot);
 
-            /**
-             * 3. DB에 저장된 오늘의 루틴 개수와 활성화된 옵션 개수가 같다면 루틴 완료로 업데이트하고 종료
-             *    DB에 저장된 루틴 리스트가 활성화된 옵션 개수보다 적다면 루틴 미완료로 업데이트
-             */
             if(routineListInDB.size() == activatedSlotOptions.size()){
                 entry.updateCompletedTrue(); // 루틴 완료 업데이트
-                return;
+                continue;
             }
             entry.updateCompletedFalse(); // 루틴 미완료 업데이트
 
@@ -87,5 +93,7 @@ public class TodayRoutineFacade {
             }
 
         }
+
+        return updatedPets;
     }
 }

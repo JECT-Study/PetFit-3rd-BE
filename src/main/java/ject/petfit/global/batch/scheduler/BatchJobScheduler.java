@@ -13,16 +13,16 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class BatchJobScheduler {
     private final JobLauncher jobLauncher;
-    private final Job todayRoutineJob; // 오늘의 루틴 자동 업데이트
+    private final Job todayRoutineSaveJob;
 
     // 매일 오전 12시 01분에 실행 (cron: 초 분 시 일 월 요일)
-    @Scheduled(cron = "0 1 0 * * *")
+    @Scheduled(cron = "0 20 0 * * *")
     public void runJob() throws Exception {
-        jobLauncher.run(todayRoutineJob, new JobParameters());
+        jobLauncher.run(todayRoutineSaveJob, new JobParameters());
     }
 
     // 테스트용
-    @Scheduled(cron = "0 40 14 * * *")
+    @Scheduled(cron = "0 15 14 * * *")
     public void runJobTest() throws Exception {
         System.out.println("BatchJobScheduler.runJobTest() called - " + LocalDateTime.now());
     }
