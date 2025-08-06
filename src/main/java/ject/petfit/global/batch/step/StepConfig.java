@@ -20,6 +20,7 @@ public class StepConfig {
     public Step todayRoutineSaveStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         return new StepBuilder("todayRoutineSaveStep", jobRepository)
                 .tasklet(todayRoutineSaveTasklet, transactionManager)
+                .allowStartIfComplete(true)
                 .build();
     }
 
@@ -27,6 +28,7 @@ public class StepConfig {
     public Step sendUpdateCompleteEmailStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         return new StepBuilder("sendUpdateCompleteEmailStep", jobRepository)
                 .tasklet(sendUpdateCompleteEmailTasklet, transactionManager)
+                .allowStartIfComplete(true)
                 .build();
     }
 }
