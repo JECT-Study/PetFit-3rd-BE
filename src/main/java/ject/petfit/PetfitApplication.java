@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableJpaAuditing
 @EnableScheduling
 @SpringBootApplication
-public class PetfitApplication { //
+public class PetfitApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PetfitApplication.class, args);
