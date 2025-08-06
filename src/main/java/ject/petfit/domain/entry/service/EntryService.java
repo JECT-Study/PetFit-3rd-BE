@@ -52,6 +52,7 @@ public class EntryService {
                 .isMemo(false)
                 .isRemarked(false)
                 .isScheduled(false)
+                .isCompleted(false)
                 .build());
     }
 
