@@ -1,5 +1,6 @@
 package ject.petfit.global.batch.step;
 
+import ject.petfit.global.batch.tasklet.SendUpdateCompleteEmailTasklet;
 import ject.petfit.global.batch.tasklet.TodayRoutineSaveTasklet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Step;
@@ -13,11 +14,21 @@ import org.springframework.transaction.PlatformTransactionManager;
 @RequiredArgsConstructor
 public class StepConfig {
     private final TodayRoutineSaveTasklet todayRoutineSaveTasklet;
+    private final SendUpdateCompleteEmailTasklet sendUpdateCompleteEmailTasklet;
 
     @Bean
     public Step todayRoutineSaveStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         return new StepBuilder("todayRoutineSaveStep", jobRepository)
                 .tasklet(todayRoutineSaveTasklet, transactionManager)
+                .allowStartIfComplete(true)
+                .build();
+    }
+
+    @Bean
+    public Step sendUpdateCompleteEmailStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+        return new StepBuilder("sendUpdateCompleteEmailStep", jobRepository)
+                .tasklet(sendUpdateCompleteEmailTasklet, transactionManager)
+                .allowStartIfComplete(true)
                 .build();
     }
 }
