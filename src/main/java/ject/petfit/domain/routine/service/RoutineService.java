@@ -174,7 +174,7 @@ public class RoutineService {
         // 카테고리 따라 목표량 달라짐
         Integer targetAmount = getTargetAmountByCategory(pet.getSlot(), category);
 
-        // 루틴 조회해서 없으면 생성 있으면 수정(메모->체크 수정하는 케이스)
+        // 루틴 조회해서 없으면 생성 있으면 수정(메모->체크 수정하는 케이스, 메모 중복 체크도 포함)
         Routine routine = routineRepository.findByEntryAndCategory(entry, category)
                 .orElseGet(() -> {
                     // 루틴이 없으면 새로 생성
