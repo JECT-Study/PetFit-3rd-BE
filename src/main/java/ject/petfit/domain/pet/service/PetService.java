@@ -66,7 +66,7 @@ public class PetService {
 
         return petRepository.findByMember(member)
                 .stream()
-                .map(p -> new PetListResponseDto(p.getId(), p.getName(), p.getIsFavorite()))
+                .map(p -> new PetListResponseDto(p.getId(), p.getName(), p.getType(), p.getIsFavorite()))
                 .collect(Collectors.toList());
     }
 
