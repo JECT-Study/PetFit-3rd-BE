@@ -178,19 +178,18 @@ public class KakaoAuthUserController {
                 );
     }
 
-//    @GetMapping("/verify")
-//    public ResponseEntity<ApiResponse<Boolean>> verifyCookies(HttpServletRequest request) {
-//
-//        // Set-Cookie 헤더에서 토큰 추출
-//        String accessToken = refreshTokenService.extractTokenFromSetCookie(request, "access_token");
-//        String refreshToken = refreshTokenService.extractTokenFromSetCookie(request, "refresh_token");
-//
-//        boolean isAuthenticated = (accessToken != null && !accessToken.isEmpty())
-//                && (refreshToken != null && !refreshToken.isEmpty());
-//
-//        return ResponseEntity.status(HttpStatus.OK).body(
-//                ApiResponse.success(isAuthenticated)
-//        );
-//    }
+    @GetMapping("/verify")
+    public ResponseEntity<ApiResponse<Boolean>> verifyCookies(
+            @CookieValue("access_token") String accessToken,
+            @CookieValue("refresh_token") String refreshToken,
+            HttpServletRequest request) {
+
+        boolean isAuthenticated = (accessToken != null && !accessToken.isEmpty())
+                && (refreshToken != null && !refreshToken.isEmpty());
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponse.success(isAuthenticated)
+        );
+    }
 
 }
