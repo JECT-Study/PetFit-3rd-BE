@@ -114,8 +114,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                uri.startsWith("/api-docs") ||
                uri.startsWith("/swagger-resources") ||
                uri.startsWith("/health") ||
-//                uri.startsWith("/api/pets") ||
-//                uri.startsWith("/api/members") ||
+               uri.startsWith("/api/pets") ||
+               uri.startsWith("/api/members") ||
                uri.startsWith("/dev") ||
                 uri.startsWith("/api/routines") ||
                 uri.startsWith("/api/remarks") ||
