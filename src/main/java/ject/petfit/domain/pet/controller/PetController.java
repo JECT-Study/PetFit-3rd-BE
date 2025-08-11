@@ -44,14 +44,9 @@ public class PetController {
     @PostMapping
     @Operation(summary = "새로운 동물 등록", description = "이름(20자), 종(6타입), 성별(3타입), 생일(YYYY-MM-DD) 형식 제한")
     public ResponseEntity<ApiResponse<PetResponseDto>> createPet(
-            @Valid @RequestBody PetRequestDto petDto,
-            @AuthenticationPrincipal UserDetails userDetails // JWT에서 사용자 정보 추출
+            @Valid @RequestBody PetRequestDto petDto
     ) {
-        if (userDetails == null) {
-            throw new AuthUserException(AuthUserErrorCode.NOT_AN_AUTHENTICATED_USER);
-        }
-        String email = userDetails.getUsername();
-        Long authUserId = authUserService.loadAuthUserByEmail(email).getId();
+        Long authUserId = authUserService.loadAuthUserByEmail(petDto.getMemberId()).getId();
         PetResponseDto createdPet = petService.createPet(petDto, authUserId);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ApiResponse.success(createdPet)
@@ -69,12 +64,10 @@ public class PetController {
     }
 
     // Read (List of Pets)
-    @GetMapping
+    @GetMapping("/{memberId}")
     @Operation(summary = "모든 동물 정보 조회", description = "한 사용자의 모든 반려동물 정보 조회")
-    public ResponseEntity<ApiResponse<List<PetListResponseDto>>> getAllPets(
-            @AuthenticationPrincipal UserDetails userDetails
-    ) {
-        List<PetListResponseDto> pets = petService.getAllPets(userDetails.getUsername());
+    public ResponseEntity<ApiResponse<List<PetListResponseDto>>> getAllPets(@PathVariable Long memberId) {
+        List<PetListResponseDto> pets = petService.getAllPets(memberId);
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.success(pets)
         );
@@ -85,10 +78,9 @@ public class PetController {
     @Operation(summary = "동물 정보 수정", description = "반려동물 ID로 반려동물 정보 수정")
     public ResponseEntity<ApiResponse<PetResponseDto>> updatePet(
             @PathVariable Long petId,
-            @Valid @RequestBody PetRequestDto petDto,
-            @AuthenticationPrincipal UserDetails userDetail
+            @Valid @RequestBody PetRequestDto petDto
     ) {
-        PetResponseDto updatedPet = petService.updatePet(petId, petDto, userDetail.getUsername());
+        PetResponseDto updatedPet = petService.updatePet(petId, petDto);
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.success(updatedPet)
         );
@@ -98,9 +90,8 @@ public class PetController {
     @PatchMapping("/favorites/batch-updates")
     @Operation(summary = "즐겨찾기 동물 목록 업데이트", description = "즐겨찾기 동물 목록을 일괄 업데이트")
     public ResponseEntity<ApiResponse<List<PetFavoriteResponseDto>>> updateFavoritesInBatch(
-            @RequestBody List<PetFavoriteRequestDto> requestDtos,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        List<PetFavoriteResponseDto> favoriteBatchResponse = petService.updateFavoriteBatch(requestDtos, userDetails.getUsername());
+            @RequestBody List<PetFavoriteRequestDto> requestDtos) {
+        List<PetFavoriteResponseDto> favoriteBatchResponse = petService.updateFavoriteBatch(requestDtos);
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.success(favoriteBatchResponse)
         );

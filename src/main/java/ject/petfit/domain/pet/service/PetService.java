@@ -60,8 +60,8 @@ public class PetService {
                 pet.getBirthDate(), pet.getIsFavorite());
     }
 
-    public List<PetListResponseDto> getAllPets(String memberEmail) {
-        Member member = memberRepository.findByAuthUserEmail(memberEmail)
+    public List<PetListResponseDto> getAllPets(Long memberId) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         return petRepository.findByMember(member)
@@ -71,11 +71,11 @@ public class PetService {
     }
 
     @Transactional
-    public PetResponseDto updatePet(Long petId, PetRequestDto petDto, String memberEmail) {
+    public PetResponseDto updatePet(Long petId, PetRequestDto petDto) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
 
-        Member member = memberRepository.findByAuthUserEmail(memberEmail)
+        Member member = memberRepository.findById(petDto.getMemberId())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         if (!pet.getMember().equals(member)) {
@@ -103,7 +103,7 @@ public class PetService {
     }
 
     @Transactional
-    public List<PetFavoriteResponseDto> updateFavoriteBatch(List<PetFavoriteRequestDto> dtos, String memberEmail) {
+    public List<PetFavoriteResponseDto> updateFavoriteBatch(List<PetFavoriteRequestDto> dtos) {
         // ID 추출 (WHERE IN 절 사용)
         List<Long> petIds = dtos.stream()
                 .map(dto -> dto.getPetId())
@@ -114,16 +114,10 @@ public class PetService {
                 .stream()
                 .collect(Collectors.toMap(Pet::getId, pet -> pet));
 
-        Member member = memberRepository.findByAuthUserEmail(memberEmail)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
-
         // 업데이트 작업
         List<Pet> updatedPets = new ArrayList<>();
         for (PetFavoriteRequestDto dto : dtos) {
             Pet pet = petMap.get(dto.getPetId());
-            if (!pet.getMember().equals(member)) {
-                throw new PetException(PetErrorCode.PET_NOT_BELONG_TO_MEMBER);
-            }
             pet.updateIsFavorite(dto.getIsFavorite());
             updatedPets.add(pet);
         }

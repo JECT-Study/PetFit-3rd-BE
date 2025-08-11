@@ -122,8 +122,8 @@ public class AuthUserService {
         return newUser;
     }
 
-    public AuthUser loadAuthUserByEmail(String email) {
-        return authUserRepository.findByEmail(email)
+    public AuthUser loadAuthUserByEmail(Long memberId) {
+        return authUserRepository.findById(memberId)
                 .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.AUTH_EMAIL_USER_NOT_FOUND));
     }
 
