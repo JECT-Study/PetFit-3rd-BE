@@ -5,7 +5,5 @@ import lombok.Getter;
 
 @Getter
 public class WithdrawAuthUserRequestDto {
-
-    @NotBlank
-    private String refreshToken;
+    private Long memberId;
 }
