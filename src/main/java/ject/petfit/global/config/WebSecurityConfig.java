@@ -62,11 +62,11 @@ public class WebSecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                // 인증이 필요한 엔드포인트
-                                "/api/pets/**",
-                                "/api/members/**"
-                        ).authenticated()
+//                        .requestMatchers(
+//                                // 인증이 필요한 엔드포인트
+//                                "/api/pets/**",
+//                                "/api/members/**"
+//                        ).authenticated()
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
