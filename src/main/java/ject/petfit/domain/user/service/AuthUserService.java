@@ -123,7 +123,7 @@ public class AuthUserService {
     }
 
     public AuthUser loadAuthUserByEmail(Long memberId) {
-        return authUserRepository.findById(memberId)
+        return authUserRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.AUTH_EMAIL_USER_NOT_FOUND));
     }
 
