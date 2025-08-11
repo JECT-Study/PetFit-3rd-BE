@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ject.petfit.domain.user.converter.AuthUserConverter;
+import ject.petfit.domain.user.dto.request.WithdrawAuthUserRequestDto;
 import ject.petfit.domain.user.dto.response.AuthUserIsNewResponseDto;
 import ject.petfit.domain.user.dto.response.AuthUserResponseDto;
 import ject.petfit.domain.user.dto.response.AuthUserSimpleResponseDto;
@@ -127,10 +128,8 @@ public class KakaoAuthUserController {
     @PostMapping("/kakao/withdraw")
     @Operation(summary = "회원 탈퇴", description = "회원 탈퇴 시 카카오 계정과의 unlink 처리 및 Refresh Token 삭제")
     public ResponseEntity<ApiResponse<Void>> withdraw(HttpServletRequest request,
-                                         Authentication authentication) {
-        // JWT 필터에서 이미 검증된 정보 사용
-        String email = authentication.getName();
-        AuthUser user = authUserService.loadAuthUserByEmail(email);
+                                                      @RequestBody WithdrawAuthUserRequestDto requestDto) {
+        AuthUser user = authUserService.loadAuthUserByEmail(requestDto.getMemberId());
 
         // Refresh Token 추가 검증
         RefreshToken refreshToken = refreshTokenService.findTokenByPlain(request.getHeader("Authorization"))
