@@ -75,13 +75,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     log.info("Email from token: {}", email);
 
                     // 3. DB에서 사용자 조회
-                    UserDetails userDetails = authUserService.loadAuthUserByEmail(email);
+//                    UserDetails userDetails = authUserService.loadAuthUserByEmail(email);
                     // 4. SecurityContext에 인증 정보 저장
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails, null, userDetails.getAuthorities()
-                            );
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+//                    UsernamePasswordAuthenticationToken authentication =
+//                            new UsernamePasswordAuthenticationToken(
+//                                    userDetails, null, userDetails.getAuthorities()
+//                            );
+//                    SecurityContextHolder.getContext().setAuthentication(authentication);
                     log.info("Authentication set successfully for user: {}", email);
                 } else {
                     log.warn("Token is invalid");
@@ -114,8 +114,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                uri.startsWith("/api-docs") ||
                uri.startsWith("/swagger-resources") ||
                uri.startsWith("/health") ||
-//                uri.startsWith("/api/pets") ||
-//                uri.startsWith("/api/members") ||
+               uri.startsWith("/api/pets") ||
+               uri.startsWith("/api/members") ||
                uri.startsWith("/dev") ||
                 uri.startsWith("/api/routines") ||
                 uri.startsWith("/api/remarks") ||
