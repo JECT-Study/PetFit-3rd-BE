@@ -174,9 +174,9 @@ public class AuthUserService {
 
         List<Pet> existingPets = authUser.getMember().getPets();
         if (existingPets.isEmpty()) {
-            return new AuthUserIsNewResponseDto(true);
+            return new AuthUserIsNewResponseDto(authUser.getMember().getId(), true);
         } else {
-            return new AuthUserIsNewResponseDto(false);
+            return new AuthUserIsNewResponseDto(authUser.getMember().getId(), false);
         }
     }
 }

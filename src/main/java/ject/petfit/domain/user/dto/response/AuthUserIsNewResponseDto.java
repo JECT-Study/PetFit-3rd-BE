@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthUserIsNewResponseDto {
+    private Long memberId;
     private boolean isNewUser;
 }
