@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Git Checkout
@@ -46,30 +46,8 @@ jobs:
       - name: Build Docker image
         run: docker build -f Dockerfile.prod -t petfit-prod .
 
-      - name: Save Docker image as tar
-        run: docker save petfit-prod -o ./petfit-prod.tar
-
-      - name: Change tar file permission
-        run: chmod 644 ./petfit-prod.tar
-
-      - name: Copy image to EC2
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.PROD_EC2_HOST }}
-          username: ${{ secrets.PROD_EC2_USER }}
-          key: ${{ secrets.PROD_EC2_SSH_KEY }}
-          source: "./petfit-prod.tar"
-          target: "/home/${{ secrets.PROD_EC2_USER }}/"
-
-      - name: Load image and run container on EC2
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.PROD_EC2_HOST }}
-          username: ${{ secrets.PROD_EC2_USER }}
-          key: ${{ secrets.PROD_EC2_SSH_KEY }}
-          script: |
-            docker rm -f $(docker ps -qa)
-            docker rmi -f petfit-prod:latest || true
-            docker load -i /home/${{ secrets.PROD_EC2_USER }}/petfit-prod.tar
-            docker compose up -d
-            docker image prune -f
+      - name: Run docker container on EC2
+        run: |
+          docker rm -f $(docker ps -qa)
+          docker compose up -d petfit-prod:latest
+          docker image prune -f
