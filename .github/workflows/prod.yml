@@ -48,6 +48,6 @@ jobs:
 
       - name: Run docker container on EC2
         run: |
+          cd /home/ubuntu
           docker compose up -d petfit-prod
           docker image prune -f
-        working-directory: /home/ubuntu
