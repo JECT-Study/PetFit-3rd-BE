@@ -50,4 +50,4 @@ jobs:
         run: |
           docker compose up -d petfit-prod
           docker image prune -f
-        working-directory: /home/${{secrets.PROD_EC2_USER}}
+        working-directory: /home/ubuntu
