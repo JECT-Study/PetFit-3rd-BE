@@ -48,5 +48,5 @@ jobs:
 
       - name: Run docker container on EC2
         run: |
-          docker compose up -d petfit-prod:latest
+          docker compose up -d petfit-prod
           docker image prune -f
