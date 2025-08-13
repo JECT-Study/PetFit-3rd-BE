@@ -48,6 +48,6 @@ jobs:
 
       - name: Run docker container on EC2
         run: |
-          docker compose up -d prod-server
+          docker compose up -d
           docker image prune -f
         working-directory: /home/${{secrets.PROD_EC2_USER}}
