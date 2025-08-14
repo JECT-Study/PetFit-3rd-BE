@@ -91,4 +91,17 @@ public class JwtUtil {
                 .parseClaimsJws(token);
 
     }
+
+    public String getEmailFromExpiredToken(String token) {
+    try {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject();
+    } catch (ExpiredJwtException e) {
+        return e.getClaims().getSubject();
+    }
+}
 }

@@ -64,7 +64,7 @@ public class PetController {
     }
 
     // Read (List of Pets)
-    @GetMapping("/{memberId}")
+    @GetMapping("/list/{memberId}")
     @Operation(summary = "모든 동물 정보 조회", description = "한 사용자의 모든 반려동물 정보 조회")
     public ResponseEntity<ApiResponse<List<PetListResponseDto>>> getAllPets(@PathVariable Long memberId) {
         List<PetListResponseDto> pets = petService.getAllPets(memberId);
