@@ -46,7 +46,7 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public AuthUser validateAndRotateToken(String oldRawRefreshToken) {
+    public AuthUser validateRefreshToken(String oldRawRefreshToken, String email) {
         RefreshToken oldToken = refreshTokenRepository.findAll().stream()
                 .filter(t -> passwordEncoder.matches(oldRawRefreshToken, t.getToken()))
                 .findFirst()
@@ -57,7 +57,9 @@ public class RefreshTokenService {
         }
 
         AuthUser user = oldToken.getAuthUser();
-        user.removeRefreshToken();
+        if (!user.getEmail().equals(email)) {
+            throw new TokenException(TokenErrorCode.REFRESH_TOKEN_INVALID);
+        }
 
         return user;
     }
@@ -70,22 +72,5 @@ public class RefreshTokenService {
         return refreshTokenRepository.findAll().stream()
                 .filter(token -> passwordEncoder.matches(plainToken, token.getToken()))
                 .findFirst();
-    }
-
-    public String extractTokenFromSetCookie(HttpServletRequest request, String cookieName) {
-        String setCookieHeader = request.getHeader("Set-Cookie");
-        if (setCookieHeader == null) {
-            return null;
-        }
-
-        // Set-Cookie 헤더에서 특정 쿠키 값 추출
-        String[] cookies = setCookieHeader.split(";");
-        for (String cookie : cookies) {
-            if (cookie.trim().startsWith(cookieName + "=")) {
-                return cookie.substring(cookieName.length() + 1);
-            }
-        }
-
-        return null;
     }
 }
