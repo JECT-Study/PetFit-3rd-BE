@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import ject.petfit.domain.entry.dto.EntryDailyResponse;
 import ject.petfit.domain.entry.dto.EntryExistsResponse;
+import ject.petfit.domain.entry.facade.EntryFacade;
 import ject.petfit.domain.entry.service.EntryService;
 import ject.petfit.domain.routine.dto.response.RoutineResponse;
 import ject.petfit.domain.routine.service.RoutineService;
@@ -27,6 +28,7 @@ import java.util.List;
 @RequestMapping("/api/entries")
 @Tag(name = "달력 API")
 public class EntryController {
+    private final EntryFacade entryFacade;
     private final EntryService entryService;
     private final RoutineService routineService;
 
@@ -41,7 +43,7 @@ public class EntryController {
             @PathVariable String month
     ) {
         return ResponseEntity.ok(
-                ApiResponse.success(entryService.getMonthlyEntries(petId, month))
+                ApiResponse.success(entryFacade.getMonthlyEntries(petId, month))
         );
     }
 
@@ -71,15 +73,8 @@ public class EntryController {
             @PathVariable LocalDate date
     ) {
 
-        List<RoutineResponse> routineResponseList = new ArrayList<>();
-        if (date.equals(LocalDate.now())) {
-            routineResponseList = routineService.getTodayRoutines(petId, date);
-        }else if(date.isBefore(LocalDate.now())) {
-            routineResponseList = routineService.getPastRoutines(petId, date);
-        }
-
         return ResponseEntity.ok(
-                ApiResponse.success(entryService.getDailyEntries(petId, date, routineResponseList))
+                ApiResponse.success(entryFacade.getDailyEntries(petId, date))
         );
     }
 

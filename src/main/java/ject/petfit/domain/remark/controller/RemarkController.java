@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import ject.petfit.domain.remark.dto.request.RemarkRegisterRequest;
 import ject.petfit.domain.remark.dto.request.RemarkUpdateRequest;
 import ject.petfit.domain.remark.dto.response.RemarkResponse;
+import ject.petfit.domain.remark.facade.RemarkFacade;
 import ject.petfit.global.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ import java.util.List;
 @Tag(name = "특이사항 API")
 @RequestMapping("/api/remarks")
 public class RemarkController {
-    private final ject.petfit.domain.remark.service.RemarkService remarkService;
+    private final RemarkFacade remarkFacade;
 
     // 홈화면 특이사항 조회(3일치)
     @GetMapping("/{petId}/home")
@@ -28,7 +29,7 @@ public class RemarkController {
             @PathVariable Long petId
     ) {
         return ResponseEntity.ok(
-                ApiResponse.success(remarkService.getHomeRemark(petId, 3))
+                ApiResponse.success(remarkFacade.getHomeRemark(petId))
         );
     }
 
@@ -42,7 +43,7 @@ public class RemarkController {
             @RequestBody @Valid RemarkRegisterRequest remarkRegisterRequest
     ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponse.success(remarkService.createRemark(petId, remarkRegisterRequest))
+                ApiResponse.success(remarkFacade.createRemark(petId, remarkRegisterRequest))
         );
     }
 
@@ -54,7 +55,7 @@ public class RemarkController {
             @RequestBody @Valid RemarkUpdateRequest remarkRegisterRequest
     ) {
         return ResponseEntity.ok(
-                ApiResponse.success(remarkService.updateRemark(remarkId, remarkRegisterRequest))
+                ApiResponse.success(remarkFacade.updateRemark(remarkId, remarkRegisterRequest))
         );
     }
 
@@ -64,7 +65,7 @@ public class RemarkController {
     public ResponseEntity<ApiResponse<String>> deleteRemark(
             @PathVariable Long remarkId
     ) {
-        remarkService.deleteRemark(remarkId);
+        remarkFacade.deleteRemark(remarkId);
         return ResponseEntity.ok(ApiResponse.success("특이사항 삭제 성공"));
     }
 }

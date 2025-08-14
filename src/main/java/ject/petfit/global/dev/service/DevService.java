@@ -58,7 +58,7 @@ public class DevService {
 
         // 2. 현재 시점 활성화된 슬롯 옵션에서 루틴 완료 여부 판단
         // 활성화된 슬롯 옵션명 조회
-        List<String> activatedSlotOptions = slotService.getActivatedSlotOptions(slot);
+        List<String> activatedSlotOptions = slotService.getActivatedSlotCategories(slot);
 
         /* 슬롯 활성화해놓고 CHECKED나 MEMO한 루틴이지만 밤 12시 시점에 비활성화된 슬롯이면 삭제함 */
         // 에러를 아직 못잡음
@@ -96,7 +96,7 @@ public class DevService {
 
         // 남은 활성화된 옵션들로 UNCHECKED 루틴 DB 추가
         for(String category : activatedSlotOptions){
-            Integer targetAmount = routineService.getTargetAmountByCategory(pet.getSlot(), category);
+            Integer targetAmount = slotService.getTargetAmountOrNull(pet.getSlot(), category);
             routineRepository.save(
                     Routine.builder()
                             .entry(entry)
@@ -120,9 +120,10 @@ public class DevService {
             routineIsCompleted = false;
         }
 
+        List<String> activatedSlotList = slotService.getActivatedSlotCategories(pet.getSlot());
         List<RoutineResponse> routineResponseList = entryDate.equals(LocalDate.now()) ?
-                routineService.getTodayRoutines(petId, entryDate) :
-                routineService.getPastRoutines(petId, entryDate);
+                routineService.getTodayRoutines(entry, pet.getSlot()) :
+                routineService.getPastRoutines(entry);
 
         return EntryFlushResponse.builder()
                 .routineIsCompleted(routineIsCompleted)

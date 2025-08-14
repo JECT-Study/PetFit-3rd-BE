@@ -23,22 +23,9 @@ public class EntryDailyResponse {
     @Schema(description = "날짜", example = "2025-07-01")
     private LocalDate entryDate; // 날짜
 
-//    @Schema(description = "루틴체크 존재 여부", example = "true")
-//    private boolean isChecked; // 루틴체크 존재 여부
-//
-//    @Schema(description = "메모 존재 여부", example = "true")
-//    private boolean isMemo; // 메모 존재 여부
-//
-//    @Schema(description = "특이사항 존재 여부", example = "true")
-//    private boolean isRemarked; // 특이사항 존재 여부
-//
-//    @Schema(description = "일정 존재 여부", example = "false")
-//    private boolean isScheduled; // 일정 존재 여부
-
     List<RemarkResponse> remarkResponseList;
 
     List<RoutineResponse> routineResponseList; // 아래로 변경
-//    DailyAllRoutineResponse dailyAllRoutineResponse;
 
     public static EntryDailyResponse from(Entry entry) {
         return EntryDailyResponse.builder()
@@ -55,9 +42,6 @@ public class EntryDailyResponse {
     public static EntryDailyResponse of(Entry entry, List<RoutineResponse> routineResponseList) {
         return EntryDailyResponse.builder()
                 .entryDate(entry.getEntryDate())
-//                .routineResponseList(entry.getRoutines().stream()
-//                        .map(RoutineResponse::from)
-//                        .toList())
                 .routineResponseList(routineResponseList)
                 .remarkResponseList(entry.getRemarks().stream()
                         .map(RemarkResponse::from)
@@ -73,12 +57,4 @@ public class EntryDailyResponse {
                 .build();
     }
 
-
-//    public static EntryDailyResponse ofNull(LocalDate date, List<RoutineResponse> routineResponseList) {
-//        return EntryDailyResponse.builder()
-//                .entryDate(date)
-//                .remarkResponseList(List.of())
-//                .routineResponseList(routineResponseList)
-//                .build();
-//    }
 }

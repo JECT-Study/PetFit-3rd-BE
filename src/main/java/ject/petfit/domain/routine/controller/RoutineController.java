@@ -8,6 +8,7 @@ import ject.petfit.domain.routine.dto.request.RoutineMemoRequest;
 import ject.petfit.domain.routine.dto.response.RoutineResponse;
 import ject.petfit.domain.routine.exception.RoutineErrorCode;
 import ject.petfit.domain.routine.exception.RoutineException;
+import ject.petfit.domain.routine.facade.RoutineFacade;
 import ject.petfit.domain.routine.service.RoutineService;
 import ject.petfit.global.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ import java.util.List;
         "활성화되어 있는 슬롯의 루틴만 조작 가능 <br> " +
         "{category}는 루틴 종류 feed, water, walk, potty, dental, skin 중 하나 입력")
 public class RoutineController {
-    private final RoutineService routineService;
+    private final RoutineFacade routineFacade;
 
     // 일간 루틴 조회
     @GetMapping("/{petId}/daily/{date}")
@@ -37,17 +38,9 @@ public class RoutineController {
             @Parameter(description = "yyyy-MM-dd 형식으로 입력", example = "2025-07-01")
             @PathVariable LocalDate date
     ) {
-        if (date.equals(LocalDate.now())) {
-            return ResponseEntity.ok(
-                    ApiResponse.success(routineService.getTodayRoutines(petId, date))
-            );
-        }else if( date.isBefore(LocalDate.now())) {
-            return ResponseEntity.ok(
-                    ApiResponse.success(routineService.getPastRoutines(petId, date))
-            );
-        } else {
-            throw new RoutineException(RoutineErrorCode.ROUTINE_FUTURE_DATE);
-        }
+        return ResponseEntity.ok(
+                ApiResponse.success(routineFacade.getDailyRoutines(petId, date))
+        );
     }
 
     // 루틴 체크(V)
@@ -63,7 +56,7 @@ public class RoutineController {
     ) {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponse.success(routineService.checkRoutine(petId, date, category))
+                ApiResponse.success(routineFacade.checkRoutine(petId, date, category))
         );
     }
 
@@ -81,7 +74,7 @@ public class RoutineController {
             @Valid @RequestBody RoutineMemoRequest routineMemoRequest
     ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponse.success(routineService.createRoutineMemo(petId, date, category, routineMemoRequest))
+                ApiResponse.success(routineFacade.addMemoRoutine(petId, date, category, routineMemoRequest))
         );
     }
 
@@ -96,7 +89,7 @@ public class RoutineController {
             @PathVariable String category
     ) {
         return ResponseEntity.ok(
-                ApiResponse.success(routineService.uncheckRoutine(petId, date, category))
+                ApiResponse.success(routineFacade.uncheckRoutine(petId, date, category))
         );
     }
 

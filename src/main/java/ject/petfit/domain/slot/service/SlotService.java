@@ -34,42 +34,65 @@ public class SlotService {
 
     // ------------------------------ 슬롯 공통 메서드 -----------------------------------
     // 특정 반려동물의 슬롯 조회
-    private Slot getSlotOrThrow(Long petId) {
-        Pet pet = petRepository.findById(petId)
-                .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
-        Slot slot = pet.getSlot();
-        if (slot == null) {
-            throw new SlotException(SlotErrorCode.SLOT_NOT_FOUND);
-        }
-        return slot;
+//    private Slot getSlotOrThrow(Long petId) {
+//        Pet pet = petRepository.findById(petId)
+//                .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
+//        Slot slot = pet.getSlot();
+//        if (slot == null) {
+//            throw new SlotException(SlotErrorCode.SLOT_NOT_FOUND);
+//        }
+//        return slot;
+//    }
+
+    public Slot getSlotOrThrow(Pet pet) {
+        return slotRepository.findByPet(pet)
+                .orElseThrow(() -> new SlotException(SlotErrorCode.SLOT_NOT_FOUND));
     }
 
-    // 슬롯 활성화된 옵션명 리스트 조회
-    public List<String> getActivatedSlotOptions(Slot slot) {
-        List<String> activatedOptions = new ArrayList<>();
+    // 활성화된 슬롯 카테고리 리스트 조회
+    public List<String> getActivatedSlotCategories(Slot slot) {
+        List<String> activatedCategories = new ArrayList<>();
         if (slot.isFeedActivated()) {
-            activatedOptions.add("feed");
+            activatedCategories.add("feed");
         }
         if (slot.isWaterActivated()) {
-            activatedOptions.add("water");
+            activatedCategories.add("water");
         }
         if (slot.isWalkActivated()) {
-            activatedOptions.add("walk");
+            activatedCategories.add("walk");
         }
         if (slot.isPottyActivated()) {
-            activatedOptions.add("potty");
+            activatedCategories.add("potty");
         }
         if (slot.isDentalActivated()) {
-            activatedOptions.add("dental");
+            activatedCategories.add("dental");
         }
         if (slot.isSkinActivated()) {
-            activatedOptions.add("skin");
+            activatedCategories.add("skin");
         }
-        return activatedOptions;
+        return activatedCategories;
     }
 
-    // 해당 카테고리가 슬롯에서 활성화되어 있는지 확인
-    public void isCategorySlotActivated(Slot slot, String category) {
+    // 슬롯 목표량 반환
+    public Integer getTargetAmountOrNull(Slot slot, String category) {
+        return switch (category) {
+            case "feed" -> slot.getFeedAmount();
+            case "water" -> slot.getWaterAmount();
+            case "walk" -> slot.getWalkAmount();
+            case "potty", "skin", "dental" -> null;
+            default -> throw new SlotException(SlotErrorCode.SLOT_CATEGORY_NOT_FOUND);
+        };
+    }
+
+    public void validateSlotExists(Pet pet){
+        if(slotRepository.existsByPet(pet)){
+            throw new SlotException(SlotErrorCode.SLOT_ALREADY_EXISTS);
+        }
+    }
+
+
+    // 슬롯에서 해당 카테고리가 활성화되어 있는지 검증
+    public void validateSlotCategoryActivated(Slot slot, String category) {
         switch (category) {
             case "feed" -> {
                 if (!slot.isFeedActivated()) {
@@ -107,7 +130,7 @@ public class SlotService {
     }
 
     // ------------------------------ API 메서드 -----------------------------------
-    // 슬롯 초기화 (회원가입 슬롯 설정)
+    // @슬롯 초기화 (회원가입 슬롯 설정)
     @Transactional
     public SlotResponse initializePetSlot(Long petId, SlotInitializeRequest request) {
         // petId로 Pet 엔티티 조회
@@ -119,23 +142,11 @@ public class SlotService {
         }
 
         // 초기 슬롯 레코드 생성 및 저장
-        Slot slot = slotRepository.save(Slot.builder()
-                .feedActivated(request.isFeedActivated())
-                .waterActivated(request.isWaterActivated())
-                .walkActivated(request.isWalkActivated())
-                .pottyActivated(request.isPottyActivated())
-                .dentalActivated(request.isDentalActivated())
-                .skinActivated(request.isSkinActivated())
-                .feedAmount(request.getFeedAmount())
-                .waterAmount(request.getWaterAmount())
-                .walkAmount(request.getWalkAmount())
-                .pet(pet)
-                .build());
+        Slot slot = createSlot(request, pet);
         return SlotResponse.from(slot);
     }
 
-
-    // 슬롯 활성화 상태 조회
+    // @슬롯 활성화 상태 조회
     public SlotResponse getSlotActivated(Long petId) {
         Slot slot = getSlotOrThrow(petId);
         return SlotResponse.from(slot);
@@ -235,6 +246,22 @@ public class SlotService {
 
         return SlotResponse.from(slot);
     }
+
+    public Slot createSlot(SlotInitializeRequest request, Pet pet) {
+        return slotRepository.save(Slot.builder()
+                .feedActivated(request.isFeedActivated())
+                .waterActivated(request.isWaterActivated())
+                .walkActivated(request.isWalkActivated())
+                .pottyActivated(request.isPottyActivated())
+                .dentalActivated(request.isDentalActivated())
+                .skinActivated(request.isSkinActivated())
+                .feedAmount(request.getFeedAmount())
+                .waterAmount(request.getWaterAmount())
+                .walkAmount(request.getWalkAmount())
+                .pet(pet)
+                .build());
+    }
+
 }
 
 

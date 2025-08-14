@@ -1,7 +1,6 @@
 package ject.petfit.domain.routine.facade;
 
 import ject.petfit.domain.entry.entity.Entry;
-import ject.petfit.domain.entry.repository.EntryRepository;
 import ject.petfit.domain.routine.entity.Routine;
 import ject.petfit.domain.routine.enums.RoutineStatus;
 import ject.petfit.domain.routine.repository.RoutineRepository;
@@ -50,7 +49,7 @@ public class TodayRoutineFacade {
 
         // 활성화된 슬롯 옵션 조회
         Slot slot = entry.getPet().getSlot();
-        List<String> activatedSlotOptions = slotService.getActivatedSlotOptions(slot);
+        List<String> activatedSlotOptions = slotService.getActivatedSlotCategories(slot);
 
         if (routineListInDB.size() == activatedSlotOptions.size()) {
             entry.updateCompletedTrue(); // 루틴 완료 업데이트
@@ -70,7 +69,7 @@ public class TodayRoutineFacade {
 
         // 남은 활성화된 옵션들로 UNCHECKED 루틴 DB 추가
         for (String category : activatedSlotOptions) {
-            Integer targetAmount = routineService.getTargetAmountByCategory(slot, category);
+            Integer targetAmount = slotService.getTargetAmountOrNull(slot, category);
             routineRepository.save(
                     Routine.builder()
                             .entry(entry)
