@@ -95,7 +95,7 @@ public class JwtUtil {
     public String getEmailFromExpiredToken(String token) {
     try {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+                .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
