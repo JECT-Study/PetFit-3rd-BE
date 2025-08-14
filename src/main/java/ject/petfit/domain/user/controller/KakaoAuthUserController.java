@@ -125,26 +125,28 @@ public class KakaoAuthUserController {
 
     // 회원 탈퇴 (JWT 기반 Refresh Token 삭제 후 카카오 계정과의 unlink 처리)
     // UX 고려하여 회원 탈퇴 시 카카오 계정과의 unlink 처리
+    // 수정된 코드 (권장)
     @PostMapping("/kakao/withdraw")
-    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴 시 카카오 계정과의 unlink 처리 및 Refresh Token 삭제")
-    public ResponseEntity<ApiResponse<Void>> withdraw(HttpServletRequest request,
-                                                      @RequestBody WithdrawAuthUserRequestDto requestDto) {
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴 시 카카오 계정과의 unlink 처리 및 토큰 삭제")
+    public ResponseEntity<ApiResponse<Void>> withdraw(
+            @RequestBody WithdrawAuthUserRequestDto requestDto,
+            @CookieValue(name = "refresh_token") String refreshToken) {
+
         AuthUser user = authUserService.loadAuthUserByEmail(requestDto.getMemberId());
 
-        // Refresh Token 추가 검증
-        RefreshToken refreshToken = refreshTokenService.findTokenByPlain(request.getHeader("Authorization"))
+        // 리프레시 토큰 검증
+        RefreshToken refreshTokenEntity = refreshTokenService.findTokenByPlain(refreshToken)
                 .orElseThrow(() -> new TokenException(TokenErrorCode.REFRESH_TOKEN_NOT_FOUND));
-        if (!refreshToken.getAuthUser().getId().equals(user.getId())) {
+
+        if (!refreshTokenEntity.getAuthUser().getId().equals(user.getId())) {
             throw new TokenException(TokenErrorCode.REFRESH_TOKEN_INVALID);
         }
-        // 카카오 계정과의 unlink 처리
+
         authUserService.unlinkUserByAdminKey(user.getKakaoUUID().toString(), adminKey);
 
-        // 회원 탈퇴 처리
-        authUserService.withdraw(user.getId(), request.getHeader("Authorization"));
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
-                ApiResponse.success(null)
-        );
+        authUserService.withdraw(user.getId(), refreshToken);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.success(null));
     }
 
     @GetMapping("/accesscookie")
