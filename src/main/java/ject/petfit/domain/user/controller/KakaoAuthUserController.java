@@ -149,16 +149,16 @@ public class KakaoAuthUserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.success(null));
     }
 
-    @GetMapping("/accesscookie")
-    public ResponseEntity<ApiResponse<AuthUserSimpleResponseDto>> refreshTokenToInfoCookie(
-            HttpServletRequest request, HttpServletResponse response
-    ) {
-        String refreshToken = CookieUtils.getCookieValue(request, "refresh_token");
-        AuthUserSimpleResponseDto memberInfo = authUserService.getMemberInfoFromRefreshTokenCookie(refreshToken);
-        return ResponseEntity.status(HttpStatus.OK).body(
-                ApiResponse.success(null)
-        );
-    }
+    // @GetMapping("/accesscookie")
+    // public ResponseEntity<ApiResponse<AuthUserSimpleResponseDto>> refreshTokenToInfoCookie(
+    //         HttpServletRequest request, HttpServletResponse response
+    // ) {
+    //     String refreshToken = CookieUtils.getCookieValue(request, "refresh_token");
+    //     AuthUserSimpleResponseDto memberInfo = authUserService.getMemberInfoFromRefreshTokenCookie(refreshToken);
+    //     return ResponseEntity.status(HttpStatus.OK).body(
+    //             ApiResponse.success(null)
+    //     );
+    // }
 
     @PostMapping("/token/cookie")
     @Operation(summary = "토큰 쿠키 반환", description = "Access Token과 Refresh Token을 쿠키로 반환합니다.")
