@@ -115,7 +115,7 @@ class JwtIntegrationTest {
         assertThat(refreshToken.getExpires_at()).isAfter(java.time.Instant.now());
 
         // 검증 및 회전 테스트
-        AuthUser validatedUser = refreshTokenService.validateAndRotateToken(rawToken);
+        AuthUser validatedUser = refreshTokenService.validateRefreshToken(rawToken, authUser.getEmail());
         assertThat(validatedUser).isEqualTo(authUser);
     }
 
@@ -165,7 +165,7 @@ class JwtIntegrationTest {
         refreshTokenService.createOrUpdateRefreshToken(authUser, rawToken, validitySeconds);
 
         // when - 토큰 회전
-        refreshTokenService.validateAndRotateToken(rawToken);
+        refreshTokenService.validateRefreshToken(rawToken, authUser.getEmail());
 
         // then - 기존 토큰으로 다시 검증 시도하면 실패
         assertThat(refreshTokenRepository.findByToken(rawToken)).isEmpty();
