@@ -107,30 +107,31 @@ public class PetService {
     }
 
     @Transactional
-    public PetFavoriteResponseDto updateFavoriteBatch(PetFavoriteRequestDto dto) {
+    public List<PetFavoriteResponseDto> updateFavoriteBatch(PetFavoriteRequestDto dto) {
         Pet pet = petRepository.findById(dto.getPetId())
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
 
-        // true로 설정하려는 경우에만 다른 펫들을 false로 설정
+        List<PetFavoriteResponseDto> petFavoriteResponseDtos = new ArrayList<>();
+
         if (Boolean.TRUE.equals(dto.getIsFavorite())) {
             // 해당 멤버의 모든 펫을 false로 설정
             List<Pet> memberPets = petRepository.findByMember(pet.getMember());
             for (Pet memberPet : memberPets) {
                 memberPet.updateIsFavorite(false);
+                petFavoriteResponseDtos.add(new PetFavoriteResponseDto(memberPet.getId(), memberPet.getIsFavorite()));
             }
             
             // 요청된 펫만 true로 설정
             pet.updateIsFavorite(true);
+            petFavoriteResponseDtos.add(new PetFavoriteResponseDto(pet.getId(), pet.getIsFavorite()));
             
-            // 모든 멤버의 펫을 저장
             petRepository.saveAll(memberPets);
         } else {
-            // false로 설정하는 경우는 단순히 해당 펫만 업데이트
             pet.updateIsFavorite(false);
             petRepository.save(pet);
         }
         
-        return new PetFavoriteResponseDto(pet.getId(), pet.getIsFavorite());
+        return petFavoriteResponseDtos;
     }
 }
 
