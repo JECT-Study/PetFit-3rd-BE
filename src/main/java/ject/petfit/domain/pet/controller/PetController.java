@@ -87,13 +87,13 @@ public class PetController {
     }
 
     // Update (Pet List info) - 즐겨찾기 동물 (isFavorite) 변경
-    @PatchMapping("/favorites/batch-updates")
-    @Operation(summary = "즐겨찾기 동물 목록 업데이트", description = "즐겨찾기 동물 목록을 일괄 업데이트")
-    public ResponseEntity<ApiResponse<List<PetFavoriteResponseDto>>> updateFavoritesInBatch(
-            @RequestBody List<PetFavoriteRequestDto> requestDtos) {
-        List<PetFavoriteResponseDto> favoriteBatchResponse = petService.updateFavoriteBatch(requestDtos);
+    @PatchMapping("/favorites")
+    @Operation(summary = "즐겨찾기 동물 업데이트", description = "즐겨찾기 동물을 업데이트 (다른 펫들은 자동으로 false로 설정)")
+    public ResponseEntity<ApiResponse<PetFavoriteResponseDto>> updateFavorite(
+            @RequestBody PetFavoriteRequestDto requestDto) {
+        PetFavoriteResponseDto favoriteResponse = petService.updateFavoriteBatch(requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(
-                ApiResponse.success(favoriteBatchResponse)
+                ApiResponse.success(favoriteResponse)
         );
     }
 
