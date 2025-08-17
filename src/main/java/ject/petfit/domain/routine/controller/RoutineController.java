@@ -6,10 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import ject.petfit.domain.routine.dto.request.RoutineMemoRequest;
 import ject.petfit.domain.routine.dto.response.RoutineResponse;
-import ject.petfit.domain.routine.exception.RoutineErrorCode;
-import ject.petfit.domain.routine.exception.RoutineException;
 import ject.petfit.domain.routine.facade.RoutineFacade;
-import ject.petfit.domain.routine.service.RoutineService;
 import ject.petfit.global.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,7 +19,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/routines")
-@Tag(name = "루틴 API", description = "루틴 조회, 체크, 메모, 미체크 API <br> " +
+@Tag(name = "Routine", description = "루틴 API <br> " +
         "활성화되어 있는 슬롯의 루틴만 조작 가능 <br> " +
         "{category}는 루틴 종류 feed, water, walk, potty, dental, skin 중 하나 입력")
 public class RoutineController {

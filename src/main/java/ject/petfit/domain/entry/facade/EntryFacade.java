@@ -3,30 +3,25 @@ package ject.petfit.domain.entry.facade;
 import ject.petfit.domain.entry.dto.EntryDailyResponse;
 import ject.petfit.domain.entry.dto.EntryExistsResponse;
 import ject.petfit.domain.entry.entity.Entry;
-import ject.petfit.domain.entry.repository.EntryRepository;
 import ject.petfit.domain.entry.service.EntryQueryService;
 import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.pet.service.PetQueryService;
 import ject.petfit.domain.routine.dto.response.RoutineResponse;
-import ject.petfit.domain.routine.repository.RoutineRepository;
-import ject.petfit.domain.routine.service.RoutineService;
-import ject.petfit.domain.slot.service.SlotService;
+import ject.petfit.domain.routine.service.RoutineQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class EntryFacade {
     private final PetQueryService petQueryService;
     private final EntryQueryService entryQueryService;
-    private final EntryRepository entryRepository;
-    private final SlotService slotService;
-    private final RoutineService routineService;
-    private final RoutineRepository routineRepository;
+    private final RoutineQueryService routineQueryService;
 
     // 월간 루틴체크, 메모, 특이사항, (일정) 유무 조회
     public List<EntryExistsResponse> getMonthlyEntries(Long petId, String month) {
@@ -52,18 +47,20 @@ public class EntryFacade {
     // 일간 엔트리 조회(특이사항+루틴 리스트)
     public EntryDailyResponse getDailyEntries(Long petId, LocalDate date) {
         Pet pet = petQueryService.getPetOrThrow(petId);
-        Entry entry = entryQueryService.getEntryOrNull(pet, date);
+        Optional<Entry> entry = entryQueryService.getEntryOptional(pet, date);
 
         // getDailyRoutines의 오늘/과거 날짜에 따른 루틴 조회 로직을 재사용
         List<RoutineResponse> routineResponseList = new ArrayList<>();
         if (date.isEqual(LocalDate.now())) {
-            routineResponseList = routineService.getTodayRoutines(entry, pet.getSlot());
+            routineResponseList = routineQueryService.getTodayRoutines(entry, pet.getSlot());
         }else if( date.isBefore(LocalDate.now())) {
-            routineResponseList = routineService.getPastRoutines(entry);
+            routineResponseList = routineQueryService.getPastRoutines(entry);
         }
 
-        // entry가 null인 경우 특이사항 X, 루틴 리스트 없거나(과거) 모두 Unchecked(오늘)로 응답
+        // entry가 없는 경우 특이사항 X, 루틴 리스트 없거나(과거) 모두 Unchecked(오늘)로 응답
         // entry가 있는 경우 해당 entry의 특이사항들과 루틴 리스트 응답
-        return entry == null ? EntryDailyResponse.ofNull(date, routineResponseList) : EntryDailyResponse.of(entry, routineResponseList);
+        return entry.isEmpty() ?
+                EntryDailyResponse.ofNull(date, routineResponseList)
+                : EntryDailyResponse.of(entry.get(), routineResponseList);
     }
 }

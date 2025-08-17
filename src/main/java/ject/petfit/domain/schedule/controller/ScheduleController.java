@@ -7,7 +7,6 @@ import ject.petfit.domain.schedule.dto.request.ScheduleRegisterRequest;
 import ject.petfit.domain.schedule.dto.request.ScheduleUpdateRequest;
 import ject.petfit.domain.schedule.dto.response.ScheduleResponse;
 import ject.petfit.domain.schedule.facade.ScheduleFacade;
-import ject.petfit.domain.schedule.service.ScheduleQueryService;
 import ject.petfit.global.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +19,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "일정(알람) API")
+@Tag(name = "Schedule", description = "일정 API")
 @RequestMapping("/api/schedules")
 public class ScheduleController {
     private final ScheduleFacade scheduleFacade;

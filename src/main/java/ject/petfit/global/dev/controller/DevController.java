@@ -3,16 +3,12 @@ package ject.petfit.global.dev.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import ject.petfit.domain.entry.service.EntryService;
-import ject.petfit.domain.pet.repository.PetRepository;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.exception.AuthUserErrorCode;
 import ject.petfit.domain.user.exception.AuthUserException;
 import ject.petfit.domain.user.repository.AuthUserRepository;
 import ject.petfit.global.common.ApiResponse;
 import ject.petfit.global.dev.dto.TokenResponse;
-import ject.petfit.global.exception.CustomException;
-import ject.petfit.global.exception.ErrorCode;
 import ject.petfit.global.jwt.refreshtoken.service.RefreshTokenService;
 import ject.petfit.global.jwt.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -26,13 +22,10 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@Tag(name = "개발용 API")
+@Tag(name = "Developer", description = "개발자용 API")
 @RequestMapping("/dev")
 @RequiredArgsConstructor
 public class DevController {
-
-    private final EntryService entryService;
-    private final PetRepository petRepository;
     private final AuthUserRepository authUserRepository;
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;

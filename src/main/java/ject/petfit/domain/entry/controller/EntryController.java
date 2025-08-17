@@ -6,9 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import ject.petfit.domain.entry.dto.EntryDailyResponse;
 import ject.petfit.domain.entry.dto.EntryExistsResponse;
 import ject.petfit.domain.entry.facade.EntryFacade;
-import ject.petfit.domain.entry.service.EntryService;
-import ject.petfit.domain.routine.dto.response.RoutineResponse;
-import ject.petfit.domain.routine.service.RoutineService;
+import ject.petfit.domain.entry.service.EntryCommandService;
 import ject.petfit.global.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,22 +17,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/entries")
-@Tag(name = "달력 API")
+@Tag(name = "Entry", description = "달력 API")
 public class EntryController {
     private final EntryFacade entryFacade;
-    private final EntryService entryService;
-    private final RoutineService routineService;
 
     // 월간 루틴체크,메모,특이사항,(일정) 유무 조회
     @GetMapping("/{petId}/monthly/{month}")
-    @Operation(summary = "월간 루틴완료,메모,특이사항,(일정) 유무 조회",
+    @Operation(summary = "월간 루틴완료, 메모, 특이사항, (일정) 유무 조회",
             description = "특정 월의 루틴완료, 메모, 특이사항, (일정) 유무를 조회 <br> " +
                     "요구사항은 아니지만 일정 유무도 응답에 포함 ")
     public ResponseEntity<ApiResponse<List<EntryExistsResponse>>> getMonthlyEntries(

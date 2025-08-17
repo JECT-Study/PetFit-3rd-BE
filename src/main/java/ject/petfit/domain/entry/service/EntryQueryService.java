@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,19 +19,17 @@ public class EntryQueryService {
 
     private static final Long RECENT_ENTRY_LIMIT = 3L; // 최근 3일간의 엔트리 조회
 
-    public Entry getEntryByPetAndLocalDateOrThrow(Pet pet, LocalDate localDate) {
-        return entryRepository.findByPetAndEntryDate(pet, localDate)
-                .orElseThrow(() -> new EntryException(EntryErrorCode.ENTRY_NOT_IMPLEMENTED));
-    }
-
     public Entry getEntryOrThrow(Pet pet, LocalDate localDate) {
         return entryRepository.findByPetAndEntryDate(pet, localDate)
                 .orElseThrow(() -> new EntryException(EntryErrorCode.ENTRY_NOT_FOUND));
     }
 
-    public Entry getEntryOrNull(Pet pet, LocalDate localDate) {
-        return entryRepository.findByPetAndEntryDate(pet, localDate)
-                .orElse(null);
+    public Optional<Entry> getEntryOptional(Pet pet, LocalDate localDate) {
+        return entryRepository.findByPetAndEntryDate(pet, localDate);
+    }
+
+    public List<Entry> getEntriesByPetAndScheduled(Pet pet) {
+        return entryRepository.findAllByPetAndIsScheduledTrue(pet);
     }
 
     public List<Entry> getEntriesByPetAndDateRange(Pet pet, LocalDate startDate, LocalDate endDate) {
