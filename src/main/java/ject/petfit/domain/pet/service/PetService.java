@@ -25,10 +25,14 @@ import ject.petfit.domain.user.exception.AuthUserException;
 import ject.petfit.domain.user.repository.AuthUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
 public class PetService {
+
+    private static final Logger log = LoggerFactory.getLogger(PetService.class);
 
     private final AuthUserRepository authUserRepository;
     private final PetRepository petRepository;
@@ -103,29 +107,30 @@ public class PetService {
     }
 
     @Transactional
-    public List<PetFavoriteResponseDto> updateFavoriteBatch(List<PetFavoriteRequestDto> dtos) {
-        // ID 추출 (WHERE IN 절 사용)
-        List<Long> petIds = dtos.stream()
-                .map(dto -> dto.getPetId())
-                .collect(Collectors.toList());
+    public PetFavoriteResponseDto updateFavoriteBatch(PetFavoriteRequestDto dto) {
+        Pet pet = petRepository.findById(dto.getPetId())
+                .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
 
-        // 한 번의 쿼리로 엔티티 조회
-        Map<Long, Pet> petMap = petRepository.findByIdIn(petIds)
-                .stream()
-                .collect(Collectors.toMap(Pet::getId, pet -> pet));
-
-        // 업데이트 작업
-        List<Pet> updatedPets = new ArrayList<>();
-        for (PetFavoriteRequestDto dto : dtos) {
-            Pet pet = petMap.get(dto.getPetId());
-            pet.updateIsFavorite(dto.getIsFavorite());
-            updatedPets.add(pet);
+        // true로 설정하려는 경우에만 다른 펫들을 false로 설정
+        if (Boolean.TRUE.equals(dto.getIsFavorite())) {
+            // 해당 멤버의 모든 펫을 false로 설정
+            List<Pet> memberPets = petRepository.findByMember(pet.getMember());
+            for (Pet memberPet : memberPets) {
+                memberPet.updateIsFavorite(false);
+            }
+            
+            // 요청된 펫만 true로 설정
+            pet.updateIsFavorite(true);
+            
+            // 모든 멤버의 펫을 저장
+            petRepository.saveAll(memberPets);
+        } else {
+            // false로 설정하는 경우는 단순히 해당 펫만 업데이트
+            pet.updateIsFavorite(false);
+            petRepository.save(pet);
         }
-        // 일괄 저장 (batch update)
-        petRepository.saveAll(updatedPets);
-        // 응답 생성
-        return updatedPets.stream()
-                .map(pet -> new PetFavoriteResponseDto(pet.getId(), pet.getIsFavorite()))
-                .collect(Collectors.toList());
+        
+        return new PetFavoriteResponseDto(pet.getId(), pet.getIsFavorite());
     }
 }
+

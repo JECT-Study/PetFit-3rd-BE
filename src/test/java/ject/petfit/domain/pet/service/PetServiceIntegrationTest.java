@@ -171,7 +171,7 @@ class PetServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("여러 반려동물 즐겨찾기 상태 일괄 수정")
+    @DisplayName("반려동물 즐겨찾기 상태 수정")
     void updateFavoriteBatch_Success() {
         // given
         Pet pet1 = Pet.builder()
@@ -195,22 +195,19 @@ class PetServiceIntegrationTest {
         pet1 = petRepository.save(pet1);
         pet2 = petRepository.save(pet2);
 
-        PetFavoriteRequestDto req1 = new PetFavoriteRequestDto(pet1.getId(), true);
-        PetFavoriteRequestDto req2 = new PetFavoriteRequestDto(pet2.getId(), true);
-
-        List<PetFavoriteRequestDto> batchRequest = Arrays.asList(req1, req2);
+        PetFavoriteRequestDto request = new PetFavoriteRequestDto(pet1.getId(), true);
 
         // when
-        List<PetFavoriteResponseDto> result = petService.updateFavoriteBatch(batchRequest, member.getAuthUser().getEmail());
+        PetFavoriteResponseDto result = petService.updateFavoriteBatch(request);
 
         // then
-        assertThat(result).hasSize(2);
-        assertThat(result).allMatch(r -> r.getIsFavorite().equals(true));
+        assertThat(result.getIsFavorite()).isTrue();
+        assertThat(result.getPetId()).isEqualTo(pet1.getId());
 
-        // 실제 DB 반영 확인
+        // 실제 DB 반영 확인 - pet1은 true, pet2는 false
         Pet updatedPet1 = petRepository.findById(pet1.getId()).orElseThrow();
         Pet updatedPet2 = petRepository.findById(pet2.getId()).orElseThrow();
         assertThat(updatedPet1.getIsFavorite()).isTrue();
-        assertThat(updatedPet2.getIsFavorite()).isTrue();
+        assertThat(updatedPet2.getIsFavorite()).isFalse();
     }
 }
