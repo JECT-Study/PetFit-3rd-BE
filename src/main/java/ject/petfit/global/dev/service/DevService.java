@@ -119,7 +119,7 @@ public class DevService {
         Pet pet = petQueryService.getPetOrThrow(petId);
         Optional<Entry> entry = entryQueryService.getEntryOptional(pet, entryDate);
         Boolean routineIsCompleted = true;
-        if (entry == null) {
+        if (entry.isEmpty()) {
             routineIsCompleted = false;
         }
 
