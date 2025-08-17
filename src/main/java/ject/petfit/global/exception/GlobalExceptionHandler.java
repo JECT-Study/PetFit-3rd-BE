@@ -144,6 +144,7 @@ public class GlobalExceptionHandler {
     // 그외 모든 예외 처리 핸들러
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
+        log.info(e.getMessage(), e);
         ApiResponse<Void> response = ApiResponse.fail(
                 "SERVER-500",
                 "서버 내부 오류가 발생하였습니다."

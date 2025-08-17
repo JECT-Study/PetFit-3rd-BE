@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import ject.petfit.domain.entry.entity.Entry;
 import ject.petfit.global.common.BaseTime;
 import lombok.*;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -29,6 +28,9 @@ public class Schedule extends BaseTime {
     @JoinColumn(name = "entry_id")
     private Entry entry;
 
+    public void updateEntry(Entry entry) {
+        this.entry = entry;
+    }
     public void updateTitle(String title) {
         this.title = title;
     }

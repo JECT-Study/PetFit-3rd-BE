@@ -6,7 +6,7 @@ import jakarta.validation.Valid;
 import ject.petfit.domain.slot.dto.request.SlotInitializeRequest;
 import ject.petfit.domain.slot.dto.request.SlotRequest;
 import ject.petfit.domain.slot.dto.response.SlotResponse;
-import ject.petfit.domain.slot.service.SlotService;
+import ject.petfit.domain.slot.facade.SlotFacade;
 import ject.petfit.global.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/slots")
-@Tag(name = "슬롯 설정 API")
+@Tag(name = "Slot", description = "슬롯 API")
 public class SlotController {
-    private final SlotService slotService;
+    private final SlotFacade slotFacade;
 
     // 슬롯 초기화 (회원가입 후 슬롯 설정)
     @PostMapping("/{petId}")
@@ -28,9 +28,8 @@ public class SlotController {
             @PathVariable Long petId,
             @RequestBody @Valid SlotInitializeRequest slotInitializeRequest
             ) {
-
         return ResponseEntity.status(201).body(ApiResponse.success(
-                slotService.initializePetSlot(petId, slotInitializeRequest))
+                slotFacade.initializePetSlot(petId, slotInitializeRequest))
         );
     }
 
@@ -40,7 +39,7 @@ public class SlotController {
     public ResponseEntity<ApiResponse<SlotResponse>> activated(
             @PathVariable Long petId)
     {
-        return ResponseEntity.ok(ApiResponse.success(slotService.getSlotActivated(petId)));
+        return ResponseEntity.ok(ApiResponse.success(slotFacade.getSlotActivated(petId)));
     }
 
     // 슬롯 활성화 상태 변경
@@ -52,29 +51,7 @@ public class SlotController {
             @RequestBody @Valid SlotRequest slotRequest
     ){
         return ResponseEntity.status(201).body(
-                ApiResponse.success(slotService.setSlotActivated(petId, slotRequest))
+                ApiResponse.success(slotFacade.setSlotActivated(petId, slotRequest))
         );
     }
-
-//    // 사료, 음수, 배변 목표량 조회
-//    @GetMapping("/{petId}/amounts")
-//    @Operation(summary = "사료, 음수, 배변 목표량 조회", description = "특정 반려동물의 사료, 음수, 배변 목표량을 조회합니다.")
-//    public ResponseEntity<ApiResponse<SlotAmountResponse>> getAmounts(
-//            @PathVariable Long petId
-//    ) {
-//        return ResponseEntity.ok(ApiResponse.success(slotService.getSlotAmounts(petId)));
-//    }
-//
-//    // 사료, 음수, 배변 목표량 설정
-//    @PatchMapping("/{petId}/amounts")
-//    @Operation(summary = "사료, 음수, 배변 목표량 설정", description = "특정 반려동물의 사료, 음수, 배변 목표량을 설정합니다.<br>" +
-//            "수정 없는 슬롯은 null 입력 혹은 기존값 입력")
-//    public ResponseEntity<ApiResponse<SlotAmountResponse>> setAmounts(
-//            @PathVariable Long petId,
-//            @RequestBody @Valid SlotAmountRequest slotAmountRequest
-//    ) {
-//        return ResponseEntity.status(201).body(
-//                ApiResponse.success(slotService.setSlotAmounts(petId, slotAmountRequest))
-//        );
-//    }
 }

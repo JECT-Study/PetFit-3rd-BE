@@ -1,6 +1,5 @@
 package ject.petfit.global.health;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-@Tag(name = "헬스 체크 API")
+@Tag(name = "HealthCheck", description = "헬스 체크 API")
 @RestController
 public class HealthCheckController {
 

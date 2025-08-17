@@ -16,8 +16,8 @@ public class BatchJobScheduler {
     private final JobLauncher jobLauncher;
     private final Job todayRoutineSaveJob;
 
-    // 매일 오전 12시 01분에 실행 (cron = 초 분 시 일 월 요일)
-    @Scheduled(cron = "0 1 0 * * *")
+    // 매일 자정 00시 00분에 실행 (cron = 초 분 시 일 월 요일)
+    @Scheduled(cron = "0 0 0 * * *")
     public void runJob() throws Exception {
         System.out.println("실행시작");
         JobParameters jobParameters = new JobParametersBuilder()
