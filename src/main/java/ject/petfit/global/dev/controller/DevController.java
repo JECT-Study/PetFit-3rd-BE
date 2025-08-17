@@ -8,15 +8,20 @@ import ject.petfit.domain.user.exception.AuthUserErrorCode;
 import ject.petfit.domain.user.exception.AuthUserException;
 import ject.petfit.domain.user.repository.AuthUserRepository;
 import ject.petfit.global.common.ApiResponse;
+import ject.petfit.global.dev.dto.EntryFlushResponse;
 import ject.petfit.global.dev.dto.TokenResponse;
+import ject.petfit.global.dev.service.DevService;
 import ject.petfit.global.jwt.refreshtoken.service.RefreshTokenService;
 import ject.petfit.global.jwt.util.JwtUtil;
+import ject.petfit.global.kafka.ConsumerService;
+import ject.petfit.global.kafka.ProducerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 
@@ -29,6 +34,7 @@ public class DevController {
     private final AuthUserRepository authUserRepository;
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
+    private final DevService devService;
 
     @Value("${spring.jwt.refresh-token-validity-seconds}")
     private long refreshTokenValiditySeconds;
@@ -54,44 +60,18 @@ public class DevController {
         );
     }
 
-
-
-
-
-//    @Operation(summary = "스웨거 동작 확인",
-//            description = "상세 설명")
-//    @GetMapping()
-//    public ResponseEntity<String> swaggerTest() {
-//        return ResponseEntity.ok("Swagger Test");
-//    }
-//
-//    @Operation(summary = "ApiResponse 확인용 예제",
-//            description = "ApiResponse 적용 후 성공/실패, 예외처리 응답 형태 확인")
-//    @GetMapping("/{id}")
-//    public ResponseEntity<ApiResponse<String>> getUserName(@PathVariable Long id) {
-//        if (id > 0) {
-//            // 성공 응답
-//            return ResponseEntity
-//                    .ok(ApiResponse.success("김철수"));
-//        }else if(id == 0){
-//            // 실패 응답
-//            return ResponseEntity
-//                    .status(404)
-//                    .body(ApiResponse.fail("DEV-404", "사용자를 찾을 수 없습니다(직접 기재)"));
-//        }
-//        // 예외처리 응답
-//        throw new CustomException(ErrorCode.DEV_NOT_FOUND);
-//    }
-
-//    @PostMapping("/entries/{petId}/{entryDate}")
-//    public ResponseEntity<ApiResponse<String>> createEntry(
-//            @PathVariable Long petId,
-//            @PathVariable String entryDate
-//    ) {
-//        Pet pet = petRepository.findById(petId)
-//                .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
-//        entryService.createEntry(pet, LocalDate.parse(entryDate));
-//        return ResponseEntity
-//                .ok(ApiResponse.success("Entry 생성 성공"));
-//    }
+    @PostMapping("/flush")
+    @Operation(summary = "하루 기록 수동 업데이트",
+            description = "1. 해당 날짜의 루틴 완료 여부 업데이트 <br>" +
+                    "2. 해당 날짜의 미체크 루틴을 DB에 추가 <br> " +
+                    "기록된 루틴 CHECKED, 루틴 MEMO, 특이사항, 일정이 있는 경우에만 업데이트")
+    public ResponseEntity<ApiResponse<EntryFlushResponse>> flushEntries(
+            @RequestParam LocalDate entryDate,
+            @RequestParam Long petId
+    ) {
+        devService.entryDateFlush(petId, entryDate);
+        return ResponseEntity.ok(
+                ApiResponse.success(devService.getEntryFlushResponse(petId, entryDate))
+        );
+    }
 }

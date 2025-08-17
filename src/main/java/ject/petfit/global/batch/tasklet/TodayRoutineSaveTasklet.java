@@ -31,6 +31,7 @@ public class TodayRoutineSaveTasklet implements Tasklet {
         for( Entry entry : entryList) {
             boolean isRoutineCompleted =  todayRoutineFacade.todayRoutineSave(entry);
             updatedPets.put(entry.getPet().getId(), isRoutineCompleted);
+
         }
 
         // 업데이트된 펫 정보 로그 출력
