@@ -6,7 +6,7 @@ import jakarta.validation.Valid;
 import ject.petfit.domain.schedule.dto.request.ScheduleRegisterRequest;
 import ject.petfit.domain.schedule.dto.request.ScheduleUpdateRequest;
 import ject.petfit.domain.schedule.dto.response.ScheduleResponse;
-import ject.petfit.domain.schedule.service.ScheduleService;
+import ject.petfit.domain.schedule.facade.ScheduleFacade;
 import ject.petfit.global.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,21 +19,10 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "일정(알람) API")
+@Tag(name = "Schedule", description = "일정 API")
 @RequestMapping("/api/schedules")
 public class ScheduleController {
-    private final ScheduleService scheduleService;
-
-    // 일정 조회(3일치)
-    @GetMapping("/{petId}/home")
-    @Operation(summary = "홈화면 일정 조회", description = "홈화면에서 3일치 일정들을 조회")
-    public ResponseEntity<ApiResponse<List<ScheduleResponse>>> getHomeSchedule(
-            @PathVariable Long petId
-    ) {
-        return ResponseEntity.ok(
-                ApiResponse.success(scheduleService.getHomeSchedule(petId, 3))
-        );
-    }
+    private final ScheduleFacade scheduleFacade;
 
     // 일정 조회(All)
     @GetMapping("/{petId}/all")
@@ -42,9 +31,22 @@ public class ScheduleController {
             @PathVariable Long petId
     ) {
         return ResponseEntity.ok(
-                ApiResponse.success(scheduleService.getScheduleList(petId))
+                ApiResponse.success(scheduleFacade.getScheduleList(petId))
         );
     }
+
+    // 일정 조회(3일치)
+    @GetMapping("/{petId}/home")
+    @Operation(summary = "홈화면 일정 조회", description = "홈화면에서 3일치 일정들을 조회")
+    public ResponseEntity<ApiResponse<List<ScheduleResponse>>> getHomeSchedule(
+            @PathVariable Long petId
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.success(scheduleFacade.getHomeSchedule(petId))
+        );
+    }
+
+
 
     // 일정 단일 조회 - 필요?
 
@@ -57,7 +59,7 @@ public class ScheduleController {
             @PathVariable Long petId,
             @RequestBody @Valid ScheduleRegisterRequest scheduleRegisterRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponse.success(scheduleService.createSchedule(petId, scheduleRegisterRequest))
+                ApiResponse.success(scheduleFacade.createSchedule(petId, scheduleRegisterRequest))
         );
     }
 
@@ -68,7 +70,7 @@ public class ScheduleController {
             @PathVariable Long scheduleId,
             @RequestBody ScheduleUpdateRequest scheduleUpdateRequest) {
         return ResponseEntity.ok(
-                ApiResponse.success(scheduleService.updateSchedule(scheduleId, scheduleUpdateRequest))
+                ApiResponse.success(scheduleFacade.updateSchedule(scheduleId, scheduleUpdateRequest))
         );
     }
 
@@ -77,7 +79,7 @@ public class ScheduleController {
     @Operation(summary = "일정 삭제", description = "일정 ID로 일정 삭제")
     public ResponseEntity<ApiResponse<String>> deleteSchedule(
             @PathVariable Long scheduleId) {
-        scheduleService.deleteSchedule(scheduleId);
+        scheduleFacade.deleteSchedule(scheduleId);
         return ResponseEntity.ok(ApiResponse.success("일정 삭제 성공"));
     }
 }

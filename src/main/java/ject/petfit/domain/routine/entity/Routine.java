@@ -3,6 +3,7 @@ package ject.petfit.domain.routine.entity;
 import jakarta.persistence.*;
 import ject.petfit.domain.entry.entity.Entry;
 import ject.petfit.domain.routine.enums.RoutineStatus;
+import ject.petfit.global.common.BaseTime;
 import lombok.*;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @ToString
-public class Routine  {
+public class Routine extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long routineId;
