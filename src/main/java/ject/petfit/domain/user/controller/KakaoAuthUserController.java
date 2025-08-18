@@ -130,7 +130,9 @@ public class KakaoAuthUserController {
     @Operation(summary = "회원 탈퇴", description = "회원 탈퇴 시 카카오 계정과의 unlink 처리 및 토큰 삭제")
     public ResponseEntity<ApiResponse<Void>> withdraw(
             @RequestBody WithdrawAuthUserRequestDto requestDto,
-            @CookieValue(name = "refresh_token") String refreshToken) {
+            @CookieValue(name = "refresh_token") String refreshToken,
+            HttpServletResponse response
+    ) {
 
         AuthUser user = authUserService.loadAuthUserByEmail(requestDto.getMemberId());
 
@@ -145,6 +147,10 @@ public class KakaoAuthUserController {
         authUserService.unlinkUserByAdminKey(user.getKakaoUUID().toString(), adminKey);
 
         authUserService.withdraw(user.getId(), refreshToken);
+
+        response.addCookie(CookieUtils.deleteCookieByName("access_token"));
+        response.addCookie(CookieUtils.deleteCookieByName("refresh_token"));
+        response.setHeader("Clear-Site-Data", "\"cache\", \"cookies\", \"storage\"");
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.success(null));
     }
