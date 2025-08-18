@@ -66,19 +66,14 @@ public class CookieUtils {
         return cookie;
     }
 
-    public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name){
-        Cookie[] cookies = request.getCookies();
-        if(cookies==null){
-            return;
-        }
-        for(Cookie cookie : cookies){
-            if(name.equals(cookie.getName())){
-                cookie.setValue(""); // 쿠키 빈 값 처리
-                cookie.setPath("/");
-                cookie.setMaxAge(0); // 만료 시간 0으로 바로 만료되도록
-                response.addCookie(cookie);
-            }
-        }
+    public static ResponseCookie deleteTokenCookie(String name) {
+        return ResponseCookie.from(name, "")
+                .secure(true)
+                .domain(frontDomain)
+                .path("/")
+                .sameSite("none")
+                .maxAge(0)  // 즉시 만료
+                .build();
     }
 
     public static Cookie deleteCookieByName(String name) {
