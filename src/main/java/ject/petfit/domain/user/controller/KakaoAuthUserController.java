@@ -99,12 +99,14 @@ public class KakaoAuthUserController {
         refreshTokenService.findTokenByPlain(refreshToken)
                 .ifPresent(refreshTokenRepository::delete);
         // 클라이언트 정리 지시
-        response.addCookie(CookieUtils.deleteCookieByName("access_token"));
-        response.addCookie(CookieUtils.deleteCookieByName("refresh_token"));
-        response.setHeader("Clear-Site-Data", "\"cache\", \"cookies\", \"storage\"");
-        return ResponseEntity.status(HttpStatus.OK).body(
-                ApiResponse.success(null)
-        );
+        ResponseCookie accessCookie = CookieUtils.deleteTokenCookie("access_token");
+        ResponseCookie refreshCookie = CookieUtils.deleteTokenCookie("refresh_token");
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .header("Clear-Site-Data", "\"cache\", \"cookies\", \"storage\"")
+                .body(ApiResponse.success(null));
     }
 
     // 서비스만 로그아웃 -> Dev
@@ -148,11 +150,14 @@ public class KakaoAuthUserController {
 
         authUserService.withdraw(user.getId(), refreshToken);
 
-        response.addCookie(CookieUtils.deleteCookieByName("access_token"));
-        response.addCookie(CookieUtils.deleteCookieByName("refresh_token"));
-        response.setHeader("Clear-Site-Data", "\"cache\", \"cookies\", \"storage\"");
+        ResponseCookie accessCookie = CookieUtils.deleteTokenCookie("access_token");
+        ResponseCookie refreshCookie = CookieUtils.deleteTokenCookie("refresh_token");
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.success(null));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .header("Clear-Site-Data", "\"cache\", \"cookies\", \"storage\"")
+                .body(ApiResponse.success(null));
     }
 
     // @GetMapping("/accesscookie")
