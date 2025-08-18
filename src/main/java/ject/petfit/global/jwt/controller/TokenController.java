@@ -61,7 +61,7 @@ public class TokenController {
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                ApiResponse.error("토큰이 유효하지 않습니다.")
+                ApiResponse.fail("토큰이 유효하지 않습니다.")
         );
     }
 }
