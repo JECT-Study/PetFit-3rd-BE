@@ -46,17 +46,12 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public AuthUser validateRefreshToken(String oldRawRefreshToken, String email) {
-        RefreshToken oldToken = refreshTokenRepository.findAll().stream()
-                .filter(t -> passwordEncoder.matches(oldRawRefreshToken, t.getToken()))
-                .findFirst()
+    public AuthUser validateRefreshToken(String receivedHashedToken, String email) {
+        // 쿠키에 해시된 토큰이 전달된다고 가정
+        RefreshToken storedToken = refreshTokenRepository.findByToken(receivedHashedToken)
                 .orElseThrow(() -> new TokenException(TokenErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
-        if (!passwordEncoder.matches(oldRawRefreshToken, oldToken.getToken())) {
-            throw new TokenException(TokenErrorCode.REFRESH_TOKEN_INVALID);
-        }
-
-        AuthUser user = oldToken.getAuthUser();
+        AuthUser user = storedToken.getAuthUser();
         if (!user.getEmail().equals(email)) {
             throw new TokenException(TokenErrorCode.REFRESH_TOKEN_INVALID);
         }
@@ -68,9 +63,8 @@ public class RefreshTokenService {
         return passwordEncoder.encode(rawToken);
     }
 
-    public Optional<RefreshToken> findTokenByPlain(String plainToken) {
-        return refreshTokenRepository.findAll().stream()
-                .filter(token -> passwordEncoder.matches(plainToken, token.getToken()))
-                .findFirst();
+    public Optional<RefreshToken> findTokenByCookie(String hashedTokenFromCookie) {
+        // 쿠키에 해시 토큰이 옴
+        return refreshTokenRepository.findByToken(hashedTokenFromCookie);
     }
 }
