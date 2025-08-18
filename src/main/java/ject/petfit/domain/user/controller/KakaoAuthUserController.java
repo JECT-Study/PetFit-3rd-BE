@@ -150,6 +150,7 @@ public class KakaoAuthUserController {
 
         authUserService.withdraw(user.getId(), refreshToken);
 
+
         ResponseCookie accessCookie = CookieUtils.deleteTokenCookie("access_token");
         ResponseCookie refreshCookie = CookieUtils.deleteTokenCookie("refresh_token");
 
