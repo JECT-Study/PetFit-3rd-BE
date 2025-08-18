@@ -46,7 +46,7 @@ public class Pet {
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Entry> entries;
 
-    @OneToOne(mappedBy = "pet")
+    @OneToOne(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
     private Slot slot;
 
     @Builder
