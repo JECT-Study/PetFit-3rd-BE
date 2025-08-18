@@ -145,13 +145,14 @@ public class AuthUserService {
         WebClient.create()
                 .post()
                 .uri("https://kapi.kakao.com/v1/user/unlink")
-                .header("Authorization", "KakaoAK " + adminKey)
-                .bodyValue("target_id_type=user_id&target_id=" + kakaoUserId)
+                .header(HttpHeaders.AUTHORIZATION, "KakaoAK " + adminKey)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(BodyInserters.fromFormData("target_id_type", "user_id")
+                        .with("target_id", kakaoUserId))
                 .retrieve()
                 .toBodilessEntity()
                 .then()
                 .block();
-
     }
 
     public AuthUserSimpleResponseDto getMemberInfoFromRefreshTokenCookie(String refreshToken) {
