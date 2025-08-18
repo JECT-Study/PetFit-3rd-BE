@@ -36,23 +36,33 @@ public class TokenController {
     // Refresh Token 재발급
     @PostMapping("/auth/refresh")
     public ResponseEntity<ApiResponse<AuthUserTokenResponseDto>> refresh(
-        @CookieValue(name = "access_token") String expiredAccessToken,
-        @CookieValue(name = "refresh_token") String refreshToken
+        @CookieValue(name = "access_token", required = false) String expiredAccessToken,
+        @CookieValue(name = "refresh_token", required = false) String refreshToken
     ) {
+        // 쿠키가 없는 경우 처리
+        if (expiredAccessToken == null || refreshToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                ApiResponse.error("토큰이 없습니다.")
+            );
+        }
         
-        String email = jwtUtil.getEmailFromExpiredToken(expiredAccessToken);
-        
-        AuthUser authUser = refreshTokenService.validateRefreshToken(refreshToken, email);
-        
-        String newAccessToken = jwtUtil.createAccessToken(authUser.getEmail(), authUser.getMember().getRole().name());
-        
-        String newRefreshToken = refreshTokenService.createOrUpdateRefreshToken(authUser, UUID.randomUUID().toString(),
-                refreshTokenValiditySeconds).getToken();
-
-        AuthUserTokenResponseDto tokenResponseDto = new AuthUserTokenResponseDto(newAccessToken, newRefreshToken);
-
-        return ResponseEntity.status(HttpStatus.OK).body(
-                ApiResponse.success(tokenResponseDto)
+        try {
+            String email = jwtUtil.getEmailFromExpiredToken(expiredAccessToken);
+            AuthUser authUser = refreshTokenService.validateRefreshToken(refreshToken, email);
+            
+            String newAccessToken = jwtUtil.createAccessToken(authUser.getEmail(), authUser.getMember().getRole().name());
+            String newRefreshToken = refreshTokenService.createOrUpdateRefreshToken(authUser, UUID.randomUUID().toString(),
+                    refreshTokenValiditySeconds).getToken();
+    
+            AuthUserTokenResponseDto tokenResponseDto = new AuthUserTokenResponseDto(newAccessToken, newRefreshToken);
+    
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    ApiResponse.success(tokenResponseDto)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                ApiResponse.error("토큰이 유효하지 않습니다.")
         );
     }
+}
 }
