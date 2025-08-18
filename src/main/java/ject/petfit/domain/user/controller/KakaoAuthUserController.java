@@ -96,7 +96,7 @@ public class KakaoAuthUserController {
          @CookieValue(name = "refresh_token", required = false) String refreshToken, HttpServletResponse response) {
         authUserService.logout(accessToken);
         // 리프레시 토큰 무효화
-        refreshTokenService.findTokenByPlain(refreshToken)
+        refreshTokenService.findTokenByCookie(refreshToken)
                 .ifPresent(refreshTokenRepository::delete);
         // 클라이언트 정리 지시
         ResponseCookie accessCookie = CookieUtils.deleteTokenCookie("access_token");
@@ -115,7 +115,7 @@ public class KakaoAuthUserController {
     public ResponseEntity<ApiResponse<?>> logoutDev(
             @RequestBody RefreshTokenRequestDto request, HttpServletResponse response) {
         // 리프레시 토큰 무효화
-        refreshTokenService.findTokenByPlain(request.getRefreshToken())
+        refreshTokenService.findTokenByCookie(request.getRefreshToken())
                 .ifPresent(refreshTokenRepository::delete);
 
         // 프론트엔드에 토큰 삭제 지시
@@ -139,7 +139,7 @@ public class KakaoAuthUserController {
         AuthUser user = authUserService.loadAuthUserByEmail(requestDto.getMemberId());
 
         // 리프레시 토큰 검증
-        RefreshToken refreshTokenEntity = refreshTokenService.findTokenByPlain(refreshToken)
+        RefreshToken refreshTokenEntity = refreshTokenService.findTokenByCookie(refreshToken)
                 .orElseThrow(() -> new TokenException(TokenErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
         if (!refreshTokenEntity.getAuthUser().getId().equals(user.getId())) {
