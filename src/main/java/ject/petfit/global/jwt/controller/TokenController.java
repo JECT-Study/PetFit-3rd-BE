@@ -42,7 +42,7 @@ public class TokenController {
         // 쿠키가 없는 경우 처리
         if (expiredAccessToken == null || refreshToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                ApiResponse.error("토큰이 없습니다.")
+                ApiResponse.fail("토큰이 없습니다.")
             );
         }
         
