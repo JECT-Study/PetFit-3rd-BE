@@ -13,13 +13,20 @@ import org.springframework.context.annotation.Configuration;
 public class JobConfig {
     private final Step todayRoutineSaveStep;
     private final Step sendUpdateCompleteEmailStep;
+    private final Step todaySlotHistorySaveStep;
 
     @Bean
     public Job todayRoutineSaveJob(JobRepository jobRepository) {
-        // Job 정의 및 설정을 여기에 추가합니다.
         return new JobBuilder("todayRoutineSaveJob", jobRepository)
                 .start(todayRoutineSaveStep)
                 .next(sendUpdateCompleteEmailStep)
+                .build();
+    }
+
+    @Bean
+    public Job todaySlotHistorySaveJob(JobRepository jobRepository) {
+        return new JobBuilder("todaySlotSaveJob", jobRepository)
+                .start(todaySlotHistorySaveStep)
                 .build();
     }
 }

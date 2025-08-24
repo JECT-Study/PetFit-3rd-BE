@@ -2,19 +2,36 @@ package ject.petfit.domain.slot.service;
 
 import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.slot.entity.Slot;
+import ject.petfit.domain.slot.entity.SlotHistory;
 import ject.petfit.domain.slot.exception.SlotErrorCode;
 import ject.petfit.domain.slot.exception.SlotException;
+import ject.petfit.domain.slot.repository.SlotHistoryRepository;
 import ject.petfit.domain.slot.repository.SlotRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class SlotQueryService {
     private final SlotRepository slotRepository;
+    private final SlotHistoryRepository slotHistoryRepository;
+
+    public Optional<SlotHistory> getSlotHistoryOptional(Pet pet, LocalDate localDate) {
+        return slotHistoryRepository.findSlotHistoryByPetAndRecordDate(pet, localDate);
+    }
+
+    public int countSlotHistoriesByDate(LocalDate localDate) {
+        return slotHistoryRepository.countByRecordDate(localDate);
+    }
+
+    public Optional<Slot> getSlotOptional(Pet pet) {
+        return slotRepository.findByPet(pet);
+    }
 
     public Slot getSlotOrThrow(Pet pet) {
         return slotRepository.findByPet(pet)
