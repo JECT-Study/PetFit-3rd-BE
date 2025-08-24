@@ -14,12 +14,7 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @ToString
-@Table(
-        name = "slot_history",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"slot_id", "pet_id"})
-        }
-)
+@Table(name = "slot_history")
 public class SlotHistory extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,10 +44,6 @@ public class SlotHistory extends BaseTime {
     private Integer feedAmount;        // 사료 목표량
     private Integer waterAmount;       // 음수 목표량
     private Integer walkAmount;        // 산책 목표량
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "slot_id")
-    private Slot slot;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pet_id")

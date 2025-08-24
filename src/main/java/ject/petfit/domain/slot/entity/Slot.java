@@ -45,9 +45,6 @@ public class Slot {
     @JoinColumn(name = "pet_id")
     private Pet pet;
 
-    @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SlotHistory> slotHistories;
-
     public void updateFeedActivated(boolean activated) {
         this.feedActivated = activated;
     }
