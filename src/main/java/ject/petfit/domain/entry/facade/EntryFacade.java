@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,12 +49,7 @@ public class EntryFacade {
         Optional<Entry> entry = entryQueryService.getEntryOptional(pet, date);
 
         // getDailyRoutines의 오늘/과거 날짜에 따른 루틴 조회 로직을 재사용
-        List<RoutineResponse> routineResponseList = new ArrayList<>();
-        if (date.isEqual(LocalDate.now())) {
-            routineResponseList = routineQueryService.getTodayRoutines(entry, pet.getSlot());
-        }else if( date.isBefore(LocalDate.now())) {
-            routineResponseList = routineQueryService.getPastRoutines(entry);
-        }
+        List<RoutineResponse> routineResponseList = routineQueryService.getDailyRoutines(pet, entry, date);
 
         // entry가 없는 경우 특이사항 X, 루틴 리스트 없거나(과거) 모두 Unchecked(오늘)로 응답
         // entry가 있는 경우 해당 entry의 특이사항들과 루틴 리스트 응답

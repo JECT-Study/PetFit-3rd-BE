@@ -9,14 +9,12 @@ import ject.petfit.domain.pet.exception.PetErrorCode;
 import ject.petfit.domain.pet.exception.PetException;
 import ject.petfit.domain.pet.repository.PetRepository;
 import ject.petfit.domain.pet.service.PetQueryService;
-import ject.petfit.domain.routine.dto.response.RoutineResponse;
 import ject.petfit.domain.routine.entity.Routine;
 import ject.petfit.domain.routine.enums.RoutineStatus;
 import ject.petfit.domain.routine.repository.RoutineRepository;
 import ject.petfit.domain.routine.service.RoutineQueryService;
 import ject.petfit.domain.slot.entity.Slot;
 import ject.petfit.domain.slot.service.SlotQueryService;
-import ject.petfit.global.dev.dto.EntryFlushResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -115,22 +113,22 @@ public class DevService {
 
     }
 
-    public EntryFlushResponse getEntryFlushResponse(Long petId, LocalDate entryDate) {
-        Pet pet = petQueryService.getPetOrThrow(petId);
-        Optional<Entry> entry = entryQueryService.getEntryOptional(pet, entryDate);
-        Boolean routineIsCompleted = true;
-        if (entry.isEmpty()) {
-            routineIsCompleted = false;
-        }
-
-        List<String> activatedSlotList = slotQueryService.getActivatedSlotCategories(pet.getSlot());
-        List<RoutineResponse> routineResponseList = entryDate.equals(LocalDate.now()) ?
-                routineQueryService.getTodayRoutines(entry, pet.getSlot()) :
-                routineQueryService.getPastRoutines(entry);
-
-        return EntryFlushResponse.builder()
-                .routineIsCompleted(routineIsCompleted)
-                .routineResponseList(routineResponseList)
-                .build();
-    }
+//    public EntryFlushResponse getEntryFlushResponse(Long petId, LocalDate entryDate) {
+//        Pet pet = petQueryService.getPetOrThrow(petId);
+//        Optional<Entry> entry = entryQueryService.getEntryOptional(pet, entryDate);
+//        Boolean routineIsCompleted = true;
+//        if (entry.isEmpty()) {
+//            routineIsCompleted = false;
+//        }
+//
+//        List<String> activatedSlotList = slotQueryService.getActivatedSlotCategories(pet.getSlot());
+//        List<RoutineResponse> routineResponseList = entryDate.equals(LocalDate.now()) ?
+//                routineQueryService.getTodayRoutines(entry, pet.getSlot()) :
+//                routineQueryService.getPastRoutines(entry);
+//
+//        return EntryFlushResponse.builder()
+//                .routineIsCompleted(routineIsCompleted)
+//                .routineResponseList(routineResponseList)
+//                .build();
+//    }
 }
