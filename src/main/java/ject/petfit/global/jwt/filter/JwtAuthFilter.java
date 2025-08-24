@@ -37,17 +37,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // 인증이 필요 없는 엔드포인트는 토큰 체크 건너뛰기
         String uri = request.getRequestURI();
         String method = request.getMethod();
-        log.info("=== JWT Filter Start ===");
-        log.info("Request Method: {}, URI: {}", method, uri);
+//        log.info("=== JWT Filter Start ===");
+//        log.info("Request Method: {}, URI: {}", method, uri);
         
         // URI 체크 로직 디버깅
         boolean shouldSkip = shouldSkipJwtCheck(uri);
-        log.info("URI: '{}', shouldSkip: {}", uri, shouldSkip);
+//        log.info("URI: '{}', shouldSkip: {}", uri, shouldSkip);
         
         // 인증이 필요 없는 엔드포인트 체크를 가장 먼저 수행
         if (shouldSkip) {
-            log.info("✅ Skipping JWT check for URI: {}", uri);
-            log.info("=== JWT Filter End (Skipped) ===");
+//            log.info("✅ Skipping JWT check for URI: {}", uri);
+//            log.info("=== JWT Filter End (Skipped) ===");
             filterChain.doFilter(request, response);
             return;
         }
@@ -82,7 +82,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 //                                    userDetails, null, userDetails.getAuthorities()
 //                            );
 //                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                    log.info("Authentication set successfully for user: {}", email);
+//                    log.info("Authentication set successfully for user: {}", email);
                 } else {
                     log.warn("Token is invalid");
                     throw new TokenException(TokenErrorCode.AUTH_INVALID_TOKEN);
@@ -134,7 +134,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 uri.startsWith("/resources/") ||
                 uri.startsWith("/token");
 
-        log.info("Final result: {}", result);
+//        log.info("Final result: {}", result);
         return result;
     }
 }
