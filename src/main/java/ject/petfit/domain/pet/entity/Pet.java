@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import ject.petfit.domain.entry.entity.Entry;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.slot.entity.Slot;
+import ject.petfit.domain.slot.entity.SlotHistory;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,6 +49,9 @@ public class Pet {
 
     @OneToOne(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
     private Slot slot;
+
+    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SlotHistory> slotHistories;
 
     @Builder
     public Pet(String name, String type, String gender, LocalDate birthDate, boolean isFavorite) {
