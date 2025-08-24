@@ -1,23 +1,32 @@
 package ject.petfit.domain.slot.entity;
 
 import jakarta.persistence.*;
-import ject.petfit.domain.slot.dto.request.SlotRequest;
-import lombok.*;
 import ject.petfit.domain.pet.entity.Pet;
+import ject.petfit.domain.slot.dto.request.SlotRequest;
+import ject.petfit.global.common.BaseTime;
+import lombok.*;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-@Table(name = "slot")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
 @ToString
-public class Slot {
+@Table(
+        name = "slot_history",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"slot_id", "pet_id"})
+        }
+)
+public class SlotHistory extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long slotId;
+    private Long slotHistoryId;
+
+    @Column(nullable = false)
+    private LocalDate recordDate;       // 기록 날짜
 
     @Column(nullable = false)
     private boolean feedActivated;     // 사료 슬롯 활성화 여부
@@ -41,12 +50,13 @@ public class Slot {
     private Integer waterAmount;       // 음수 목표량
     private Integer walkAmount;        // 산책 목표량
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "slot_id")
+    private Slot slot;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pet_id")
     private Pet pet;
-
-    @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SlotHistory> slotHistories;
 
     public void updateFeedActivated(boolean activated) {
         this.feedActivated = activated;
@@ -75,7 +85,6 @@ public class Slot {
     public void updateWalkAmount(Integer amount) {
         this.walkAmount = amount;
     }
-
 
     public void updateSlot(SlotRequest request) {
         // 활성화 여부
