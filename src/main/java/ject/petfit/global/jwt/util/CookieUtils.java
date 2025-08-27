@@ -17,9 +17,9 @@ import org.springframework.stereotype.Component;
 public class CookieUtils {
 
     @Value("${app.front.domain}")
-    private static String frontDomain;
+    private String frontDomain;
 
-    public static void addCookie(String name, String value, HttpServletResponse response) {
+    public void addCookie(String name, String value, HttpServletResponse response) {
         Cookie cookie = new Cookie(name, value);
         cookie.setSecure(true);
         cookie.setDomain(frontDomain);
@@ -46,16 +46,7 @@ public class CookieUtils {
         }
     }
 
-    public static Cookie createCookie(String name, String value) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setSecure(true);
-        cookie.setDomain(frontDomain);
-        cookie.setPath("/");
-        cookie.setMaxAge(7 * 24 * 60 * 60);
-        return cookie;
-    }
-
-    public static ResponseCookie createTokenCookie(String name, String value) {
+    public ResponseCookie createTokenCookie(String name, String value) {
         ResponseCookie cookie = ResponseCookie.from(name, value)
                 .secure(true)
                 .domain(frontDomain)
@@ -66,7 +57,7 @@ public class CookieUtils {
         return cookie;
     }
 
-    public static ResponseCookie deleteTokenCookie(String name) {
+    public ResponseCookie deleteTokenCookie(String name) {
         return ResponseCookie.from(name, "")
                 .secure(true)
                 .domain(frontDomain)
@@ -76,26 +67,5 @@ public class CookieUtils {
                 .build();
     }
 
-    public static Cookie deleteCookieByName(String name) {
-        Cookie cookie = new Cookie(name, null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        return cookie;
-    }
-
-    public static String getCookieValue(HttpServletRequest req, String name) {
-        return Optional
-                .ofNullable(req.getCookies())
-                .flatMap(cookies ->
-                        Arrays.stream(cookies)
-                                .filter(cookie -> cookie.getName().equals(name))
-                                .map(Cookie::getValue)
-                                .filter(value -> !value.isBlank())
-                                .findFirst()
-                )
-                .orElse(null);
-    }
 }
 
