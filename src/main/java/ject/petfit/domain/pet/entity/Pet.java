@@ -67,12 +67,11 @@ public class Pet {
     }
 
 
-    public void updatePet(String name, String type, String gender, LocalDate birthDate, Boolean isFavorite) {
+    public void updatePet(String name, String type, String gender, LocalDate birthDate) {
         this.name = name;
         this.type = type;
         this.gender = gender;
         this.birthDate = birthDate;
-        this.isFavorite = isFavorite;
     }
 
     public void updateIsFavorite(Boolean isFavorite) {

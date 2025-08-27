@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import ject.petfit.domain.pet.dto.request.PetFavoriteRequestDto;
 import ject.petfit.domain.pet.dto.request.PetRequestDto;
+import ject.petfit.domain.pet.dto.request.PetUpdateRequestDto;
 import ject.petfit.domain.pet.dto.response.PetFavoriteResponseDto;
 import ject.petfit.domain.pet.dto.response.PetListResponseDto;
 import ject.petfit.domain.pet.dto.response.PetResponseDto;
@@ -78,9 +79,9 @@ public class PetController {
     @Operation(summary = "동물 정보 수정", description = "반려동물 ID로 반려동물 정보 수정")
     public ResponseEntity<ApiResponse<PetResponseDto>> updatePet(
             @PathVariable Long petId,
-            @Valid @RequestBody PetRequestDto petDto
+            @Valid @RequestBody PetUpdateRequestDto petUpdateRequestDto
     ) {
-        PetResponseDto updatedPet = petService.updatePet(petId, petDto);
+        PetResponseDto updatedPet = petService.updatePet(petId, petUpdateRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.success(updatedPet)
         );
