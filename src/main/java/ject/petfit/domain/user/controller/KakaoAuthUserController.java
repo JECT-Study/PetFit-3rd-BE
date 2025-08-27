@@ -3,11 +3,8 @@ package ject.petfit.domain.user.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ject.petfit.domain.user.converter.AuthUserConverter;
 import ject.petfit.domain.user.dto.request.WithdrawAuthUserRequestDto;
 import ject.petfit.domain.user.dto.response.AuthUserIsNewResponseDto;
-import ject.petfit.domain.user.dto.response.AuthUserResponseDto;
-import ject.petfit.domain.user.dto.response.AuthUserSimpleResponseDto;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.service.AuthUserService;
 import ject.petfit.global.common.ApiResponse;
@@ -26,7 +23,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -43,7 +39,6 @@ public class KakaoAuthUserController {
     private final RefreshTokenService refreshTokenService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtUtil jwtUtil;
-    private final CookieUtils cookieUtils;
 
     @Value("${spring.jwt.refresh-token-validity-seconds}")
     private long refreshTokenValiditySeconds;
@@ -100,8 +95,8 @@ public class KakaoAuthUserController {
         refreshTokenService.findTokenByCookie(refreshToken)
                 .ifPresent(refreshTokenRepository::delete);
         // 클라이언트 정리 지시
-        ResponseCookie accessCookie = cookieUtils.deleteTokenCookie("access_token");
-        ResponseCookie refreshCookie = cookieUtils.deleteTokenCookie("refresh_token");
+        ResponseCookie accessCookie = CookieUtils.deleteTokenCookie("access_token");
+        ResponseCookie refreshCookie = CookieUtils.deleteTokenCookie("refresh_token");
 
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
@@ -152,8 +147,8 @@ public class KakaoAuthUserController {
         authUserService.withdraw(user.getId(), refreshToken);
 
 
-        ResponseCookie accessCookie = cookieUtils.deleteTokenCookie("access_token");
-        ResponseCookie refreshCookie = cookieUtils.deleteTokenCookie("refresh_token");
+        ResponseCookie accessCookie = CookieUtils.deleteTokenCookie("access_token");
+        ResponseCookie refreshCookie = CookieUtils.deleteTokenCookie("refresh_token");
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
@@ -180,8 +175,8 @@ public class KakaoAuthUserController {
         AuthUserIsNewResponseDto isNewResponseDto = authUserService.isNewUserFromRefreshToken(refreshToken);
 
         // SameSite=None이 적용된 쿠키 생성
-        ResponseCookie accessCookie = cookieUtils.createTokenCookie("access_token", accessToken);
-        ResponseCookie refreshCookie = cookieUtils.createTokenCookie("refresh_token", refreshToken);
+        ResponseCookie accessCookie = CookieUtils.createTokenCookie("access_token", accessToken);
+        ResponseCookie refreshCookie = CookieUtils.createTokenCookie("refresh_token", refreshToken);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .header("Authorization", "Bearer " + accessToken)
