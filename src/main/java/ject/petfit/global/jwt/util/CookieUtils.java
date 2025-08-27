@@ -16,8 +16,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class CookieUtils {
 
+
     @Value("${app.front.domain}")
     private static String domain;
+
 
     public static ResponseCookie createTokenCookie(String name, String value) {
         ResponseCookie cookie = ResponseCookie.from(name, value)
