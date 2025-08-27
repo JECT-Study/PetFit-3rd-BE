@@ -12,6 +12,7 @@ import ject.petfit.domain.member.exception.MemberException;
 import ject.petfit.domain.member.repository.MemberRepository;
 import ject.petfit.domain.pet.dto.request.PetFavoriteRequestDto;
 import ject.petfit.domain.pet.dto.request.PetRequestDto;
+import ject.petfit.domain.pet.dto.request.PetUpdateRequestDto;
 import ject.petfit.domain.pet.dto.response.PetFavoriteResponseDto;
 import ject.petfit.domain.pet.dto.response.PetListResponseDto;
 import ject.petfit.domain.pet.dto.response.PetResponseDto;
@@ -75,11 +76,11 @@ public class PetService {
     }
 
     @Transactional
-    public PetResponseDto updatePet(Long petId, PetRequestDto petDto) {
+    public PetResponseDto updatePet(Long petId, PetUpdateRequestDto petUpdateRequestDto) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
 
-        Member member = memberRepository.findById(petDto.getMemberId())
+        Member member = memberRepository.findById(petUpdateRequestDto.getMemberId())
                 .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         if (!pet.getMember().equals(member)) {
@@ -87,12 +88,12 @@ public class PetService {
         }
 
         pet.updatePet(
-                petDto.getName(),
-                petDto.getType(),
-                petDto.getGender(),
-                petDto.getBirthDate(),
-                petDto.getIsFavorite()
+                petUpdateRequestDto.getName(),
+                petUpdateRequestDto.getType(),
+                petUpdateRequestDto.getGender(),
+                petUpdateRequestDto.getBirthDate()
         );
+
         Pet updatedPet = petRepository.save(pet);
         return new PetResponseDto(updatedPet.getId(), updatedPet.getName(), updatedPet.getType(),
                 updatedPet.getGender(), updatedPet.getBirthDate(), updatedPet.getIsFavorite());
