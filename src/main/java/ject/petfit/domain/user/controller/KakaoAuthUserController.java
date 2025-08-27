@@ -43,6 +43,7 @@ public class KakaoAuthUserController {
     private final RefreshTokenService refreshTokenService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtUtil jwtUtil;
+    private final CookieUtils cookieUtils;
 
     @Value("${spring.jwt.refresh-token-validity-seconds}")
     private long refreshTokenValiditySeconds;
@@ -99,8 +100,8 @@ public class KakaoAuthUserController {
         refreshTokenService.findTokenByCookie(refreshToken)
                 .ifPresent(refreshTokenRepository::delete);
         // 클라이언트 정리 지시
-        ResponseCookie accessCookie = CookieUtils.deleteTokenCookie("access_token");
-        ResponseCookie refreshCookie = CookieUtils.deleteTokenCookie("refresh_token");
+        ResponseCookie accessCookie = cookieUtils.deleteTokenCookie("access_token");
+        ResponseCookie refreshCookie = cookieUtils.deleteTokenCookie("refresh_token");
 
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
@@ -151,8 +152,8 @@ public class KakaoAuthUserController {
         authUserService.withdraw(user.getId(), refreshToken);
 
 
-        ResponseCookie accessCookie = CookieUtils.deleteTokenCookie("access_token");
-        ResponseCookie refreshCookie = CookieUtils.deleteTokenCookie("refresh_token");
+        ResponseCookie accessCookie = cookieUtils.deleteTokenCookie("access_token");
+        ResponseCookie refreshCookie = cookieUtils.deleteTokenCookie("refresh_token");
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
@@ -179,8 +180,8 @@ public class KakaoAuthUserController {
         AuthUserIsNewResponseDto isNewResponseDto = authUserService.isNewUserFromRefreshToken(refreshToken);
 
         // SameSite=None이 적용된 쿠키 생성
-        ResponseCookie accessCookie = CookieUtils.createTokenCookie("access_token", accessToken);
-        ResponseCookie refreshCookie = CookieUtils.createTokenCookie("refresh_token", refreshToken);
+        ResponseCookie accessCookie = cookieUtils.createTokenCookie("access_token", accessToken);
+        ResponseCookie refreshCookie = cookieUtils.createTokenCookie("refresh_token", refreshToken);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .header("Authorization", "Bearer " + accessToken)
