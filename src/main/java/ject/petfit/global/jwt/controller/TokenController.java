@@ -50,7 +50,8 @@ public class TokenController {
             String email = jwtUtil.getEmailFromExpiredToken(expiredAccessToken);
             AuthUser authUser = refreshTokenService.validateRefreshToken(refreshToken, email);
             
-            String newAccessToken = jwtUtil.createAccessToken(authUser.getEmail(), authUser.getMember().getRole().name());
+            String newAccessToken = jwtUtil.createAccessToken(
+                    authUser.getEmail(), authUser.getMember().getRole().name(), authUser.getMember().getId());
             String newRefreshToken = refreshTokenService.createOrUpdateRefreshToken(authUser, UUID.randomUUID().toString(),
                     refreshTokenValiditySeconds).getToken();
     
