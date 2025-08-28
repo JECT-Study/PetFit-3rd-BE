@@ -1,15 +1,11 @@
 package ject.petfit.global.jwt.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import ject.petfit.domain.user.dto.response.AuthUserTokenResponseDto;
+
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.service.AuthUserService;
 import ject.petfit.global.common.ApiResponse;
-import ject.petfit.global.jwt.dto.RefreshTokenRequestDto;
 import ject.petfit.global.jwt.dto.ReissueTokenResponseDto;
 import ject.petfit.global.jwt.refreshtoken.service.RefreshTokenService;
-import ject.petfit.global.jwt.util.CookieUtils;
 import ject.petfit.global.jwt.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
