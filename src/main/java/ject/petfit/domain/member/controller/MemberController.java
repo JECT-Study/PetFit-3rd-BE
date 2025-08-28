@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import ject.petfit.domain.member.dto.request.MemberRequestDto;
 import ject.petfit.domain.member.dto.response.MemberResponseDto;
-import ject.petfit.domain.member.service.MemberService;
+import ject.petfit.domain.member.facade.MemberFacade;
 import ject.petfit.global.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MemberController {
 
-    private final MemberService memberService;
+    private final MemberFacade memberFacade;
 
     @GetMapping("/{memberId}")
     @Operation(summary = "마이페이지 닉네임 조회", description = "회원 ID로 닉네임 조회")
     public ResponseEntity<ApiResponse<MemberResponseDto>> getMemberById(@PathVariable Long memberId) {
-        MemberResponseDto member = memberService.getMemberById(memberId);
+        log.info("Controller: Getting member by ID: {}", memberId);
+        MemberResponseDto member = memberFacade.getMemberById(memberId);
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.success(member)
         );
@@ -37,9 +38,10 @@ public class MemberController {
 
     @PutMapping("/{memberId}")
     @Operation(summary = "마이페이지 닉네임 수정", description = "회원 ID로 닉네임 수정")
-    public ResponseEntity<ApiResponse<MemberResponseDto>> editMemberNickNameById(@PathVariable Long memberId,
-                                                                    @Valid @RequestBody MemberRequestDto memberRequestDto) {
-        MemberResponseDto editedMember = memberService.editMember(memberId, memberRequestDto);
+    public ResponseEntity<ApiResponse<MemberResponseDto>> editMemberNickNameById(
+            @PathVariable Long memberId,
+            @Valid @RequestBody MemberRequestDto command) {
+        MemberResponseDto editedMember = memberFacade.updateMember(memberId, command);
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.success(editedMember)
         );
