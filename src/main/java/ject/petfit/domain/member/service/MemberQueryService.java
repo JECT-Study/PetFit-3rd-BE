@@ -1,6 +1,6 @@
 package ject.petfit.domain.member.service;
 
-import ject.petfit.domain.member.dto.response.MemberQueryResponse;
+
 import ject.petfit.domain.member.dto.response.MemberResponseDto;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.member.exception.MemberErrorCode;
