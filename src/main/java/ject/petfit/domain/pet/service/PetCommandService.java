@@ -1,11 +1,6 @@
 package ject.petfit.domain.pet.service;
 
-
 import jakarta.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.member.exception.MemberErrorCode;
 import ject.petfit.domain.member.exception.MemberException;
@@ -14,7 +9,6 @@ import ject.petfit.domain.pet.dto.request.PetFavoriteRequestDto;
 import ject.petfit.domain.pet.dto.request.PetRequestDto;
 import ject.petfit.domain.pet.dto.request.PetUpdateRequestDto;
 import ject.petfit.domain.pet.dto.response.PetFavoriteResponseDto;
-import ject.petfit.domain.pet.dto.response.PetListResponseDto;
 import ject.petfit.domain.pet.dto.response.PetResponseDto;
 import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.pet.exception.PetErrorCode;
@@ -25,18 +19,20 @@ import ject.petfit.domain.user.exception.AuthUserErrorCode;
 import ject.petfit.domain.user.exception.AuthUserException;
 import ject.petfit.domain.user.repository.AuthUserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-// Facade Pattern + CQRS Pattern 도입으로 사용하지는 않으나 유지
+import java.util.ArrayList;
+import java.util.List;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
-public class PetService {
+public class PetCommandService {
+
     private final AuthUserRepository authUserRepository;
     private final PetRepository petRepository;
     private final MemberRepository memberRepository;
-
 
     @Transactional
     public PetResponseDto createPet(PetRequestDto petDto, Long authUserId) {
@@ -52,25 +48,9 @@ public class PetService {
         pet.setMember(member);
 
         Pet savedPet = petRepository.save(pet);
+        
         return new PetResponseDto(savedPet.getId(), savedPet.getName(), savedPet.getType(), savedPet.getGender(),
                 savedPet.getBirthDate(), savedPet.getIsFavorite());
-    }
-
-    public PetResponseDto getPetById(Long petId) {
-        Pet pet = petRepository.findById(petId)
-                .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
-        return new PetResponseDto(pet.getId(), pet.getName(), pet.getType(), pet.getGender(),
-                pet.getBirthDate(), pet.getIsFavorite());
-    }
-
-    public List<PetListResponseDto> getAllPets(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
-
-        return petRepository.findByMember(member)
-                .stream()
-                .map(p -> new PetListResponseDto(p.getId(), p.getName(), p.getType(), p.getIsFavorite()))
-                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -93,10 +73,10 @@ public class PetService {
         );
 
         Pet updatedPet = petRepository.save(pet);
+        
         return new PetResponseDto(updatedPet.getId(), updatedPet.getName(), updatedPet.getType(),
                 updatedPet.getGender(), updatedPet.getBirthDate(), updatedPet.getIsFavorite());
     }
-
 
     @Transactional
     public void deletePet(Long petId) {
@@ -129,8 +109,7 @@ public class PetService {
             pet.updateIsFavorite(false);
             petRepository.save(pet);
         }
-        
+
         return petFavoriteResponseDtos;
     }
-}
-
+} 
