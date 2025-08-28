@@ -12,6 +12,7 @@ import ject.petfit.domain.user.entity.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+// Facade Pattern + CQRS Pattern 도입으로 사용하지는 않으나 유지
 @Service
 @RequiredArgsConstructor
 public class MemberService {
