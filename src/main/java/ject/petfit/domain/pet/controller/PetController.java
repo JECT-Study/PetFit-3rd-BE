@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -60,10 +61,12 @@ public class PetController {
     }
 
     // Read (List of Pets)
-    @GetMapping("/list/{memberId}")
+    @GetMapping("/list")
     @Operation(summary = "모든 동물 정보 조회", description = "한 사용자의 모든 반려동물 정보 조회")
-    public ResponseEntity<ApiResponse<List<PetListResponseDto>>> getAllPets(@PathVariable Long memberId) {
-        List<PetListResponseDto> pets = petFacade.getAllPets(memberId);
+    public ResponseEntity<ApiResponse<List<PetListResponseDto>>> getAllPets(
+            @CookieValue (name = "access_token", required = false) String accessToken
+    ) {
+        List<PetListResponseDto> pets = petFacade.getAllPets(accessToken);
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.success(pets)
         );

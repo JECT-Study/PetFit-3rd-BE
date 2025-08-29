@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -26,22 +27,23 @@ public class MemberController {
 
     private final MemberFacade memberFacade;
 
-    @GetMapping("/{memberId}")
+    @GetMapping
     @Operation(summary = "마이페이지 닉네임 조회", description = "회원 ID로 닉네임 조회")
-    public ResponseEntity<ApiResponse<MemberResponseDto>> getMemberById(@PathVariable Long memberId) {
-        log.info("Controller: Getting member by ID: {}", memberId);
-        MemberResponseDto member = memberFacade.getMemberById(memberId);
+    public ResponseEntity<ApiResponse<MemberResponseDto>> getMemberById(
+            @CookieValue (name = "access_token", required = false) String accessToken
+    ) {
+        MemberResponseDto member = memberFacade.getMemberByAccessToken(accessToken);
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.success(member)
         );
     }
 
-    @PutMapping("/{memberId}")
+    @PutMapping
     @Operation(summary = "마이페이지 닉네임 수정", description = "회원 ID로 닉네임 수정")
     public ResponseEntity<ApiResponse<MemberResponseDto>> editMemberNickNameById(
-            @PathVariable Long memberId,
+            @CookieValue (name = "access_token", required = false) String accessToken,
             @Valid @RequestBody MemberRequestDto command) {
-        MemberResponseDto editedMember = memberFacade.updateMember(memberId, command);
+        MemberResponseDto editedMember = memberFacade.updateMember(accessToken, command);
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.success(editedMember)
         );
