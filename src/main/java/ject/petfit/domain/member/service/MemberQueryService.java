@@ -6,6 +6,7 @@ import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.member.exception.MemberErrorCode;
 import ject.petfit.domain.member.exception.MemberException;
 import ject.petfit.domain.member.repository.MemberRepository;
+import ject.petfit.global.jwt.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,9 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberQueryService {
 
     private final MemberRepository memberRepository;
+    private final JwtUtil jwtUtil;
 
-    public MemberResponseDto getMemberById(Long memberId) {
-        
+    public MemberResponseDto getMemberByAccessToken(String accessToken) {
+        Long memberId = jwtUtil.getMemberId(accessToken);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 

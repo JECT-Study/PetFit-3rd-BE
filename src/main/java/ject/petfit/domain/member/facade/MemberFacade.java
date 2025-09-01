@@ -16,15 +16,15 @@ public class MemberFacade {
     private final MemberCommandService memberCommandService;
     private final MemberQueryService memberQueryService;
 
-    public MemberResponseDto getMemberById(Long memberId) {
-        return memberQueryService.getMemberById(memberId);
+    public MemberResponseDto getMemberByAccessToken(String accessToken) {
+        return memberQueryService.getMemberByAccessToken(accessToken);
     }
 
     public MemberResponseDto getMemberByEmail(String email) {
         return memberQueryService.getMemberByAuthUserEmail(email);
     }
 
-    public MemberResponseDto updateMember(Long memberId, MemberRequestDto command) {
-        return memberCommandService.updateMember(memberId, command);
+    public MemberResponseDto updateMember(String accessToken, MemberRequestDto command) {
+        return memberCommandService.updateMember(accessToken, command);
     }
 } 
