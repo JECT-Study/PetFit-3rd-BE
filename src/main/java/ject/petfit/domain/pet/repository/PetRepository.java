@@ -1,12 +1,8 @@
 package ject.petfit.domain.pet.repository;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.pet.entity.Pet;
-import ject.petfit.domain.user.entity.AuthUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -30,4 +26,5 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
     @Modifying
     @Query("UPDATE Pet p SET p.isFavorite = :isFavorite WHERE p.id = :petId")
     void updatePetFavoriteById(@Param("petId") Long petId, @Param("isFavorite") Boolean isFavorite);
+
 }

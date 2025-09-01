@@ -47,9 +47,11 @@ public class PetQueryService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        return petRepository.findByMember(member)
+        List<PetListResponseDto> pets = petRepository.findByMemberId(member.getId())
                 .stream()
                 .map(p -> new PetListResponseDto(p.getId(), p.getName(), p.getType(), p.getIsFavorite()))
                 .collect(Collectors.toList());
+
+        return pets;
     }
 }
