@@ -67,7 +67,7 @@ public class PetService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        return petRepository.findByMember(member)
+        return petRepository.findByMemberId(member.getId())
                 .stream()
                 .map(p -> new PetListResponseDto(p.getId(), p.getName(), p.getType(), p.getIsFavorite()))
                 .collect(Collectors.toList());
@@ -114,7 +114,7 @@ public class PetService {
 
         if (Boolean.TRUE.equals(dto.getIsFavorite())) {
             // 해당 멤버의 모든 펫을 false로 설정
-            List<Pet> memberPets = petRepository.findByMember(pet.getMember());
+            List<Pet> memberPets = petRepository.findByMemberId(pet.getMember().getId());
             for (Pet memberPet : memberPets) {
                 memberPet.updateIsFavorite(false);
                 petFavoriteResponseDtos.add(new PetFavoriteResponseDto(memberPet.getId(), memberPet.getIsFavorite()));
