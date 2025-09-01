@@ -45,7 +45,8 @@ public class DevController {
         AuthUser authUser = authUserRepository.findById(testId)
                 .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.USER_NOT_FOUND));
 
-        String newAccessToken = jwtUtil.createAccessToken(authUser.getEmail(), authUser.getMember().getRole().name());
+        String newAccessToken = jwtUtil.createAccessToken(
+                authUser.getEmail(), authUser.getMember().getRole().name(), authUser.getMember().getId());
         String newRefreshToken = refreshTokenService.createOrUpdateRefreshToken(authUser, UUID.randomUUID().toString(),
                 refreshTokenValiditySeconds).getToken();
 

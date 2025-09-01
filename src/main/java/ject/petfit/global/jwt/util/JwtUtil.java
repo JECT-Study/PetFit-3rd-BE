@@ -48,17 +48,18 @@ public class JwtUtil {
         return token.isEmpty() ? null : token;
     }
 
-    public String createAccessToken(String email, String role) {
-        return createToken(email, role, accessTokenValidityMilliseconds);
+    public String createAccessToken(String email, String role, Long memberId) {
+        return createToken(email, role, memberId, accessTokenValidityMilliseconds);
     }
 
-    private String createToken(String email, String role, long validityMilliseconds) {
+    private String createToken(String email, String role, Long memberId, long validityMilliseconds) {
         ZonedDateTime now = ZonedDateTime.now();
         ZonedDateTime expiration = now.plusSeconds(validityMilliseconds / 1000);
 
         return Jwts.builder()
                 .setSubject(email)
                 .claim("role", role)
+                .claim("memberId", memberId)
                 .setIssuer(issuer)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenValidityMilliseconds))
@@ -68,6 +69,10 @@ public class JwtUtil {
 
     public String getEmail(String token) {
         return getClaims(token).getBody().getSubject();
+    }
+
+    public Long getMemberId(String token) {
+        return getClaims(token).getBody().get("memberId", Long.class);
     }
 
     public boolean isTokenValid(String token) {
