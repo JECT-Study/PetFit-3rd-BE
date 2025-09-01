@@ -64,11 +64,16 @@ public class PetService {
     }
 
     public List<PetListResponseDto> getAllPets(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
-
-        return petRepository.findByMemberId(member.getId())
-                .stream()
+        // 한 번의 쿼리로 모든 데이터 조회 (N+1 해결)
+        List<Pet> pets = petRepository.findByMemberIdWithMember(memberId);
+        
+        if (pets.isEmpty()) {
+            // 멤버가 존재하지 않는 경우 체크
+            memberRepository.findById(memberId)
+                    .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+        }
+        
+        return pets.stream()
                 .map(p -> new PetListResponseDto(p.getId(), p.getName(), p.getType(), p.getIsFavorite()))
                 .collect(Collectors.toList());
     }
@@ -107,27 +112,28 @@ public class PetService {
 
     @Transactional
     public List<PetFavoriteResponseDto> updateFavoriteBatch(PetFavoriteRequestDto dto) {
-        Pet pet = petRepository.findById(dto.getPetId())
+        // 1. 요청된 펫이 존재하는지 확인하고 멤버 ID 가져오기
+        Pet targetPet = petRepository.findById(dto.getPetId())
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
-
+        
+        Long memberId = targetPet.getMember().getId();
         List<PetFavoriteResponseDto> petFavoriteResponseDtos = new ArrayList<>();
 
         if (Boolean.TRUE.equals(dto.getIsFavorite())) {
-            // 해당 멤버의 모든 펫을 false로 설정
-            List<Pet> memberPets = petRepository.findByMemberId(pet.getMember().getId());
-            for (Pet memberPet : memberPets) {
-                memberPet.updateIsFavorite(false);
-                petFavoriteResponseDtos.add(new PetFavoriteResponseDto(memberPet.getId(), memberPet.getIsFavorite()));
-            }
-            
-            // 요청된 펫만 true로 설정
-            pet.updateIsFavorite(true);
-            petFavoriteResponseDtos.add(new PetFavoriteResponseDto(pet.getId(), pet.getIsFavorite()));
-            
-            petRepository.saveAll(memberPets);
+
+            petRepository.updateAllPetsFavoriteByMemberId(memberId, false);
+
+            petRepository.updatePetFavoriteById(dto.getPetId(), true);
+
+            List<Pet> updatedPets = petRepository.findByMemberId(memberId);
+
+            petFavoriteResponseDtos = updatedPets.stream()
+                    .map(pet -> new PetFavoriteResponseDto(pet.getId(), pet.getIsFavorite()))
+                    .collect(Collectors.toList());
         } else {
-            pet.updateIsFavorite(false);
-            petRepository.save(pet);
+            petRepository.updatePetFavoriteById(dto.getPetId(), false);
+            
+            petFavoriteResponseDtos.add(new PetFavoriteResponseDto(dto.getPetId(), false));
         }
         
         return petFavoriteResponseDtos;

@@ -3,11 +3,12 @@ package ject.petfit.domain.user.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.concurrent.CompletableFuture;
 import ject.petfit.domain.user.dto.response.AuthUserIsNewResponseDto;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.service.AuthUserService;
 import ject.petfit.global.common.ApiResponse;
-import ject.petfit.global.jwt.dto.RefreshTokenRequestDto;
+import ject.petfit.global.jwt.dto.AccessTokenRequestDto;
 import ject.petfit.global.jwt.refreshtoken.RefreshToken;
 import ject.petfit.global.jwt.refreshtoken.repository.RefreshTokenRepository;
 import ject.petfit.global.jwt.refreshtoken.service.RefreshTokenService;
@@ -89,18 +90,17 @@ public class KakaoAuthUserController {
     public ResponseEntity<ApiResponse<?>> logout(
          @CookieValue(name = "access_token", required = false) String accessToken) {
 
-        authUserService.logout(accessToken);
-
-        Long memberId = jwtUtil.getMemberId(accessToken);
-        AuthUser user = authUserService.loadAuthUserByEmail(memberId);
-
-        RefreshToken refreshToken = user.getRefreshToken();
-
-        // 리프레시 토큰 무효화
-        refreshTokenService.findTokenByCookie(refreshToken.toString())
-                .ifPresent(refreshTokenRepository::delete);
-        // 클라이언트 정리 지시
+        // 즉시 쿠키 삭제 응답
         ResponseCookie accessCookie = CookieUtils.deleteTokenCookie("access_token");
+
+        // 백그라운드에서 카카오 API 호출 및 DB 정리
+        CompletableFuture.runAsync(() -> {
+            try {
+                authUserService.logoutAsync(accessToken);
+            } catch (Exception e) {
+                log.error("Background logout failed: {}", e.getMessage());
+            }
+        });
 
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
@@ -112,10 +112,16 @@ public class KakaoAuthUserController {
     @PostMapping("/kakao/logout/dev")
     @Operation(summary = "카카오 로그아웃 (개발용)", description = "개발 환경에서 카카오 로그아웃 후 쿠키를 삭제합니다.")
     public ResponseEntity<ApiResponse<?>> logoutDev(
-            @RequestBody RefreshTokenRequestDto request, HttpServletResponse response) {
-        // 리프레시 토큰 무효화
-        refreshTokenService.findTokenByCookie(request.getRefreshToken())
-                .ifPresent(refreshTokenRepository::delete);
+            @RequestBody AccessTokenRequestDto request, HttpServletResponse response) {
+
+        // 백그라운드에서 카카오 API 호출 및 DB 정리
+        CompletableFuture.runAsync(() -> {
+            try {
+                authUserService.logoutAsync(request.getAccessToken());
+            } catch (Exception e) {
+                log.error("Background logout failed: {}", e.getMessage());
+            }
+        });
 
         // 프론트엔드에 토큰 삭제 지시
         response.setHeader("X-Clear-Tokens", "true");
@@ -134,14 +140,23 @@ public class KakaoAuthUserController {
     ) {
         Long memberId = jwtUtil.getMemberId(accessToken);
         AuthUser user = authUserService.loadAuthUserByEmail(memberId);
-
         RefreshToken refreshTokenEntity = user.getRefreshToken();
 
-        authUserService.unlinkUserByAdminKey(user.getKakaoUUID().toString(), adminKey);
-
-        authUserService.withdraw(user.getId(), refreshTokenEntity.getToken());
-
         ResponseCookie accessCookie = CookieUtils.deleteTokenCookie("access_token");
+
+        // 백그라운드에서 카카오 API 호출 및 DB 정리
+        CompletableFuture.runAsync(() -> {
+            try {
+                authUserService.withdrawAsync(
+                        user.getId(),
+                        refreshTokenEntity.getToken(),
+                        user.getKakaoUUID().toString(),
+                        adminKey
+                );
+            } catch (Exception e) {
+                log.error("Background logout failed: {}", e.getMessage());
+            }
+        });
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())

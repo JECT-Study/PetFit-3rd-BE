@@ -10,6 +10,7 @@ import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.pet.exception.PetErrorCode;
 import ject.petfit.domain.pet.exception.PetException;
 import ject.petfit.domain.pet.repository.PetRepository;
+import ject.petfit.global.jwt.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class PetQueryService {
     
     private final PetRepository petRepository;
     private final MemberRepository memberRepository;
+    private final JwtUtil jwtUtil;
 
     public Pet getPetOrThrow(Long petId) {
         return petRepository.findById(petId)
@@ -40,7 +42,8 @@ public class PetQueryService {
                 pet.getBirthDate(), pet.getIsFavorite());
     }
 
-    public List<PetListResponseDto> getAllPets(Long memberId) {
+    public List<PetListResponseDto> getAllPets(String accessToken) {
+        Long memberId = jwtUtil.getMemberId(accessToken);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
