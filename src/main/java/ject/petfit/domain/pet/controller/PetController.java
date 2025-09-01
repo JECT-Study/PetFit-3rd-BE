@@ -10,20 +10,15 @@ import ject.petfit.domain.pet.dto.request.PetUpdateRequestDto;
 import ject.petfit.domain.pet.dto.response.PetFavoriteResponseDto;
 import ject.petfit.domain.pet.dto.response.PetListResponseDto;
 import ject.petfit.domain.pet.dto.response.PetResponseDto;
-import ject.petfit.domain.pet.service.PetService;
-import ject.petfit.domain.user.exception.AuthUserErrorCode;
-import ject.petfit.domain.user.exception.AuthUserException;
+import ject.petfit.domain.pet.facade.PetFacade;
 import ject.petfit.domain.user.service.AuthUserService;
 import ject.petfit.global.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -37,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PetController {
 
-    private final PetService petService;
+    private final PetFacade petFacade;
     private final AuthUserService authUserService;
 
     // Create - 회원가입 직후 (첫 반려동물 등록)
@@ -48,7 +43,7 @@ public class PetController {
             @Valid @RequestBody PetRequestDto petDto
     ) {
         Long authUserId = authUserService.loadAuthUserByEmail(petDto.getMemberId()).getId();
-        PetResponseDto createdPet = petService.createPet(petDto, authUserId);
+        PetResponseDto createdPet = petFacade.createPet(petDto, authUserId);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ApiResponse.success(createdPet)
         );
@@ -58,7 +53,7 @@ public class PetController {
     @GetMapping("/{petId}")
     @Operation(summary = "동물 한 마리 정보 조회", description = "반려동물 ID로 반려동물 정보 조회")
     public ResponseEntity<ApiResponse<PetResponseDto>> getPetById(@PathVariable Long petId) {
-        PetResponseDto pet = petService.getPetById(petId);
+        PetResponseDto pet = petFacade.getPetById(petId);
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.success(pet)
         );
@@ -68,7 +63,7 @@ public class PetController {
     @GetMapping("/list/{memberId}")
     @Operation(summary = "모든 동물 정보 조회", description = "한 사용자의 모든 반려동물 정보 조회")
     public ResponseEntity<ApiResponse<List<PetListResponseDto>>> getAllPets(@PathVariable Long memberId) {
-        List<PetListResponseDto> pets = petService.getAllPets(memberId);
+        List<PetListResponseDto> pets = petFacade.getAllPets(memberId);
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.success(pets)
         );
@@ -81,7 +76,7 @@ public class PetController {
             @PathVariable Long petId,
             @Valid @RequestBody PetUpdateRequestDto petUpdateRequestDto
     ) {
-        PetResponseDto updatedPet = petService.updatePet(petId, petUpdateRequestDto);
+        PetResponseDto updatedPet = petFacade.updatePet(petId, petUpdateRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.success(updatedPet)
         );
@@ -92,7 +87,7 @@ public class PetController {
     @Operation(summary = "즐겨찾기 동물 업데이트", description = "즐겨찾기 동물을 업데이트 (다른 펫들은 자동으로 false로 설정)")
     public ResponseEntity<ApiResponse<List<PetFavoriteResponseDto>>> updateFavorite(
             @RequestBody PetFavoriteRequestDto requestDto) {
-        List<PetFavoriteResponseDto> favoriteResponse = petService.updateFavoriteBatch(requestDto);
+        List<PetFavoriteResponseDto> favoriteResponse = petFacade.updateFavoriteBatch(requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.success(favoriteResponse)
         );
@@ -102,7 +97,7 @@ public class PetController {
     @DeleteMapping("/{petId}")
     @Operation(summary = "동물 삭제", description = "반려동물 ID로 반려동물 정보 삭제")
     public ResponseEntity<ApiResponse<Void>> deletePet(@PathVariable Long petId) {
-        petService.deletePet(petId);
+        petFacade.deletePet(petId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
                 ApiResponse.success(null)
         );

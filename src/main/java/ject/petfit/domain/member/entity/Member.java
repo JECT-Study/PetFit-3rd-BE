@@ -2,6 +2,7 @@ package ject.petfit.domain.member.entity;
 
 
 import jakarta.persistence.*;
+import java.util.Arrays;
 import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.user.entity.AuthUser;
 import lombok.Builder;
@@ -28,7 +29,7 @@ public class Member {
     private String nickname;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="authuser_id")
+    @JoinColumn(name = "authuser_id")
     private AuthUser authUser;
 
     @Enumerated(EnumType.STRING)
@@ -60,4 +61,5 @@ public class Member {
     public void editNickname(String nickname) {
         this.nickname = nickname;
     }
+
 }
