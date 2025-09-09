@@ -63,7 +63,7 @@ public class KakaoAuthUserController {
         user.addRefreshToken(refreshToken);
 
         // 리다이렉트
-        httpServletResponse.sendRedirect(frontDomain + "/token?access_token=" + accessToken);
+        httpServletResponse.sendRedirect(frontDomain + "/token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
 //        AuthUserTokenResponseDto tokenResponseDto = new AuthUserTokenResponseDto(accessToken, refreshToken.getToken());
     }
 
@@ -80,7 +80,7 @@ public class KakaoAuthUserController {
         user.addRefreshToken(refreshToken);
 
 //        httpServletResponse.sendRedirect(frontDomain + "/token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
-        httpServletResponse.sendRedirect(frontLocal + "/token?access_token=" + accessToken);
+        httpServletResponse.sendRedirect(frontLocal + "/token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
     }
 
     // 서비스만 로그아웃 -> 쿠키 삭제
@@ -92,6 +92,7 @@ public class KakaoAuthUserController {
 
         // 즉시 쿠키 삭제 응답
         ResponseCookie accessCookie = CookieUtils.deleteTokenCookie("access_token");
+        ResponseCookie refreshCookie = CookieUtils.deleteTokenCookie("refresh_token");
 
         // 백그라운드에서 카카오 API 호출 및 DB 정리
         CompletableFuture.runAsync(() -> {
@@ -104,6 +105,7 @@ public class KakaoAuthUserController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
                 .header("Clear-Site-Data", "\"cache\", \"cookies\", \"storage\"")
                 .body(ApiResponse.success(null));
     }
@@ -143,6 +145,7 @@ public class KakaoAuthUserController {
         RefreshToken refreshTokenEntity = user.getRefreshToken();
 
         ResponseCookie accessCookie = CookieUtils.deleteTokenCookie("access_token");
+        ResponseCookie refreshCookie = CookieUtils.deleteTokenCookie("refresh_token");
 
         // 백그라운드에서 카카오 API 호출 및 DB 정리
         CompletableFuture.runAsync(() -> {
@@ -160,6 +163,7 @@ public class KakaoAuthUserController {
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
                 .header("Clear-Site-Data", "\"cache\", \"cookies\", \"storage\"")
                 .body(ApiResponse.success(null));
     }
@@ -183,10 +187,12 @@ public class KakaoAuthUserController {
 
         // SameSite=None이 적용된 쿠키 생성
         ResponseCookie accessCookie = CookieUtils.createTokenCookie("access_token", accessToken);
+        ResponseCookie refreshCookie = CookieUtils.createTokenCookie("refresh_token", refreshToken);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .header("Authorization", "Bearer " + accessToken)
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
                 .body(
                         ApiResponse.success(isNewResponseDto)
                 );
@@ -195,9 +201,11 @@ public class KakaoAuthUserController {
     @GetMapping("/verify")
     public ResponseEntity<ApiResponse<Boolean>> verifyCookies(
             @CookieValue("access_token") String accessToken,
+            @CookieValue("refresh_token") String refreshToken,
             HttpServletRequest request) {
 
-        boolean isAuthenticated = accessToken != null && !accessToken.isEmpty();
+        boolean isAuthenticated = (accessToken != null && !accessToken.isEmpty())
+                && (refreshToken != null && !refreshToken.isEmpty());
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.success(isAuthenticated)
