@@ -21,7 +21,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.Locale;
 
 @Slf4j
 @Profile("!test")
@@ -39,6 +38,8 @@ public class WebSecurityConfig {
     private String frontVercel;
     @Value("${app.front.domain}")
     private String frontDomain;
+    @Value("${app.front.dev-alarm}")
+    private String devAlarmDomain;
     @Value("${app.backend.domain}")
     private String backendDomain;
 
@@ -85,6 +86,7 @@ public class WebSecurityConfig {
                 frontLocal,
                 frontVercel,
                 frontDomain,
+                devAlarmDomain,
                 backendDomain
         ));
 
