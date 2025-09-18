@@ -7,7 +7,6 @@ import ject.petfit.domain.pet.entity.Pet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -16,8 +15,9 @@ public class AlarmQueryService {
     private final AlarmRepository alarmRepository;
 
     public List<AlarmResponse> getUnreadAlarms(Pet pet) {
-        LocalDateTime oneMinuteAgo = LocalDateTime.now().withSecond(0).withNano(0).minusMinutes(1);
-        List<Alarm> unreadAlarms = alarmRepository.findByIsReadFalseAndPetAndTargetDateTimeBeforeOrderByTargetDateTimeDesc(pet, oneMinuteAgo);
+//        LocalDateTime oneMinuteAgo = LocalDateTime.now().withSecond(0).withNano(0).minusMinutes(1);
+//        List<Alarm> unreadAlarms = alarmRepository.findByIsReadFalseAndPetAndTargetDateTimeBeforeOrderByTargetDateTimeDesc(pet, oneMinuteAgo);
+        List<Alarm> unreadAlarms = alarmRepository.findByIsReadFalseAndPetOrderByTargetDateTimeDesc(pet);
         return unreadAlarms.stream()
                 .map(AlarmResponse::from)
                 .toList();
