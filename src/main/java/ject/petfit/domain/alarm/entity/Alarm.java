@@ -35,4 +35,13 @@ public class Alarm {
     public void markAsRead() {
         this.isRead = true;
     }
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+    public void updateContent(String content) {
+        this.content = content;
+    }
+    public void updateTargetDateTime(LocalDateTime targetDateTime) {
+        this.targetDateTime = targetDateTime;
+    }
 }
