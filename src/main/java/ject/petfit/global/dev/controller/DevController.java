@@ -3,6 +3,7 @@ package ject.petfit.global.dev.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import ject.petfit.domain.pet.entity.Pet;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.exception.AuthUserErrorCode;
 import ject.petfit.domain.user.exception.AuthUserException;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -45,7 +47,8 @@ public class DevController {
         AuthUser authUser = authUserRepository.findById(testId)
                 .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.USER_NOT_FOUND));
 
-        String newAccessToken = jwtUtil.createAccessToken(authUser.getEmail(), authUser.getMember().getRole().name());
+        String newAccessToken = jwtUtil.createAccessToken(
+                authUser.getEmail(), authUser.getMember().getRole().name(), authUser.getMember().getId());
         String newRefreshToken = refreshTokenService.createOrUpdateRefreshToken(authUser, UUID.randomUUID().toString(),
                 refreshTokenValiditySeconds).getToken();
 
@@ -54,6 +57,19 @@ public class DevController {
         );
     }
 
+    @GetMapping("/{testId}/petIds")
+    @Operation(summary = "테스트 계정의 petId 리스트 조회 API")
+    public ResponseEntity<ApiResponse<List<Long>>> getPetIdsByTestId(
+            @PathVariable Long testId
+    ) {
+        AuthUser authUser = authUserRepository.findById(testId)
+                .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.USER_NOT_FOUND));
+
+        List<Long> petIds = authUser.getMember().getPets().stream()
+                .map(Pet::getId)
+                .toList();
+        return ResponseEntity.ok(ApiResponse.success(petIds));
+    }
 
 
 

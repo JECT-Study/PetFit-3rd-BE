@@ -1,6 +1,7 @@
 package ject.petfit.domain.pet.entity;
 
 import jakarta.persistence.*;
+import ject.petfit.domain.alarm.entity.Alarm;
 import ject.petfit.domain.entry.entity.Entry;
 import ject.petfit.domain.member.entity.Member;
 import ject.petfit.domain.slot.entity.Slot;
@@ -53,6 +54,9 @@ public class Pet {
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SlotHistory> slotHistories;
 
+    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Alarm> alarms;
+
     @Builder
     public Pet(String name, String type, String gender, LocalDate birthDate, boolean isFavorite) {
         this.name = name;
@@ -67,12 +71,11 @@ public class Pet {
     }
 
 
-    public void updatePet(String name, String type, String gender, LocalDate birthDate, Boolean isFavorite) {
+    public void updatePet(String name, String type, String gender, LocalDate birthDate) {
         this.name = name;
         this.type = type;
         this.gender = gender;
         this.birthDate = birthDate;
-        this.isFavorite = isFavorite;
     }
 
     public void updateIsFavorite(Boolean isFavorite) {
