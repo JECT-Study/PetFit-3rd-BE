@@ -2,11 +2,14 @@ package ject.petfit.domain.alarm.service;
 
 import ject.petfit.domain.alarm.dto.response.AlarmResponse;
 import ject.petfit.domain.alarm.entity.Alarm;
+import ject.petfit.domain.alarm.exception.AlarmErrorCode;
+import ject.petfit.domain.alarm.exception.AlarmException;
 import ject.petfit.domain.alarm.repository.AlarmRepository;
 import ject.petfit.domain.pet.entity.Pet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,14 +18,30 @@ import java.util.List;
 public class AlarmQueryService {
     private final AlarmRepository alarmRepository;
 
-    public List<AlarmResponse> getUnreadAlarms(Pet pet) {
-        LocalDateTime oneMinuteAgo = LocalDateTime.now().withSecond(0).withNano(0).minusMinutes(1);
-        List<Alarm> unreadAlarms = alarmRepository.findByIsReadFalseAndPetAndTargetDateTimeBeforeOrderByTargetDateTimeDesc(pet, oneMinuteAgo);
+    public List<AlarmResponse> getAllUnreadAlarms(Pet pet) {
+//        LocalDateTime oneMinuteAgo = LocalDateTime.now().withSecond(0).withNano(0).minusMinutes(1);
+//        List<Alarm> unreadAlarms = alarmRepository.findByIsReadFalseAndPetAndTargetDateTimeBeforeOrderByTargetDateTimeDesc(pet, oneMinuteAgo);
+        List<Alarm> unreadAlarms = alarmRepository.findByIsReadFalseAndPetOrderByTargetDateTimeDesc(pet);
         return unreadAlarms.stream()
                 .map(AlarmResponse::from)
                 .toList();
     }
 
-//    getHomeAlarmList
+    public List<Alarm> getAlarmsWithinNextThreeDays(Pet pet) {
+        LocalDateTime nowParsed = LocalDate.now().atStartOfDay();
+        return alarmRepository.findAllByPetAndTargetDateTimeBetween(
+                pet,
+                nowParsed,
+                nowParsed.plusDays(3)
+        );
+    }
+
+    public Alarm getAlarmOrThrow(Long alarmId) {
+        return alarmRepository.findById(alarmId)
+                .orElseThrow(() -> new AlarmException(AlarmErrorCode.ALARM_NOT_FOUND));
+    }
+
+
+
 
 }

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AlarmRegisterRequest {
+public class AlarmUpdateRequest {
     private String title;        // 일정 제목
     private String content;      // 일정 내용
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")

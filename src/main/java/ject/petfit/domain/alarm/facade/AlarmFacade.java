@@ -2,7 +2,9 @@ package ject.petfit.domain.alarm.facade;
 
 import jakarta.transaction.Transactional;
 import ject.petfit.domain.alarm.dto.request.AlarmRegisterRequest;
+import ject.petfit.domain.alarm.dto.request.AlarmUpdateRequest;
 import ject.petfit.domain.alarm.dto.response.AlarmResponse;
+import ject.petfit.domain.alarm.entity.Alarm;
 import ject.petfit.domain.alarm.service.AlarmCommandService;
 import ject.petfit.domain.alarm.service.AlarmQueryService;
 import ject.petfit.domain.alarm.service.SseEmitterService;
@@ -32,9 +34,9 @@ public class AlarmFacade {
         alarmCommandService.saveAlarm(request, pet);
     }
 
-    public List<AlarmResponse> getUnreadAlarms(Long petId) {
+    public List<AlarmResponse> getAllUnreadAlarms(Long petId) {
         Pet pet = petQueryService.getPetOrThrow(petId);
-        return alarmQueryService.getUnreadAlarms(pet);
+        return alarmQueryService.getAllUnreadAlarms(pet);
     }
 
     @Transactional
@@ -46,5 +48,19 @@ public class AlarmFacade {
     public void markAllAsRead(Long petId) {
         Pet pet = petQueryService.getPetOrThrow(petId);
         alarmCommandService.markAllAsRead(pet);
+    }
+
+    public List<AlarmResponse> getHomeAlarms(Long petId) {
+        Pet pet = petQueryService.getPetOrThrow(petId);
+        List<Alarm> alarmList = alarmQueryService.getAlarmsWithinNextThreeDays(pet);
+        return alarmList.stream()
+                .map(AlarmResponse::from)
+                .toList();
+    }
+
+    @Transactional
+    public AlarmResponse updateAlarm(Long alarmId, AlarmUpdateRequest alarmUpdateRequest) {
+        Alarm alarm = alarmQueryService.getAlarmOrThrow(alarmId);
+        return alarmCommandService.updateAlarm(alarm, alarmUpdateRequest);
     }
 }

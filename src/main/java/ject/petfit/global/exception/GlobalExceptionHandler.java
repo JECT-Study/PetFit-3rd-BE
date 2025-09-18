@@ -1,5 +1,6 @@
 package ject.petfit.global.exception;
 
+import ject.petfit.domain.alarm.exception.AlarmException;
 import ject.petfit.domain.entry.exception.EntryException;
 import ject.petfit.domain.member.exception.MemberException;
 import ject.petfit.domain.pet.exception.PetException;
@@ -125,6 +126,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RoutineException.class)
     public ResponseEntity<ApiResponse<Void>> handleRoutineException(RoutineException e) {
+        log.info(e.getMessage(), e);
+        ApiResponse<Void> response = ApiResponse.fail(
+                e.getCode(),
+                e.getMessage()
+        );
+        return ResponseEntity.status(e.getHttpStatus()).body(response);
+    }
+
+    @ExceptionHandler(AlarmException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAlarmException(AlarmException e) {
         log.info(e.getMessage(), e);
         ApiResponse<Void> response = ApiResponse.fail(
                 e.getCode(),
