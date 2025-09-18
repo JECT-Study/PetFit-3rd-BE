@@ -27,6 +27,7 @@ public class CookieUtils {
                 .domain(domain)
                 .path("/")
                 .sameSite("none")
+                .httpOnly(true)
                 .maxAge(7 * 24 * 60 * 60)
                 .build();
         return cookie;
@@ -38,6 +39,7 @@ public class CookieUtils {
                 .domain(domain)
                 .path("/")
                 .sameSite("none")
+                .httpOnly(true)
                 .maxAge(0)  // 즉시 만료
                 .build();
     }
