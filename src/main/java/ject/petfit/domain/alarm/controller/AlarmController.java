@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import ject.petfit.domain.alarm.dto.request.AlarmRegisterRequest;
+import ject.petfit.domain.alarm.dto.request.AlarmUpdateRequest;
 import ject.petfit.domain.alarm.dto.response.AlarmResponse;
 import ject.petfit.domain.alarm.facade.AlarmFacade;
 import ject.petfit.global.common.ApiResponse;
@@ -24,7 +25,7 @@ import java.util.List;
 public class AlarmController {
     private final AlarmFacade alarmFacade;
 
-    /**
+    /*
      * 클라이언트가 /api/alarms/subscribe에 접속하면 서버와의 연결이 유지되고,
      * 서버에서 SseEmitter를 통해 알림이 발생할 때마다 즉시 데이터를 푸시할 수 있습니다.
      *
@@ -53,31 +54,44 @@ public class AlarmController {
     }
 
     @GetMapping("/{petId}/unread")
-    @Operation(summary = "읽지 않은 알람 리스트 조회")
-    public ResponseEntity<ApiResponse<List<AlarmResponse>>> getUnreadAlarms(
+    @Operation(summary = "읽지 않은 알람 리스트 조회", description = "읽지 않은 모든 알람을 최신순으로 조회")
+    public ResponseEntity<ApiResponse<List<AlarmResponse>>> getAllUnreadAlarms(
             @PathVariable Long petId
     ) {
         log.info("조회 petId: {}", petId);
-        return ResponseEntity.ok(ApiResponse.success(alarmFacade.getUnreadAlarms(petId)));
+        return ResponseEntity.ok(ApiResponse.success(alarmFacade.getAllUnreadAlarms(petId)));
     }
 
-//    @GetMapping("/{petId}/home")
-//    public ResponseEntity<ApiResponse<List<AlarmResponse>>> getHomeAlarms()
-//    @GetMapping("/{petId}")
-//    public ResponseEntity<ApiResponse<List<AlarmResponse>>> getAllAlarms()
+    @GetMapping("/{petId}/home")
+    @Operation(summary = "홈화면 알람 리스트 조회", description = "3일 이내의 모든 알람을 조회")
+    public ResponseEntity<ApiResponse<List<AlarmResponse>>> getHomeAlarms(
+            @PathVariable Long petId
+    ){
+        return ResponseEntity.ok(ApiResponse.success(alarmFacade.getHomeAlarms(petId)));
+    }
 
-    // 알람 읽음 처리 API
     @PatchMapping("/{alarmId}/read")
+    @Operation(summary = "알람 읽음 처리")
     public void markAsRead(@PathVariable Long alarmId) {
         log.info("{}번 알람 읽음 처리", alarmId);
         alarmFacade.markAsRead(alarmId);
     }
 
-    // 알람 일괄 읽음 처리 API
     @PatchMapping("/{petId}/all/read")
+    @Operation(summary = "알람 일괄 읽음 처리")
     public void markAllAsRead(@PathVariable Long petId) {
         log.info("{}번 펫 알람 일괄 읽음 처리", petId);
         alarmFacade.markAllAsRead(petId);
+    }
+
+    @PatchMapping("/{alarmId}")
+    @Operation(summary = "알람 수정")
+    public ResponseEntity<ApiResponse<AlarmResponse>> updateAlarm(
+            @PathVariable Long alarmId,
+            @RequestBody AlarmUpdateRequest alarmUpdateRequest
+    ) {
+        log.info("{}번 알람 수정", alarmId);
+        return ResponseEntity.ok(ApiResponse.success(alarmFacade.updateAlarm(alarmId, alarmUpdateRequest)));
     }
 
 }
