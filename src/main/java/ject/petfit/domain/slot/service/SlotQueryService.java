@@ -59,6 +59,21 @@ public class SlotQueryService {
         if (slot.isSkinActivated()) {
             activatedCategories.add("skin");
         }
+        if(slot.getSupplementActivated() != null && slot.getSupplementActivated()){
+            activatedCategories.add("supplement");
+        }
+        if(slot.getMedicineActivated() != null && slot.getMedicineActivated()){
+            activatedCategories.add("medicine");
+        }
+        if(slot.getCustom1Activated() != null && slot.getCustom1Activated()){
+            activatedCategories.add("custom1");
+        }
+        if(slot.getCustom2Activated() != null && slot.getCustom2Activated()){
+            activatedCategories.add("custom2");
+        }
+        if(slot.getCustom3Activated() != null && slot.getCustom3Activated()){
+            activatedCategories.add("custom3");
+        }
         return activatedCategories;
     }
 
@@ -68,7 +83,9 @@ public class SlotQueryService {
             case "feed" -> slot.getFeedAmount();
             case "water" -> slot.getWaterAmount();
             case "walk" -> slot.getWalkAmount();
-            case "potty", "skin", "dental" -> null;
+            case "supplement" -> slot.getSupplementAmount();
+            case "medicine" -> slot.getMedicineAmount();
+            case "potty", "skin", "dental", "custom1", "custom2", "custom3" -> null;
             default -> throw new SlotException(SlotErrorCode.SLOT_CATEGORY_NOT_FOUND);
         };
     }
@@ -85,32 +102,57 @@ public class SlotQueryService {
         switch (category) {
             case "feed" -> {
                 if (!slot.isFeedActivated()) {
-                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED);
+                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED, "feed");
                 }
             }
             case "water" -> {
                 if (!slot.isWaterActivated()) {
-                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED);
+                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED, "water");
                 }
             }
             case "walk" -> {
                 if (!slot.isWalkActivated()) {
-                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED);
+                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED, "walk");
                 }
             }
             case "potty" -> {
                 if (!slot.isPottyActivated()) {
-                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED);
+                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED, "potty");
                 }
             }
             case "dental" -> {
                 if (!slot.isDentalActivated()) {
-                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED);
+                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED, "dental");
                 }
             }
             case "skin" -> {
                 if (!slot.isSkinActivated()) {
-                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED);
+                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED, "skin");
+                }
+            }
+            case "supplement" -> {
+                if (slot.getSupplementActivated() == null || !slot.getSupplementActivated()) {
+                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED, "supplement");
+                }
+            }
+            case "medicine" -> {
+                if (slot.getMedicineActivated() == null || !slot.getMedicineActivated()) {
+                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED, "medicine");
+                }
+            }
+            case "custom1" -> {
+                if (slot.getCustom1Activated() == null || !slot.getCustom1Activated()) {
+                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED, "custom1");
+                }
+            }
+            case "custom2" -> {
+                if (slot.getCustom2Activated() == null || !slot.getCustom2Activated()) {
+                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED, "custom2");
+                }
+            }
+            case "custom3" -> {
+                if (slot.getCustom3Activated() == null || !slot.getCustom3Activated()) {
+                    throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED, "custom3");
                 }
             }
             default -> throw new SlotException(SlotErrorCode.SLOT_NOT_ACTIVATED);

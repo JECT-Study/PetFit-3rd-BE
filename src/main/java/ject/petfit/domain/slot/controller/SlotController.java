@@ -22,8 +22,9 @@ public class SlotController {
     // 슬롯 초기화 (회원가입 후 슬롯 설정)
     @PostMapping("/{petId}")
     @Operation(summary = "슬롯 초기화 (회원가입 슬롯 설정)", description = "회원가입 후 반려동물의 슬롯을 초기화 <br>" +
-            "사료량, 음수량, 배변량은 미설정시 null 입력 <br>" +
-            "슬롯 6개 활성화 여부는 null 입력 불가")
+            "사료량, 음수량, 산책량은 미설정시 null 입력 <br>" +
+            "기존 슬롯들의 활성화 여부는 null 입력 불가 <br>" +
+            "없어질 (치아, 피부) 슬롯과 새로 추가된 영양제, 약, 커스텀 슬롯은 null 입력 가능")
     public ResponseEntity<ApiResponse<SlotResponse>> initialize(
             @PathVariable Long petId,
             @RequestBody @Valid SlotInitializeRequest slotInitializeRequest

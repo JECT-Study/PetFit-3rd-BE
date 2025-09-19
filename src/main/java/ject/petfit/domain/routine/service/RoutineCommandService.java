@@ -17,7 +17,6 @@ public class RoutineCommandService {
     private final RoutineRepository routineRepository;
     private final SlotQueryService slotQueryService;
 
-
     public Routine getOrCreateRoutine(Entry entry, String category, Slot slot) {
         return routineRepository.findByEntryAndCategory(entry, category)
                 .orElseGet(() -> createRoutine(entry, category, slot));
@@ -32,7 +31,7 @@ public class RoutineCommandService {
                 .build());
     }
 
-    public Routine updateRoutine(Routine routine, RoutineStatus routineStatus ,Integer actualAmount, String content) {
+    public Routine updateRoutine(Routine routine, RoutineStatus routineStatus, Integer actualAmount, String content) {
         routine.updateStatus(routineStatus);
         routine.updateActualAmount(actualAmount);
         routine.updateContent(content);
