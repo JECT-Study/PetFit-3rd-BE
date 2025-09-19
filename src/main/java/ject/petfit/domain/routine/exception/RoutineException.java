@@ -7,10 +7,12 @@ import org.springframework.http.HttpStatus;
 public class RoutineException extends RuntimeException {
     private final HttpStatus httpStatus;
     private final String code;
+     private final String message;
 
     public RoutineException(RoutineErrorCode routineErrorCode) {
         super(routineErrorCode.getMessage());
         this.httpStatus = routineErrorCode.getHttpStatus();
         this.code = routineErrorCode.getCode();
+        this.message = routineErrorCode.getMessage();
     }
 }

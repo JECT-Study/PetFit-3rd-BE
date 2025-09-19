@@ -7,10 +7,12 @@ import org.springframework.http.HttpStatus;
 public class AlarmException extends RuntimeException {
     private final HttpStatus httpStatus;
     private final String code;
+    private final String message;
 
     public AlarmException(AlarmErrorCode alarmErrorCode) {
         super(alarmErrorCode.getMessage());
         this.httpStatus = alarmErrorCode.getHttpStatus();
         this.code = alarmErrorCode.getCode();
+        this.message = alarmErrorCode.getMessage();
     }
 }

@@ -21,7 +21,7 @@ import java.util.List;
 @RequestMapping("/api/routines")
 @Tag(name = "Routine", description = "루틴 API <br> " +
         "활성화되어 있는 슬롯의 루틴만 조작 가능 <br> " +
-        "{category}는 루틴 종류 feed, water, walk, potty, dental, skin 중 하나 입력")
+        "{category}는 루틴 종류 feed, water, walk, potty, (dental, skin), supplement, medicine, custom1, custom2, custom3 중 하나 입력")
 public class RoutineController {
     private final RoutineFacade routineFacade;
 
@@ -47,7 +47,7 @@ public class RoutineController {
             @PathVariable Long petId,
             @Parameter(description = "yyyy-MM-dd 형식으로 입력", example = "2025-07-01")
             @PathVariable LocalDate date,
-            @Parameter(description = "루틴 종류 - feed, water, walk, potty, dental, skin", example = "feed")
+            @Parameter(description = "루틴 종류 - feed, water, walk, potty, (dental, skin), supplement, medicine, custom1, custom2, custom3", example = "feed")
             @PathVariable String category
 //            @RequestBody RoutineRequest routineRequest
     ) {
@@ -60,13 +60,13 @@ public class RoutineController {
     // 루틴 세모
     @PostMapping("/{petId}/{date}/{category}/memo")
     @Operation(summary = "루틴 메모(세모)", description = "루틴을 메모 상태로 작성 <br> " +
-            "content가 산책, 사료, 음수일때는 내용 | 배변, 치아, 피부일때는 메모로 사용 <br>" +
-            "actualAmount는 배변, 치아, 피부에서 0~99999 이내 아무값이나 입력" )
+            "content가 산책, 사료, 음수, 영양제, 약, 커스텀1, 커스텀2, 커스텀3 일때는 내용 | 배변 일때는 메모로 사용 <br>" +
+            "actualAmount는 배변에서 0~99999 이내 아무값이나 입력" )
     public ResponseEntity<ApiResponse<RoutineResponse>> createRoutineMemo(
             @PathVariable Long petId,
             @Parameter(description = "yyyy-MM-dd 형식으로 입력", example = "2025-07-01")
             @PathVariable LocalDate date,
-            @Parameter(description = "루틴 종류 - feed, water, walk, potty, dental, skin", example = "feed")
+            @Parameter(description = "루틴 종류 - feed, water, walk, potty, (dental, skin), supplement, medicine, custom1, custom2, custom3", example = "feed")
             @PathVariable String category,
             @Valid @RequestBody RoutineMemoRequest routineMemoRequest
     ) {
@@ -82,7 +82,7 @@ public class RoutineController {
             @PathVariable Long petId,
             @Parameter(description = "yyyy-MM-dd 형식으로 입력", example = "2025-07-01")
             @PathVariable LocalDate date,
-            @Parameter(description = "루틴 종류 - feed, water, walk, potty, dental, skin", example = "feed")
+            @Parameter(description = "루틴 종류 - feed, water, walk, potty, (dental, skin), supplement, medicine, custom1, custom2, custom3", example = "feed")
             @PathVariable String category
     ) {
         return ResponseEntity.ok(
