@@ -32,6 +32,20 @@ public class SlotCommandService {
                 .pottyActivated(slot.isPottyActivated())
                 .dentalActivated(slot.isDentalActivated())
                 .skinActivated(slot.isSkinActivated())
+                        // 새로 추가
+                        .supplementActivated(slot.getSupplementActivated())
+                        .supplementAmount(slot.getSupplementAmount())
+                        .medicineActivated(slot.getMedicineActivated())
+                        .medicineAmount(slot.getMedicineAmount())
+                        .custom1Activated(slot.getCustom1Activated())
+                        .custom1Name(slot.getCustom1Name())
+                        .custom1Content(slot.getCustom1Content())
+                        .custom2Activated(slot.getCustom2Activated())
+                        .custom2Name(slot.getCustom2Name())
+                        .custom2Content(slot.getCustom2Content())
+                        .custom3Activated(slot.getCustom3Activated())
+                        .custom3Name(slot.getCustom3Name())
+                        .custom3Content(slot.getCustom3Content())
                 .feedAmount(slot.getFeedAmount())
                 .waterAmount(slot.getWaterAmount())
                 .walkAmount(slot.getWalkAmount())
@@ -50,6 +64,20 @@ public class SlotCommandService {
                 .feedAmount(request.getFeedAmount())
                 .waterAmount(request.getWaterAmount())
                 .walkAmount(request.getWalkAmount())
+                    // 새로 추가
+                    .supplementActivated(request.getSupplementActivated())
+                    .supplementAmount(request.getSupplementAmount())
+                    .medicineActivated(request.getMedicineActivated())
+                    .medicineAmount(request.getMedicineAmount())
+                    .custom1Activated(request.getCustom1Activated())
+                    .custom1Name(request.getCustom1Name())
+                    .custom1Content(request.getCustom1Content())
+                    .custom2Activated(request.getCustom2Activated())
+                    .custom2Name(request.getCustom2Name())
+                    .custom2Content(request.getCustom2Content())
+                    .custom3Activated(request.getCustom3Activated())
+                    .custom3Name(request.getCustom3Name())
+                    .custom3Content(request.getCustom3Content())
                 .build());
     }
 
@@ -58,6 +86,8 @@ public class SlotCommandService {
         List<String> deActivatedList = new ArrayList<>();
 
         slot.updateSlot(request);
+
+        // 비활성화된 카테고리들 확인
         if (!slot.isFeedActivated()) {
             deActivatedList.add("feed");
         }
@@ -76,7 +106,21 @@ public class SlotCommandService {
         if (!slot.isSkinActivated()) {
             deActivatedList.add("skin");
         }
-
+        if (slot.getSupplementActivated() != null && !slot.getSupplementActivated()) {
+            deActivatedList.add("supplement");
+        }
+        if (slot.getMedicineActivated() != null && !slot.getMedicineActivated()) {
+            deActivatedList.add("medicine");
+        }
+        if (slot.getCustom1Activated() != null && !slot.getCustom1Activated()) {
+            deActivatedList.add("custom1");
+        }
+        if (slot.getCustom2Activated() != null && !slot.getCustom2Activated()) {
+            deActivatedList.add("custom2");
+        }
+        if (slot.getCustom3Activated() != null && !slot.getCustom3Activated()) {
+            deActivatedList.add("custom3");
+        }
         return deActivatedList;
     }
 

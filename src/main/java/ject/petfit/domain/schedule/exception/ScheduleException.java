@@ -7,10 +7,12 @@ import org.springframework.http.HttpStatus;
 public class ScheduleException extends RuntimeException {
     private final HttpStatus httpStatus;
     private final String code;
+    private final String message;
 
     public ScheduleException(ScheduleErrorCode scheduleErrorCode) {
         super(scheduleErrorCode.getMessage());
         this.httpStatus = scheduleErrorCode.getHttpStatus();
         this.code = scheduleErrorCode.getCode();
+        this.message = scheduleErrorCode.getMessage();
     }
 }
