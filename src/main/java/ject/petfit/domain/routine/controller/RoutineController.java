@@ -60,8 +60,8 @@ public class RoutineController {
     // 루틴 세모
     @PostMapping("/{petId}/{date}/{category}/memo")
     @Operation(summary = "루틴 메모(세모)", description = "루틴을 메모 상태로 작성 <br> " +
-            "content가 산책, 사료, 음수, 영양제, 약, 커스텀1, 커스텀2, 커스텀3 일때는 내용 | 배변 일때는 메모로 사용 <br>" +
-            "actualAmount는 배변에서 0~99999 이내 아무값이나 입력" )
+            "content가 산책, 사료, 음수, 영양제, 약, 커스텀 일때는 내용 | 배변 일때는 메모로 사용 <br>" +
+            "actualAmount는 배변, 커스텀에서 0~99999 이내 아무값이나 입력" )
     public ResponseEntity<ApiResponse<RoutineResponse>> createRoutineMemo(
             @PathVariable Long petId,
             @Parameter(description = "yyyy-MM-dd 형식으로 입력", example = "2025-07-01")
