@@ -200,10 +200,9 @@ public class AuthUserService {
                 .block();
     }
 
-    public AuthUserIsNewResponseDto isNewUserFromRefreshToken(String refreshToken) {
-        AuthUser authUser = refreshTokenRepository.findByToken(refreshToken)
-                .map(refreshTokenEntity -> refreshTokenEntity.getAuthUser())
-                .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.REFRESH_TOKEN_NOT_FOUND));
+    public AuthUserIsNewResponseDto isNewUserFromMemberId(Long memberId) {
+        AuthUser authUser = authUserRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.USER_NOT_FOUND));
 
         List<Pet> existingPets = authUser.getMember().getPets();
         if (existingPets.isEmpty()) {

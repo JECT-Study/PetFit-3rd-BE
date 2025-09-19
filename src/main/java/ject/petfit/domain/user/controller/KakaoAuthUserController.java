@@ -1,9 +1,7 @@
 package ject.petfit.domain.user.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.concurrent.CompletableFuture;
 import ject.petfit.domain.user.dto.response.AuthUserIsNewResponseDto;
 import ject.petfit.domain.user.entity.AuthUser;
 import ject.petfit.domain.user.service.AuthUserService;
@@ -53,7 +51,7 @@ public class KakaoAuthUserController {
     // 소셜 로그인/회원가입 -> 쿠키
     @GetMapping("/kakao/login")
     @Operation(summary = "카카오 로그인 (운영용)", description = "카카오 로그인 후 토큰을 쿠키에 저장합니다.")
-    public void kakaoLogin(
+    public ResponseEntity<ApiResponse<Void>> kakaoLogin(
             @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) throws IOException {
         AuthUser user = authUserService.oAuthLogin(accessCode);
 
@@ -62,15 +60,21 @@ public class KakaoAuthUserController {
         RefreshToken refreshToken = refreshTokenService.createOrUpdateRefreshToken(user, UUID.randomUUID().toString(), refreshTokenValiditySeconds);
         user.addRefreshToken(refreshToken);
 
-        // 리다이렉트
-        httpServletResponse.sendRedirect(frontDomain + "/token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
-//        AuthUserTokenResponseDto tokenResponseDto = new AuthUserTokenResponseDto(accessToken, refreshToken.getToken());
+        // SameSite=None이 적용된 쿠키 생성
+        ResponseCookie accessCookie = CookieUtils.createTokenCookie("access_token", accessToken);
+        ResponseCookie refreshCookie = CookieUtils.createTokenCookie("refresh_token", refreshToken.getToken());
+
+        return ResponseEntity.status(HttpStatus.OK)
+            .header("Authorization", "Bearer " + accessToken)
+            .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
+            .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+            .body(ApiResponse.success(null));
     }
 
     // 소셜 로그인/회원가입 -> DEV
     @GetMapping("/kakao/login/dev")
     @Operation( summary = "카카오 로그인 (개발용)", description = "개발 환경에서 카카오 로그인 후 토큰을 쿠키에 저장합니다.")
-    public void kakaoLoginDev(
+    public ResponseEntity<ApiResponse<Void>> kakaoLoginDev(
             @RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) throws IOException {
         AuthUser user = authUserService.oAuthLogin(accessCode);
 
@@ -79,8 +83,15 @@ public class KakaoAuthUserController {
         RefreshToken refreshToken = refreshTokenService.createOrUpdateRefreshToken(user, UUID.randomUUID().toString(), refreshTokenValiditySeconds);
         user.addRefreshToken(refreshToken);
 
-//        httpServletResponse.sendRedirect(frontDomain + "/token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
-        httpServletResponse.sendRedirect(frontLocal + "/token?access_token=" + accessToken + "&refresh_token=" + refreshToken.getToken());
+        // SameSite=None이 적용된 쿠키 생성
+        ResponseCookie accessCookie = CookieUtils.createTokenCookie("access_token", accessToken);
+        ResponseCookie refreshCookie = CookieUtils.createTokenCookie("refresh_token", refreshToken.getToken());
+
+        return ResponseEntity.status(HttpStatus.OK)
+            .header("Authorization", "Bearer " + accessToken)
+            .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
+            .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+            .body(ApiResponse.success(null));
     }
 
     // 서비스만 로그아웃 -> 쿠키 삭제
@@ -95,13 +106,7 @@ public class KakaoAuthUserController {
         ResponseCookie refreshCookie = CookieUtils.deleteTokenCookie("refresh_token");
 
         // 백그라운드에서 카카오 API 호출 및 DB 정리
-        CompletableFuture.runAsync(() -> {
-            try {
-                authUserService.logoutAsync(accessToken);
-            } catch (Exception e) {
-                log.error("Background logout failed: {}", e.getMessage());
-            }
-        });
+        authUserService.logoutAsync(accessToken);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
@@ -117,13 +122,7 @@ public class KakaoAuthUserController {
             @RequestBody AccessTokenRequestDto request, HttpServletResponse response) {
 
         // 백그라운드에서 카카오 API 호출 및 DB 정리
-        CompletableFuture.runAsync(() -> {
-            try {
-                authUserService.logoutAsync(request.getAccessToken());
-            } catch (Exception e) {
-                log.error("Background logout failed: {}", e.getMessage());
-            }
-        });
+        authUserService.logoutAsync(request.getAccessToken());
 
         // 프론트엔드에 토큰 삭제 지시
         response.setHeader("X-Clear-Tokens", "true");
@@ -147,19 +146,12 @@ public class KakaoAuthUserController {
         ResponseCookie accessCookie = CookieUtils.deleteTokenCookie("access_token");
         ResponseCookie refreshCookie = CookieUtils.deleteTokenCookie("refresh_token");
 
-        // 백그라운드에서 카카오 API 호출 및 DB 정리
-        CompletableFuture.runAsync(() -> {
-            try {
-                authUserService.withdrawAsync(
-                        user.getId(),
-                        refreshTokenEntity.getToken(),
-                        user.getKakaoUUID().toString(),
-                        adminKey
-                );
-            } catch (Exception e) {
-                log.error("Background logout failed: {}", e.getMessage());
-            }
-        });
+        authUserService.withdrawAsync(
+            user.getId(),
+            refreshTokenEntity.getToken(),
+            user.getKakaoUUID().toString(),
+            adminKey
+        );
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
@@ -168,48 +160,32 @@ public class KakaoAuthUserController {
                 .body(ApiResponse.success(null));
     }
 
-    // @GetMapping("/accesscookie")
-    // public ResponseEntity<ApiResponse<AuthUserSimpleResponseDto>> refreshTokenToInfoCookie(
-    //         HttpServletRequest request, HttpServletResponse response
-    // ) {
-    //     String refreshToken = CookieUtils.getCookieValue(request, "refresh_token");
-    //     AuthUserSimpleResponseDto memberInfo = authUserService.getMemberInfoFromRefreshTokenCookie(refreshToken);
-    //     return ResponseEntity.status(HttpStatus.OK).body(
-    //             ApiResponse.success(null)
-    //     );
-    // }
-
-    @PostMapping("/token/cookie")
-    @Operation(summary = "토큰 쿠키 반환", description = "Access Token과 Refresh Token을 쿠키로 반환합니다.")
+    @PostMapping("/auth/me")
+    @Operation(summary = "액세스 토큰으로 유저 정보 확인",
+        description = "액세스 토큰으로 유저 정보를 확인하고, 신규 유저인지 여부를 반환합니다.")
     public ResponseEntity<ApiResponse<AuthUserIsNewResponseDto>> returnTokenCookie(
-            @RequestParam String accessToken, @RequestParam String refreshToken) {
-        AuthUserIsNewResponseDto isNewResponseDto = authUserService.isNewUserFromRefreshToken(refreshToken);
+        @CookieValue("access_token") String accessToken
+    ) {
+        Long memberId = jwtUtil.getMemberId(accessToken);
 
-        // SameSite=None이 적용된 쿠키 생성
-        ResponseCookie accessCookie = CookieUtils.createTokenCookie("access_token", accessToken);
-        ResponseCookie refreshCookie = CookieUtils.createTokenCookie("refresh_token", refreshToken);
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .header("Authorization", "Bearer " + accessToken)
-                .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
-                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                .body(
-                        ApiResponse.success(isNewResponseDto)
-                );
-    }
-
-    @GetMapping("/verify")
-    public ResponseEntity<ApiResponse<Boolean>> verifyCookies(
-            @CookieValue("access_token") String accessToken,
-            @CookieValue("refresh_token") String refreshToken,
-            HttpServletRequest request) {
-
-        boolean isAuthenticated = (accessToken != null && !accessToken.isEmpty())
-                && (refreshToken != null && !refreshToken.isEmpty());
+        AuthUserIsNewResponseDto isNewResponseDto = authUserService.isNewUserFromMemberId(memberId);
 
         return ResponseEntity.status(HttpStatus.OK).body(
-                ApiResponse.success(isAuthenticated)
+            ApiResponse.success(isNewResponseDto)
         );
     }
+
+//    @GetMapping("/verify")
+//    public ResponseEntity<ApiResponse<Boolean>> verifyCookies(
+//            @CookieValue("access_token") String accessToken,
+//            @CookieValue("refresh_token") String refreshToken) {
+//
+//        boolean isAuthenticated = (accessToken != null && !accessToken.isEmpty())
+//                && (refreshToken != null && !refreshToken.isEmpty());
+//
+//        return ResponseEntity.status(HttpStatus.OK).body(
+//                ApiResponse.success(isAuthenticated)
+//        );
+//    }
 
 }
