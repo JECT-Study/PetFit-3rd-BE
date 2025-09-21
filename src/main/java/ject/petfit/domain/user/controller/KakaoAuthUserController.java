@@ -158,7 +158,7 @@ public class KakaoAuthUserController {
                 .body(ApiResponse.success(null));
     }
 
-    @PostMapping("/auth/me")
+    @PostMapping("/me")
     @Operation(summary = "액세스 토큰으로 유저 정보 확인",
         description = "액세스 토큰으로 유저 정보를 확인하고, 신규 유저인지 여부를 반환합니다.")
     public ResponseEntity<ApiResponse<AuthUserIsNewResponseDto>> returnTokenCookie(
