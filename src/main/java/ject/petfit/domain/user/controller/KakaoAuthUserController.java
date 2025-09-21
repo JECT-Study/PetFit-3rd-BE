@@ -65,7 +65,6 @@ public class KakaoAuthUserController {
         ResponseCookie refreshCookie = CookieUtils.createTokenCookie("refresh_token", refreshToken.getToken());
 
         return ResponseEntity.status(HttpStatus.OK)
-            .header("Authorization", "Bearer " + accessToken)
             .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
             .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
             .body(ApiResponse.success(null));
@@ -88,7 +87,6 @@ public class KakaoAuthUserController {
         ResponseCookie refreshCookie = CookieUtils.createTokenCookie("refresh_token", refreshToken.getToken());
 
         return ResponseEntity.status(HttpStatus.OK)
-            .header("Authorization", "Bearer " + accessToken)
             .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
             .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
             .body(ApiResponse.success(null));

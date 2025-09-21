@@ -64,7 +64,6 @@ public class TokenController {
             ResponseCookie refreshCookie = CookieUtils.createTokenCookie("refresh_token", newRefreshToken.getToken());
 
             return ResponseEntity.status(HttpStatus.OK)
-                .header("Authorization", "Bearer " + newAccessToken)
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
                 .body(ApiResponse.success(null));
