@@ -201,7 +201,7 @@ public class AuthUserService {
     }
 
     public AuthUserIsNewResponseDto isNewUserFromMemberId(Long memberId) {
-        AuthUser authUser = authUserRepository.findByMemberId(memberId)
+        AuthUser authUser = authUserRepository.findByMemberIdWithPets(memberId)
                 .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.USER_NOT_FOUND));
 
         List<Pet> existingPets = authUser.getMember().getPets();
