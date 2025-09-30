@@ -1,6 +1,7 @@
 package ject.petfit.global.exception;
 
 import ject.petfit.domain.aireport.exception.AiReportException;
+import ject.petfit.domain.alarm.exception.AlarmException;
 import ject.petfit.domain.entry.exception.EntryException;
 import ject.petfit.domain.member.exception.MemberException;
 import ject.petfit.domain.pet.exception.PetException;
@@ -134,12 +135,22 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(e.getHttpStatus()).body(response);
     }
 
+    @ExceptionHandler(AlarmException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAiReportException(AlarmException e) {
+        log.info(e.getMessage(), e);
+        ApiResponse<Void> response = ApiResponse.fail(
+                e.getCode(),
+                e.getMessage()
+        );
+        return ResponseEntity.status(e.getHttpStatus()).body(response);
+    }
+
     @ExceptionHandler(AiReportException.class)
     public ResponseEntity<ApiResponse<Void>> handleAiReportException(AiReportException e) {
         log.info(e.getMessage(), e);
         ApiResponse<Void> response = ApiResponse.fail(
-            e.getCode(),
-            e.getMessage()
+                e.getCode(),
+                e.getMessage()
         );
         return ResponseEntity.status(e.getHttpStatus()).body(response);
     }
