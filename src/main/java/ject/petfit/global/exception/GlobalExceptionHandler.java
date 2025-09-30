@@ -136,7 +136,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AlarmException.class)
-    public ResponseEntity<ApiResponse<Void>> handleAiReportException(AlarmException e) {
+    public ResponseEntity<ApiResponse<Void>> handleAlarmException(AlarmException e) {
         log.info(e.getMessage(), e);
         ApiResponse<Void> response = ApiResponse.fail(
                 e.getCode(),
