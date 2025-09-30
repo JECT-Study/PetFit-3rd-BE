@@ -31,8 +31,6 @@ dependencies {
 
 	runtimeOnly 'org.postgresql:postgresql'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'	// swagger UI 의존성 추가
-	implementation 'org.springframework.boot:spring-boot-starter-batch' // 배치 의존성 추가
-	implementation 'org.springframework.boot:spring-boot-starter-mail' // 메일 의존성 추가
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'io.micrometer:micrometer-registry-prometheus'
 
@@ -56,6 +54,9 @@ dependencies {
 	runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.104.Final:osx-aarch_64'
 
 	implementation 'org.springframework.boot:spring-boot-starter-validation'	// 유효성 검사 의존성 추가
+
+	// OpenAI Java SDK
+	implementation 'com.theokanning.openai-gpt3-java:service:0.18.2'
 
 	// test DB
 	testImplementation 'com.h2database:h2'
