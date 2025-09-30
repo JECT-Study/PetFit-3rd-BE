@@ -100,11 +100,12 @@ public class AiReportFacade {
         
         // 응답 DTO 생성 
         return AiReportResponseDto.builder()
-                .content(aiReportContent)
                 .title(summaryTitle)
+                .content(aiReportContent)
+                .aiReport(aiReportContent)
+                .petId(dateRequestDto.getPetId())
                 .startDate(dateRequestDto.getStartDate())
                 .endDate(dateRequestDto.getEndDate())
-                .content(aiReportContent)
                 .build();
     }
     
