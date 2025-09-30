@@ -23,8 +23,8 @@ public class TodayRoutineFacade {
     private final SlotQueryService slotQueryService;
 
     /**
-     * 오늘의 루틴 자동 업데이트 (batch schedule)
-     * 1. 오늘 날짜의 Entry를 모두 조회 (모든 Pet 대상)
+     * 오늘의 루틴 자동 업데이트
+     * 1. 오늘 날짜의 Entry를 모두 조회 (모든 zPet 대상)
      * 2. CHECKED나 MEMO한 루틴이 없다면 루틴 미완료로 저장 및 종료
      * 3. 오늘의 루틴 메모 여부 저장
      * 4. 오늘의 루틴 완료 여부 저장
