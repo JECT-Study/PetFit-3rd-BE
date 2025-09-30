@@ -1,6 +1,7 @@
 package ject.petfit.domain.pet.entity;
 
 import jakarta.persistence.*;
+import ject.petfit.domain.aireport.entity.AiReport;
 import ject.petfit.domain.alarm.entity.Alarm;
 import ject.petfit.domain.entry.entity.Entry;
 import ject.petfit.domain.member.entity.Member;
@@ -56,6 +57,9 @@ public class Pet {
 
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Alarm> alarms;
+
+    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AiReport> aiReports;
 
     @Builder
     public Pet(String name, String type, String gender, LocalDate birthDate, boolean isFavorite) {
