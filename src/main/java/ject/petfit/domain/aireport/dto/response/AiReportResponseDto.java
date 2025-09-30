@@ -15,6 +15,7 @@ import java.time.LocalDate;
 public class AiReportResponseDto {
     private String title;
     private String content;
+    private Long petId;
     private LocalDate startDate;
     private LocalDate endDate;
 
@@ -22,6 +23,7 @@ public class AiReportResponseDto {
         return AiReportResponseDto.builder()
                 .title(aiReport.getTitle())
                 .content(aiReport.getContent())
+                .petId(aiReport.getPet().getId())
                 .startDate(aiReport.getStartDate())
                 .endDate(aiReport.getEndDate())
                 .build();

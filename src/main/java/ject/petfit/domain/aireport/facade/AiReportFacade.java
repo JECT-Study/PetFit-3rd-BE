@@ -99,14 +99,7 @@ public class AiReportFacade {
         );
         
         // 응답 DTO 생성 
-        return AiReportResponseDto.builder()
-                .title(summaryTitle)
-                .content(aiReportContent)
-                .aiReport(aiReportContent)
-                .petId(dateRequestDto.getPetId())
-                .startDate(dateRequestDto.getStartDate())
-                .endDate(dateRequestDto.getEndDate())
-                .build();
+        return AiReportResponseDto.from(aiReport);
     }
     
     private Map<String, Object> convertRoutinesToCategoryMap(List<RoutineResponse> routineList) {
