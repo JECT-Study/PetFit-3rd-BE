@@ -31,6 +31,8 @@ dependencies {
 
 	runtimeOnly 'org.postgresql:postgresql'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'	// swagger UI 의존성 추가
+	implementation 'org.springframework.boot:spring-boot-starter-batch' // 배치 의존성 추가
+	implementation 'org.springframework.boot:spring-boot-starter-mail' // 메일 의존성 추가
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'io.micrometer:micrometer-registry-prometheus'
 
