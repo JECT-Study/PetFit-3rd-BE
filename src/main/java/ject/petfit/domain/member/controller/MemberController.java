@@ -42,7 +42,8 @@ public class MemberController {
     @Operation(summary = "마이페이지 닉네임 수정", description = "회원 ID로 닉네임 수정")
     public ResponseEntity<ApiResponse<MemberResponseDto>> editMemberNickNameById(
             @CookieValue (name = "access_token", required = false) String accessToken,
-            @Valid @RequestBody MemberRequestDto command) {
+            @Valid @RequestBody MemberRequestDto command
+    ) {
         MemberResponseDto editedMember = memberFacade.updateMember(accessToken, command);
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.success(editedMember)
