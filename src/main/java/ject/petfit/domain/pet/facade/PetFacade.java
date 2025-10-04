@@ -36,8 +36,8 @@ public class PetFacade {
         return petCommandService.createPet(petDto, authUserId);
     }
 
-    public PetResponseDto updatePet(Long petId, PetUpdateRequestDto petUpdateRequestDto) {
-        return petCommandService.updatePet(petId, petUpdateRequestDto);
+    public PetResponseDto updatePet(Long memberId, Long petId, PetUpdateRequestDto petUpdateRequestDto) {
+        return petCommandService.updatePet(memberId, petId, petUpdateRequestDto);
     }
 
     public void deletePet(Long petId) {

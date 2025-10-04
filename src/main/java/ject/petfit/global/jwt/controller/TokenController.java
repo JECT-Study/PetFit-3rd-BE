@@ -49,7 +49,7 @@ public class TokenController {
         
         try {
             Long memberId = jwtUtil.getMemberId(expiredAccessToken);
-            AuthUser authUser = authUserService.loadAuthUserByEmail(memberId);
+            AuthUser authUser = authUserService.loadAuthUserByMemberId(memberId);
 
             // 새로운 액세스 토큰 생성
             String newAccessToken = jwtUtil.createAccessToken(
