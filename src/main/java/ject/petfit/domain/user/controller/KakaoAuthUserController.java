@@ -138,7 +138,7 @@ public class KakaoAuthUserController {
             @CookieValue(name = "access_token") String accessToken
     ) {
         Long memberId = jwtUtil.getMemberId(accessToken);
-        AuthUser user = authUserService.loadAuthUserByEmail(memberId);
+        AuthUser user = authUserService.loadAuthUserByMemberId(memberId);
         RefreshToken refreshTokenEntity = user.getRefreshToken();
 
         ResponseCookie accessCookie = CookieUtils.deleteTokenCookie("access_token");

@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MemberResponseDto {
-    private Long memberId;
     private String nickname;
     private Role role;
 }

@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PetRequestDto {
-    private Long memberId;
-
     @Size(max = 20, message = "내용은 20자 이내여야 합니다.")
     private String name;
 
