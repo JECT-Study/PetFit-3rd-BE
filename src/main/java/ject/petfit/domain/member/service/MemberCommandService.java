@@ -35,6 +35,6 @@ public class MemberCommandService {
         }
         authUser.editNickname(command.getNickname());
 
-        return new MemberResponseDto(member.getId(), member.getNickname(), member.getRole());
+        return new MemberResponseDto(member.getNickname(), member.getRole());
     }
 } 
