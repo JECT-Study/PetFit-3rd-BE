@@ -132,7 +132,7 @@ public class AuthUserService {
         return newUser;
     }
 
-    public AuthUser loadAuthUserByEmail(Long memberId) {
+    public AuthUser loadAuthUserByMemberId(Long memberId) {
         return authUserRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.AUTH_EMAIL_USER_NOT_FOUND));
     }
@@ -152,7 +152,7 @@ public class AuthUserService {
                 // DB 정리 (선택적)
                 if (accessToken != null) {
                     Long memberId = jwtUtil.getMemberId(accessToken);
-                    AuthUser user = loadAuthUserByEmail(memberId);
+                    AuthUser user = loadAuthUserByMemberId(memberId);
                     RefreshToken refreshToken = user.getRefreshToken();
                     refreshTokenRepository.delete(refreshToken);
                 }

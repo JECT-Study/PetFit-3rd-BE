@@ -54,11 +54,11 @@ public class PetCommandService {
     }
 
     @Transactional
-    public PetResponseDto updatePet(Long petId, PetUpdateRequestDto petUpdateRequestDto) {
+    public PetResponseDto updatePet(Long memberId, Long petId, PetUpdateRequestDto petUpdateRequestDto) {
         Pet pet = petRepository.findById(petId)
                 .orElseThrow(() -> new PetException(PetErrorCode.PET_NOT_FOUND));
 
-        Member member = memberRepository.findById(petUpdateRequestDto.getMemberId())
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         if (!pet.getMember().equals(member)) {

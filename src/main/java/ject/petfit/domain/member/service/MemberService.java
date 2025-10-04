@@ -22,7 +22,7 @@ public class MemberService {
     public MemberResponseDto getMemberById(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
-        return new MemberResponseDto(member.getId(), member.getNickname(), member.getRole());
+        return new MemberResponseDto(member.getNickname(), member.getRole());
     }
 
     @Transactional
@@ -38,7 +38,7 @@ public class MemberService {
         }
         authUser.editNickname(memberRequestDto.getNickname());
 
-        return new MemberResponseDto(member.getId(), member.getNickname(), member.getRole());
+        return new MemberResponseDto(member.getNickname(), member.getRole());
     }
 
 }

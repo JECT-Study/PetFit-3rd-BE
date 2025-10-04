@@ -26,7 +26,7 @@ public class MemberQueryService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        return new MemberResponseDto(member.getId(), member.getNickname(), member.getRole());
+        return new MemberResponseDto(member.getNickname(), member.getRole());
     }
 
     public MemberResponseDto getMemberByAuthUserEmail(String email) {
@@ -34,6 +34,6 @@ public class MemberQueryService {
         Member member = memberRepository.findByAuthUserEmail(email)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        return new MemberResponseDto(member.getId(), member.getNickname(), member.getRole());
+        return new MemberResponseDto(member.getNickname(), member.getRole());
     }
 } 
