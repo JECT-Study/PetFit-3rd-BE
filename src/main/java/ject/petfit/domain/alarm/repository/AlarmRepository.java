@@ -22,4 +22,6 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 
     List<Alarm> findByIsReadFalseAndPetOrderByTargetDateTimeDesc(Pet pet);
     List<Alarm> findAllByPetAndTargetDateTimeBetween(Pet pet, LocalDateTime from, LocalDateTime to);
+
+    List<Alarm> findByPetOrderByTargetDateTimeDesc(Pet pet);
 }

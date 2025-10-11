@@ -38,7 +38,7 @@ public class AlarmController {
             HttpServletRequest request,
             @PathVariable Long petId
     ) {
-        log.info("SSE 구독 요청 받음: {}", request.getRequestURL());
+//        log.info("SSE 구독 요청 받음: {}", request.getRequestURL());
         return alarmFacade.createEmitter(petId);
     }
 
@@ -48,9 +48,17 @@ public class AlarmController {
             @RequestBody AlarmRegisterRequest request,
             @PathVariable Long petId
     ) {
-        log.info("등록 petId: {}", petId);
+//        log.info("등록 petId: {}", petId);
         alarmFacade.saveAlarm(request, petId);
         return ResponseEntity.status(201).body(ApiResponse.success(null));
+    }
+
+    @GetMapping("/{petId}")
+    @Operation(summary = "모든 알람 리스트 조회")
+    public ResponseEntity<ApiResponse<List<AlarmResponse>>> getAllAlarms(
+            @PathVariable Long petId
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(alarmFacade.getAllAlarms(petId)));
     }
 
     @GetMapping("/{petId}/unread")
@@ -58,7 +66,7 @@ public class AlarmController {
     public ResponseEntity<ApiResponse<List<AlarmResponse>>> getAllUnreadAlarms(
             @PathVariable Long petId
     ) {
-        log.info("조회 petId: {}", petId);
+//        log.info("조회 petId: {}", petId);
         return ResponseEntity.ok(ApiResponse.success(alarmFacade.getAllUnreadAlarms(petId)));
     }
 
@@ -70,17 +78,24 @@ public class AlarmController {
         return ResponseEntity.ok(ApiResponse.success(alarmFacade.getHomeAlarms(petId)));
     }
 
+    @DeleteMapping("/{alarmId}")
+    @Operation(summary = "알람 삭제")
+    public ResponseEntity<ApiResponse<String>> deleteAlarm(@PathVariable Long alarmId) {
+        alarmFacade.deleteAlarm(alarmId);
+        return ResponseEntity.ok(ApiResponse.success("알람 삭제 성공"));
+    }
+
     @PatchMapping("/{alarmId}/read")
     @Operation(summary = "알람 읽음 처리")
     public void markAsRead(@PathVariable Long alarmId) {
-        log.info("{}번 알람 읽음 처리", alarmId);
+//        log.info("{}번 알람 읽음 처리", alarmId);
         alarmFacade.markAsRead(alarmId);
     }
 
     @PatchMapping("/{petId}/all/read")
     @Operation(summary = "알람 일괄 읽음 처리")
     public void markAllAsRead(@PathVariable Long petId) {
-        log.info("{}번 펫 알람 일괄 읽음 처리", petId);
+//        log.info("{}번 펫 알람 일괄 읽음 처리", petId);
         alarmFacade.markAllAsRead(petId);
     }
 
@@ -90,7 +105,7 @@ public class AlarmController {
             @PathVariable Long alarmId,
             @RequestBody AlarmUpdateRequest alarmUpdateRequest
     ) {
-        log.info("{}번 알람 수정", alarmId);
+//        log.info("{}번 알람 수정", alarmId);
         return ResponseEntity.ok(ApiResponse.success(alarmFacade.updateAlarm(alarmId, alarmUpdateRequest)));
     }
 

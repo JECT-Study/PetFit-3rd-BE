@@ -31,6 +31,13 @@ public class AlarmCommandService {
                 .build());
     }
 
+    public void deleteAlarm(Long alarmId) {
+        if(!alarmRepository.existsById(alarmId)){
+            throw new AlarmException(AlarmErrorCode.ALARM_NOT_FOUND);
+        }
+        alarmRepository.deleteById(alarmId);
+    }
+
     public void markAsRead(Long alarmId) {
         alarmRepository.findById(alarmId).ifPresent(alarm -> {
             alarm.markAsRead();
@@ -67,6 +74,5 @@ public class AlarmCommandService {
             throw new AlarmException(AlarmErrorCode.ALARM_EDIT_TIME_INVALID);
         }
     }
-
 
 }
