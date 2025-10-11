@@ -34,9 +34,19 @@ public class AlarmFacade {
         alarmCommandService.saveAlarm(request, pet);
     }
 
+    public List<AlarmResponse> getAllAlarms(Long petId) {
+        Pet pet = petQueryService.getPetOrThrow(petId);
+        return alarmQueryService.getAllAlarms(pet);
+    }
+
     public List<AlarmResponse> getAllUnreadAlarms(Long petId) {
         Pet pet = petQueryService.getPetOrThrow(petId);
         return alarmQueryService.getAllUnreadAlarms(pet);
+    }
+
+    @Transactional
+    public void deleteAlarm(Long alarmId) {
+        alarmCommandService.deleteAlarm(alarmId);
     }
 
     @Transactional
@@ -63,4 +73,5 @@ public class AlarmFacade {
         Alarm alarm = alarmQueryService.getAlarmOrThrow(alarmId);
         return alarmCommandService.updateAlarm(alarm, alarmUpdateRequest);
     }
+
 }

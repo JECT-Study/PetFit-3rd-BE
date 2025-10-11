@@ -18,6 +18,13 @@ import java.util.List;
 public class AlarmQueryService {
     private final AlarmRepository alarmRepository;
 
+    public List<AlarmResponse> getAllAlarms(Pet pet) {
+        List<Alarm> alarms = alarmRepository.findByPetOrderByTargetDateTimeDesc(pet);
+        return alarms.stream()
+                .map(AlarmResponse::from)
+                .toList();
+    }
+
     public List<AlarmResponse> getAllUnreadAlarms(Pet pet) {
 //        LocalDateTime oneMinuteAgo = LocalDateTime.now().withSecond(0).withNano(0).minusMinutes(1);
 //        List<Alarm> unreadAlarms = alarmRepository.findByIsReadFalseAndPetAndTargetDateTimeBeforeOrderByTargetDateTimeDesc(pet, oneMinuteAgo);
@@ -40,8 +47,5 @@ public class AlarmQueryService {
         return alarmRepository.findById(alarmId)
                 .orElseThrow(() -> new AlarmException(AlarmErrorCode.ALARM_NOT_FOUND));
     }
-
-
-
 
 }
