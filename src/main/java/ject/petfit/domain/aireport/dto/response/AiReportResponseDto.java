@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AiReportResponseDto {
+    private Long aiReportId;
     private String title;
     private String content;
     private Long petId;
@@ -21,6 +22,7 @@ public class AiReportResponseDto {
 
     public static AiReportResponseDto from(AiReport aiReport) {
         return AiReportResponseDto.builder()
+                .aiReportId(aiReport.getId())
                 .title(aiReport.getTitle())
                 .content(aiReport.getContent())
                 .petId(aiReport.getPet().getId())
