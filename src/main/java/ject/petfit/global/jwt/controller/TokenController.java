@@ -38,40 +38,43 @@ public class TokenController {
     // Refresh Token 재발급
     @PostMapping("/auth/refresh")
     public ResponseEntity<ApiResponse<Void>> reIssue(
-        @CookieValue(name = "access_token", required = false) String expiredAccessToken
+        @CookieValue(name = "refresh_token", required = false) String refreshToken
     ) {
-        // 쿠키가 없는 경우 처리
-        if (expiredAccessToken == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                ApiResponse.fail("TOKEN-401", "토큰이 없습니다.")
-            );
+        // 1. 쿠키에 refresh_token이 없으면 401 반환
+        if (refreshToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.fail("TOKEN-401", "리프레시 토큰이 없습니다."));
         }
-        
+
         try {
-            Long memberId = jwtUtil.getMemberId(expiredAccessToken);
-            AuthUser authUser = authUserService.loadAuthUserByMemberId(memberId);
+            // 2. Refresh Token 검증 (DB나 Redis에 저장된 토큰과 비교)
+            RefreshToken storedToken = refreshTokenService.findByToken(refreshToken)
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다."));
+
+            // 3. AuthUser 정보 로드
+            AuthUser authUser = authUserService.getAuthUser(storedToken.getAuthUser().getId());
 
             // 새로운 액세스 토큰 생성
             String newAccessToken = jwtUtil.createAccessToken(
-                    authUser.getEmail(), authUser.getMember().getRole().name(), authUser.getMember().getId());
+                authUser.getEmail(), authUser.getMember().getRole().name(), authUser.getMember().getId());
 
             // 새로운 리프레시 토큰 생성 및 저장
             RefreshToken newRefreshToken = refreshTokenService.createOrUpdateRefreshToken(authUser,
                 UUID.randomUUID().toString(), refreshTokenValiditySeconds);
-
-            // SameSite=None이 적용된 쿠키 생성
+            // 6. 쿠키 생성
             ResponseCookie accessCookie = CookieUtils.createTokenCookie("access_token", newAccessToken);
             ResponseCookie refreshCookie = CookieUtils.createTokenCookie("refresh_token", newRefreshToken.getToken());
 
-            return ResponseEntity.status(HttpStatus.OK)
+            // 7. 응답 반환
+            return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
                 .body(ApiResponse.success(null));
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                ApiResponse.fail("TOKEN-401", "토큰이 유효하지 않습니다.")
-        );
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.fail("TOKEN-401", "토큰이 유효하지 않습니다."));
+        }
     }
 }
-}
+
