@@ -67,4 +67,8 @@ public class RefreshTokenService {
         // 쿠키에 해시 토큰이 옴
         return refreshTokenRepository.findByToken(hashedTokenFromCookie);
     }
+
+    public Optional<RefreshToken> findByToken(String token) {
+        return refreshTokenRepository.findByToken(token);
+    }
 }
