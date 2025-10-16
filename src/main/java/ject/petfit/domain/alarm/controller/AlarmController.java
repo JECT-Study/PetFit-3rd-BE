@@ -62,7 +62,7 @@ public class AlarmController {
     }
 
     @GetMapping("/{petId}/unread")
-    @Operation(summary = "읽지 않은 알람 리스트 조회", description = "읽지 않은 모든 알람을 최신순으로 조회")
+    @Operation(summary = "읽지 않은 과거의 알람 리스트 조회", description = "읽지 않은 모든 알람을 최신순으로 조회")
     public ResponseEntity<ApiResponse<List<AlarmResponse>>> getAllUnreadAlarms(
             @PathVariable Long petId
     ) {
