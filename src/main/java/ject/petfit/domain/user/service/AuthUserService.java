@@ -137,6 +137,11 @@ public class AuthUserService {
                 .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.AUTH_EMAIL_USER_NOT_FOUND));
     }
 
+    public AuthUser getAuthUser(Long authUserId) {
+        return authUserRepository.findById(authUserId)
+                .orElseThrow(() -> new AuthUserException(AuthUserErrorCode.USER_NOT_FOUND));
+    }
+
     @Async
     public void logoutAsync(String accessToken) {
         CompletableFuture.runAsync(() -> {

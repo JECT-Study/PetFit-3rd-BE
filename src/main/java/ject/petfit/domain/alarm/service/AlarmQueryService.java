@@ -28,7 +28,10 @@ public class AlarmQueryService {
     public List<AlarmResponse> getAllUnreadAlarms(Pet pet) {
 //        LocalDateTime oneMinuteAgo = LocalDateTime.now().withSecond(0).withNano(0).minusMinutes(1);
 //        List<Alarm> unreadAlarms = alarmRepository.findByIsReadFalseAndPetAndTargetDateTimeBeforeOrderByTargetDateTimeDesc(pet, oneMinuteAgo);
-        List<Alarm> unreadAlarms = alarmRepository.findByIsReadFalseAndPetOrderByTargetDateTimeDesc(pet);
+//        List<Alarm> unreadAlarms = alarmRepository.findByIsReadFalseAndPetOrderByTargetDateTimeDesc(pet);
+        List<Alarm> unreadAlarms = alarmRepository.findByIsReadFalseAndPetAndTargetDateTimeBeforeOrderByTargetDateTimeDesc(
+                pet, LocalDateTime.now()
+        );
         return unreadAlarms.stream()
                 .map(AlarmResponse::from)
                 .toList();
