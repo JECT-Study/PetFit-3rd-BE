@@ -84,6 +84,7 @@ public class WebSecurityConfig {
 
         config.setAllowedOriginPatterns(Arrays.asList(
                 frontLocal,
+                "http://localhost:5174",
                 frontVercel,
                 frontDomain,
                 devAlarmDomain,
